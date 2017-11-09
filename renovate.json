@@ -1,0 +1,16 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "baseBranches": [
+    "master-step1",
+    "master-step2",
+    "master-step-3",
+    "master-step-4",
+    "master-step-5",
+    "master-step-6",
+    "master-step-7",
+    "master-step-8",
+    "master-step-9"
+  ]
+}

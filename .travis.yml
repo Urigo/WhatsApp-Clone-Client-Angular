@@ -1,0 +1,22 @@
+dist: trusty
+sudo: required
+
+language: node_js
+node_js:
+  - "8"
+
+cache:
+  directories:
+     - ./node_modules
+
+before_install:
+  - rm -rf node_modules
+
+install:
+  - git clean -fXd
+  - npm install
+
+script:
+  # Use Chromium instead of Chrome.
+  - export CHROME_BIN=chromium-browser
+  - npm run test
