@@ -1,0 +1,15 @@
+:host {
+  display: block;
+  height: calc(100vh - 8vh - 8vh);
+  overflow-y: scroll;
+}
+
+/*
+:host::-webkit-scrollbar {
+  display: none;
+}
+*/
+
+app-message-item {
+  width: 100%;
+}

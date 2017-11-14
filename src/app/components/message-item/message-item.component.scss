@@ -1,0 +1,17 @@
+.container {
+  display: flex;
+
+  .message-row {
+    max-width: 75%;
+    background-color: lightgoldenrodyellow;
+
+    &.mine {
+      background-color: lightcyan;
+      margin-left: auto;
+    }
+
+    .message-sender {
+      font-size: small;
+    }
+  }
+}
