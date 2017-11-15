@@ -16,8 +16,10 @@ import {Location} from '@angular/common';
       </button>
       <div class="title">{{ title$ | async }}</div>
     </app-toolbar>
-    <app-messages-list [messages$]="messages$" [isGroup]="isGroup$ | async"></app-messages-list>
+    <div class="container">
+      <app-messages-list [messages$]="messages$" [isGroup]="isGroup$ | async"></app-messages-list>
     <div class="new-message">New message</div>
+    </div>
   `,
   styleUrls: ['./chat.component.scss']
 })

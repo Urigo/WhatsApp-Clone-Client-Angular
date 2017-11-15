@@ -1,4 +1,11 @@
-.new-message {
-  background-color: lightblue;
-  height: 8vh;
+.container {
+  display: flex;
+  flex-flow: column;
+  justify-content: space-between;
+  height: calc(100vh - 8vh);
+
+  .new-message {
+    background-color: lightblue;
+    height: 12vh;
+  }
 }
