@@ -33,7 +33,7 @@ import {Router} from '@angular/router';
 
     <app-chats-list [chats$]="chats$" (view)="goToChat($event)"></app-chats-list>
 
-    <button class="new-chat" mat-fab color="primary">
+    <button class="new-chat" mat-fab color="primary" (click)="goToUsers()">
       <mat-icon aria-label="Icon-button with a + icon">add</mat-icon>
     </button>
   `,
@@ -57,5 +57,9 @@ export class ChatsComponent implements OnInit {
 
   goToChat(chatId: number) {
     this.router.navigate(['/chat', chatId]);
+  }
+
+  goToUsers() {
+    this.router.navigate(['/new-chat']);
   }
 }

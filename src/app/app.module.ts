@@ -16,6 +16,12 @@ import {ChatComponent} from './containers/chat/chat.component';
 import {ToolbarComponent} from './components/toolbar/toolbar.component';
 import {MessagesListComponent} from './components/messages-list/messages-list.component';
 import {MessageItemComponent} from './components/message-item/message-item.component';
+import {NewMessageComponent} from './components/new-message/new-message.component';
+import {FormsModule} from '@angular/forms';
+import {NewChatComponent} from './containers/new-chat/new-chat.component';
+import {UsersListComponent} from './components/users-list/users-list.component';
+import {NewGroupComponent} from './containers/new-group/new-group.component';
+import {UserItemComponent} from './components/user-item/user-item.component';
 
 const routes: Routes = [
   {path: '', redirectTo: 'chats', pathMatch: 'full'},
@@ -24,6 +30,8 @@ const routes: Routes = [
       {path: ':id', component: ChatComponent},
     ],
   },
+  {path: 'new-chat', component: NewChatComponent},
+  {path: 'new-group', component: NewGroupComponent},
 ];
 
 @NgModule({
@@ -36,6 +44,11 @@ const routes: Routes = [
     ToolbarComponent,
     MessagesListComponent,
     MessageItemComponent,
+    NewMessageComponent,
+    NewChatComponent,
+    UsersListComponent,
+    NewGroupComponent,
+    UserItemComponent,
   ],
   imports: [
     BrowserModule,
@@ -54,6 +67,8 @@ const routes: Routes = [
     MatGridListModule,
     // Routing
     RouterModule.forRoot(routes),
+    // Forms
+    FormsModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

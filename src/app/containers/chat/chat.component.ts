@@ -2,11 +2,12 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import {ApolloQueryResult} from 'apollo-client';
 import {Apollo} from 'apollo-angular';
-import {GetChat} from '../../../types';
+import {AddMessage, GetChat} from '../../../types';
 import {map} from 'rxjs/operators';
 import {getChatQuery} from '../../../graphql/getChat.query';
 import {Observable} from 'rxjs/Observable';
 import {Location} from '@angular/common';
+import {addMessageMutation} from '../../../graphql/addMessage.mutation';
 
 @Component({
   template: `
@@ -18,12 +19,13 @@ import {Location} from '@angular/common';
     </app-toolbar>
     <div class="container">
       <app-messages-list [messages$]="messages$" [isGroup]="isGroup$ | async"></app-messages-list>
-    <div class="new-message">New message</div>
+    <app-new-message (newMessage)="addMessage($event)"></app-new-message>
     </div>
   `,
   styleUrls: ['./chat.component.scss']
 })
 export class ChatComponent implements OnInit {
+  chatId: number;
   messages$: Observable<GetChat.Messages[]>;
   title$: Observable<string>;
   isGroup$: Observable<boolean>;
@@ -33,7 +35,9 @@ export class ChatComponent implements OnInit {
               private location: Location) {}
 
   ngOnInit() {
-    this.route.params.pipe(map(data => data.id)).subscribe(chatId => {
+    this.route.params.subscribe(({id: chatId}: {id: number}) => {
+      this.chatId = chatId;
+
       const query = this.apollo.watchQuery<GetChat.Query>({
         query: getChatQuery,
         variables: {
@@ -57,5 +61,15 @@ export class ChatComponent implements OnInit {
 
   goBack() {
     this.location.back();
+  }
+
+  addMessage(content: string) {
+    this.apollo.mutate({
+      mutation: addMessageMutation,
+      variables: <AddMessage.Variables>{
+        chatId: this.chatId,
+        content,
+      }
+    }).subscribe(res => console.log(res));
   }
 }

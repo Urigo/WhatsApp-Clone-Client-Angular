@@ -1,7 +1,7 @@
 /* tslint:disable */
 
 export interface Query {
-  contacts: User[]; 
+  users: User[]; 
   chats: Chat[]; 
   chat?: Chat | null; 
 }
@@ -47,9 +47,9 @@ export interface Recipient {
 }
 
 export interface Mutation {
-  addChat?: number | null; 
+  addChat?: Chat | null; 
   removeChat?: boolean | null; 
-  addMessage?: number | null; 
+  addMessage?: Message | null; 
   removeMessages?: boolean | null; 
   addMembers?: boolean | null; 
   removeMembers?: boolean | null; 
@@ -110,6 +110,34 @@ export interface MarkAsReadMutationArgs {
 
 export type MessageType = "TEXT" | "LOCATION" | "PICTURE";
 
+export namespace AddChat {
+  export type Variables = {
+    recipientIds: number[];
+    groupName?: string | null;
+  }
+
+  export type Mutation = {
+    addChat?: AddChat | null; 
+  } 
+
+  export type AddChat = {
+    id: number; 
+  } 
+}
+export namespace AddMessage {
+  export type Variables = {
+    chatId: number;
+    content: string;
+  }
+
+  export type Mutation = {
+    addMessage?: AddMessage | null; 
+  } 
+
+  export type AddMessage = {
+    id: number; 
+  } 
+}
 export namespace GetChat {
   export type Variables = {
     chatId: number;
@@ -167,5 +195,19 @@ export namespace GetChats {
 
   export type LastMessage = {
     content: string; 
+  } 
+}
+export namespace GetUsers {
+  export type Variables = {
+  }
+
+  export type Query = {
+    users: Users[]; 
+  } 
+
+  export type Users = {
+    id: number; 
+    name?: string | null; 
+    picture?: string | null; 
   } 
 }

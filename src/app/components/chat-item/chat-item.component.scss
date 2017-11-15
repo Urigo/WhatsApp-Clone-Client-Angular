@@ -1,5 +1,10 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
 .chat-row {
-  padding: 0px;
+  padding: 0;
   display: flex;
   width: 100%;
   justify-content: space-between;
