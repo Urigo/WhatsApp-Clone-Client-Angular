@@ -9,6 +9,7 @@ export const addChatMutation = gql`
       picture,
       unreadMessages,
       lastMessage {
+        id,
         content,
       },
     }

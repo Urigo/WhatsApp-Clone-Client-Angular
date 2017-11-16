@@ -9,6 +9,7 @@ export const getChatsQuery = gql`
       picture,
       unreadMessages,
       lastMessage {
+        id,
         content,
       },
     }

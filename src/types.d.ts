@@ -129,6 +129,7 @@ export namespace AddChat {
   } 
 
   export type LastMessage = {
+    id: string; 
     content: string; 
   } 
 }
@@ -220,6 +221,7 @@ export namespace GetChats {
   } 
 
   export type LastMessage = {
+    id: string; 
     content: string; 
   } 
 }
