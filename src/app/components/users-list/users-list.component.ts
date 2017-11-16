@@ -25,10 +25,10 @@ export class UsersListComponent implements OnInit {
   @Input()
   multipleSelection = false;
 
-  selectedUserIds: number[] = [];
+  selectedUserIds: string[] = [];
 
   @Output()
-  newChat = new EventEmitter<number[]>();
+  newChat = new EventEmitter<string[]>();
 
   ngOnInit() {
     this.users$.pipe(map((users: SelectableUser[]) => users.map(user => {

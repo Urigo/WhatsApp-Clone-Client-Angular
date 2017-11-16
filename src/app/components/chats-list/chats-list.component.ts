@@ -18,9 +18,9 @@ export class ChatsListComponent {
   chats$: Observable<GetChats.Chats[]>;
 
   @Output()
-  view = new EventEmitter<number>();
+  view = new EventEmitter<string>();
 
-  goToChat(chatId: number) {
+  goToChat(chatId: string) {
     this.view.emit(chatId);
   }
 }

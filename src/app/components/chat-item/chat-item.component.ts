@@ -19,7 +19,7 @@ export class ChatItemComponent {
   chat: GetChats.Chats;
 
   @Output()
-  view = new EventEmitter<number>();
+  view = new EventEmitter<string>();
 
   goToChat() {
     this.view.emit(this.chat.id);

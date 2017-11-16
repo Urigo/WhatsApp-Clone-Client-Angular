@@ -55,7 +55,7 @@ export class ChatsComponent implements OnInit {
     );
   }
 
-  goToChat(chatId: number) {
+  goToChat(chatId: string) {
     this.router.navigate(['/chat', chatId]);
   }
 
