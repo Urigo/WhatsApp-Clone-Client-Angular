@@ -9,6 +9,7 @@ import {getUsersQuery} from '../../../graphql/getUsers.query';
 import {Observable} from 'rxjs/Observable';
 import {addChatMutation} from '../../../graphql/addChat.mutation';
 import {getChatsQuery} from '../../../graphql/getChats.query';
+import {ChatsService} from '../../services/chats.service';
 
 @Component({
   template: `
@@ -32,19 +33,16 @@ import {getChatsQuery} from '../../../graphql/getChats.query';
 })
 export class NewChatComponent implements OnInit {
   users$: Observable<GetUsers.Users[]>;
+  chats: GetChats.Chats[];
 
   constructor(private apollo: Apollo,
               private router: Router,
-              private location: Location) {}
+              private location: Location,
+              private chatsService: ChatsService) {}
 
   ngOnInit () {
-    const query = this.apollo.watchQuery<GetUsers.Query>({
-      query: getUsersQuery,
-    });
-
-    this.users$ = query.valueChanges.pipe(
-      map((result: ApolloQueryResult<GetUsers.Query>) => result.data.users)
-    );
+    this.users$ = this.chatsService.getUsers().users$;
+    this.chatsService.getChats().chats$.subscribe(chats => this.chats = chats);
   }
 
   goBack() {
@@ -55,23 +53,15 @@ export class NewChatComponent implements OnInit {
     this.router.navigate(['/new-group']);
   }
 
-  addChat(recipientIds: string[]) {
-    this.apollo.mutate({
-      mutation: addChatMutation,
-      variables: <AddChat.Variables>{
-        recipientIds,
-      },
-      update: (store, { data: { addChat } }) => {
-        // Read the data from our cache for this query.
-        const data: GetChats.Query = store.readQuery({ query: getChatsQuery });
-        // Add our comment from the mutation to the end.
-        console.log(addChat);
-        data.chats.push(addChat);
-        // Write our data back to the cache.
-        store.writeQuery({ query: getChatsQuery, data });
-      },
-    }).subscribe(res => {
-      this.router.navigate(['/chats']);
-    });
+  addChat([recipientId]: string[]) {
+    const chatId = this.chatsService.getChatId(recipientId, this.chats);
+    if (chatId) {
+      // Chat is already listed for the current user
+      this.router.navigate(['/chat', chatId]);
+    } else {
+      this.chatsService.addChat(recipientId).subscribe(({ data: { addChat } }) => {
+        this.router.navigate(['/chat', addChat.id]);
+      });
+    }
   }
 }

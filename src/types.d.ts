@@ -48,6 +48,7 @@ export interface Recipient {
 
 export interface Mutation {
   addChat?: Chat | null; 
+  addGroup?: Chat | null; 
   removeChat?: boolean | null; 
   addMessage?: Message | null; 
   removeMessages?: boolean | null; 
@@ -64,8 +65,11 @@ export interface ChatQueryArgs {
   chatId: string; 
 }
 export interface AddChatMutationArgs {
+  recipientId: string; 
+}
+export interface AddGroupMutationArgs {
   recipientIds: string[]; 
-  groupName?: string | null; 
+  groupName: string; 
 }
 export interface RemoveChatMutationArgs {
   chatId: string; 
@@ -112,8 +116,7 @@ export type MessageType = "TEXT" | "LOCATION" | "PICTURE";
 
 export namespace AddChat {
   export type Variables = {
-    recipientIds: string[];
-    groupName?: string | null;
+    recipientId: string;
   }
 
   export type Mutation = {
@@ -124,8 +127,35 @@ export namespace AddChat {
     id: string; 
     name?: string | null; 
     picture?: string | null; 
+    userIds: string[]; 
     unreadMessages: number; 
     lastMessage?: LastMessage | null; 
+    isGroup: boolean; 
+  } 
+
+  export type LastMessage = {
+    id: string; 
+    content: string; 
+  } 
+}
+export namespace AddGroup {
+  export type Variables = {
+    recipientIds: string[];
+    groupName?: string | null;
+  }
+
+  export type Mutation = {
+    addGroup?: AddGroup | null; 
+  } 
+
+  export type AddGroup = {
+    id: string; 
+    name?: string | null; 
+    picture?: string | null; 
+    userIds: string[]; 
+    unreadMessages: number; 
+    lastMessage?: LastMessage | null; 
+    isGroup: boolean; 
   } 
 
   export type LastMessage = {
@@ -216,8 +246,10 @@ export namespace GetChats {
     id: string; 
     name?: string | null; 
     picture?: string | null; 
+    userIds: string[]; 
     unreadMessages: number; 
     lastMessage?: LastMessage | null; 
+    isGroup: boolean; 
   } 
 
   export type LastMessage = {

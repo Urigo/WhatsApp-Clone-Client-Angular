@@ -11,11 +11,12 @@ import {GetChats} from '../../../types';
       </mat-list-item>
     </mat-list>
   `,
-  styleUrls: ['chats-list.component.scss']
+  styleUrls: ['chats-list.component.scss'],
 })
 export class ChatsListComponent {
   @Input()
   chats$: Observable<GetChats.Chats[]>;
+  chats: GetChats.Chats[];
 
   @Output()
   view = new EventEmitter<string>();

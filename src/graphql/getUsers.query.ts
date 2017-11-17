@@ -5,6 +5,7 @@ export const getUsersQuery = gql`
   query GetUsers {
     users {
       id,
+      __typename,
       name,
       picture,
     }

@@ -7,12 +7,12 @@ import {GetChats} from '../../../types';
     <button mat-menu-item class="chat-row" (click)="goToChat()">
         <div class="chat-recipient">
           <img [src]="chat.picture" width="48" height="48">
-          <div>{{ chat.name }}</div>
+          <div>{{ chat.name }} [id: {{ chat.id }}]</div>
         </div>
         <div class="chat-content">{{ chat.lastMessage?.content }}</div>
     </button>
   `,
-  styleUrls: ['chat-item.component.scss']
+  styleUrls: ['chat-item.component.scss'],
 })
 export class ChatItemComponent {
   @Input()

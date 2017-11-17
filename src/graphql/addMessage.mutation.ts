@@ -5,9 +5,11 @@ export const addMessageMutation = gql`
   mutation AddMessage($chatId: ID!, $content: String!) {
     addMessage(chatId: $chatId, content: $content) {
         id,
+        __typename,
         senderId,
         sender {
           id,
+          __typename,
           name,
         },
         content,
@@ -15,6 +17,7 @@ export const addMessageMutation = gql`
         type,
         recipients {
           id,
+          __typename,
           receivedAt,
           readAt,
         },

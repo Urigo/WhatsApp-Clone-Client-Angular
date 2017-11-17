@@ -1,20 +1,20 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {ApolloQueryResult} from 'apollo-client';
 import {Apollo} from 'apollo-angular';
 import {AddMessage, GetChat, GetChats} from '../../../types';
 import {map} from 'rxjs/operators';
 import {getChatQuery} from '../../../graphql/getChat.query';
 import {Observable} from 'rxjs/Observable';
-import {Location} from '@angular/common';
 import {addMessageMutation} from '../../../graphql/addMessage.mutation';
 import {getChatsQuery} from '../../../graphql/getChats.query';
 import * as moment from 'moment';
+import {ChatsService} from '../../services/chats.service';
 
 @Component({
   template: `
     <app-toolbar>
-      <button class="navigation" mat-button (click)="goBack()">
+      <button class="navigation" mat-button (click)="goToChats()">
         <mat-icon aria-label="Icon-button with an arrow back icon">arrow_back</mat-icon>
       </button>
       <div class="title">{{ title$ | async }}</div>
@@ -34,35 +34,20 @@ export class ChatComponent implements OnInit {
 
   constructor(private apollo: Apollo,
               private route: ActivatedRoute,
-              private location: Location) {}
+              private router: Router,
+              private chatsService: ChatsService) {}
 
   ngOnInit() {
     this.route.params.subscribe(({id: chatId}: {id: string}) => {
       this.chatId = chatId;
-
-      const query = this.apollo.watchQuery<GetChat.Query>({
-        query: getChatQuery,
-        variables: {
-          chatId,
-        }
-      });
-
-      this.messages$ = query.valueChanges.pipe(
-        map((result: ApolloQueryResult<GetChat.Query>) => result.data.chat.messages)
-      );
-
-      this.title$ = query.valueChanges.pipe(
-        map((result: ApolloQueryResult<GetChat.Query>) => result.data.chat.name)
-      );
-
-      this.isGroup$ = query.valueChanges.pipe(
-        map((result: ApolloQueryResult<GetChat.Query>) => result.data.chat.isGroup)
-      );
+      this.messages$ = this.chatsService.getChat(chatId).messages$;
+      this.title$ = this.chatsService.getChat(chatId).title$;
+      this.isGroup$ = this.chatsService.getChat(chatId).isGroup$;
     });
   }
 
-  goBack() {
-    this.location.back();
+  goToChats() {
+    this.router.navigate(['/chats']);
   }
 
   addMessage(content: string) {
@@ -72,6 +57,18 @@ export class ChatComponent implements OnInit {
         chatId: this.chatId,
         content,
       },
+      /*optimisticResponse: {
+        __typename: 'Mutation',
+        addMessage: {
+          __typename: 'Message',
+          senderId: 0,
+          content: 'Placeholder',
+          createdAt: moment().unix(),
+          type: 0,
+          recipients: [0],
+          holderIds: [0],
+        },
+      },*/
       update: (store, { data: { addMessage } }: {data: AddMessage.Mutation}) => {
         // Update the messages cache
         {
@@ -96,19 +93,6 @@ export class ChatComponent implements OnInit {
           store.writeQuery({ query: getChatsQuery, data: {chats} });
         }
       },
-      /*optimisticResponse: {
-        __typename: 'Mutation',
-        addMessage: {
-          __typename: 'Message',
-          id: 1000,
-          senderId: 0,
-          content,
-          createdAt: moment().unix(),
-          type: 0,
-          recipients: [0],
-          holderIds: [0],
-        },
-      },*/
     }).subscribe();
   }
 }

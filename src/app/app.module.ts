@@ -22,11 +22,13 @@ import {NewChatComponent} from './containers/new-chat/new-chat.component';
 import {UsersListComponent} from './components/users-list/users-list.component';
 import {NewGroupComponent} from './containers/new-group/new-group.component';
 import {UserItemComponent} from './components/user-item/user-item.component';
+import {ChatsService} from './services/chats.service';
 
 const routes: Routes = [
   {path: '', redirectTo: 'chats', pathMatch: 'full'},
   {path: 'chats', component: ChatsComponent},
-  {path: 'chat', children: [
+  {
+    path: 'chat', children: [
       {path: ':id', component: ChatComponent},
     ],
   },
@@ -70,7 +72,9 @@ const routes: Routes = [
     // Forms
     FormsModule,
   ],
-  providers: [],
+  providers: [
+    ChatsService,
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

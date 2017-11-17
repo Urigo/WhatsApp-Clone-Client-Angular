@@ -5,7 +5,8 @@ import { map } from 'rxjs/operators';
 import {ApolloQueryResult} from 'apollo-client';
 import {GetChats} from '../../../types';
 import {getChatsQuery} from '../../../graphql/getChats.query';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
+import {ChatsService} from '../../services/chats.service';
 
 @Component({
   template: `
@@ -37,22 +38,18 @@ import {Router} from '@angular/router';
       <mat-icon aria-label="Icon-button with a + icon">add</mat-icon>
     </button>
   `,
-  styleUrls: ['./chats.component.scss']
+  styleUrls: ['./chats.component.scss'],
 })
 export class ChatsComponent implements OnInit {
   chats$: Observable<GetChats.Chats[]>;
 
   constructor(private apollo: Apollo,
-              private router: Router) {}
+              private route: ActivatedRoute,
+              private router: Router,
+              private chatsService: ChatsService) {}
 
   ngOnInit() {
-    const query = this.apollo.watchQuery<GetChats.Query>({
-      query: getChatsQuery
-    });
-
-    this.chats$ = query.valueChanges.pipe(
-      map((result: ApolloQueryResult<GetChats.Query>) => result.data.chats)
-    );
+    this.chats$ = this.chatsService.getChats().chats$;
   }
 
   goToChat(chatId: string) {
