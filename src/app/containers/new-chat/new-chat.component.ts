@@ -2,13 +2,8 @@ import {Component, OnInit} from '@angular/core';
 import {Apollo} from 'apollo-angular';
 import {Location} from '@angular/common';
 import {Router} from '@angular/router';
-import {AddChat, GetChats, GetUsers} from '../../../types';
-import {map} from 'rxjs/operators';
-import {ApolloQueryResult} from 'apollo-client';
-import {getUsersQuery} from '../../../graphql/getUsers.query';
+import {GetChats, GetUsers} from '../../../types';
 import {Observable} from 'rxjs/Observable';
-import {addChatMutation} from '../../../graphql/addChat.mutation';
-import {getChatsQuery} from '../../../graphql/getChats.query';
 import {ChatsService} from '../../services/chats.service';
 
 @Component({
