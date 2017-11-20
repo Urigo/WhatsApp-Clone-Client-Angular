@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Apollo} from 'apollo-angular';
 import {Location} from '@angular/common';
 import {Router} from '@angular/router';
-import {GetChats, GetUsers} from '../../../types';
+import {GetUsers} from '../../../types';
 import {Observable} from 'rxjs/Observable';
 import {ChatsService} from '../../services/chats.service';
 
@@ -28,7 +28,7 @@ import {ChatsService} from '../../services/chats.service';
 })
 export class NewChatComponent implements OnInit {
   users$: Observable<GetUsers.Users[]>;
-  chats: GetChats.Chats[];
+  users: GetUsers.Users[];
 
   constructor(private apollo: Apollo,
               private router: Router,
@@ -37,7 +37,7 @@ export class NewChatComponent implements OnInit {
 
   ngOnInit () {
     this.users$ = this.chatsService.getUsers().users$;
-    this.chatsService.getChats().chats$.subscribe(chats => this.chats = chats);
+    this.users$.subscribe(users => this.users = users);
   }
 
   goBack() {
@@ -49,14 +49,15 @@ export class NewChatComponent implements OnInit {
   }
 
   addChat([recipientId]: string[]) {
-    const chatId = this.chatsService.getChatId(recipientId, this.chats);
+    const chatId = this.chatsService.getChatId(recipientId);
     if (chatId) {
       // Chat is already listed for the current user
       this.router.navigate(['/chat', chatId]);
     } else {
-      this.chatsService.addChat(recipientId).subscribe(({ data: { addChat } }) => {
-        this.router.navigate(['/chat', addChat.id]);
-      });
+      // Generate id for Optimistic UI
+      const ouiId = ChatsService.getRandomId();
+      this.chatsService.addChat(recipientId, ouiId, this.users).subscribe();
+      this.router.navigate(['/chat/oui', ouiId]);
     }
   }
 }

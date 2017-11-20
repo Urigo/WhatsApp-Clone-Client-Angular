@@ -1,16 +1,19 @@
-import {Component, EventEmitter, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 
 @Component({
   selector: 'app-new-message',
   template: `
     <input type="text" [(ngModel)]="message" (keyup)="onInputKeyup($event)"/>
-    <button mat-button (click)="emitMessage(true)">
+    <button mat-button (click)="emitMessage(true)" [disabled]="disabled">
       <mat-icon aria-label="Icon-button with a send icon">send</mat-icon>
     </button>
   `,
   styleUrls: ['new-message.component.scss'],
 })
 export class NewMessageComponent {
+  @Input()
+  disabled: boolean;
+
   @Output()
   newMessage = new EventEmitter<string>();
 
@@ -23,7 +26,7 @@ export class NewMessageComponent {
   }
 
   emitMessage() {
-    if (this.message) {
+    if (this.message && !this.disabled) {
       this.newMessage.emit(this.message);
       this.message = '';
     }

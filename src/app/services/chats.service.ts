@@ -1,49 +1,89 @@
 import {Injectable} from '@angular/core';
-import {Apollo} from 'apollo-angular';
+import {Apollo, QueryRef} from 'apollo-angular';
 import {getChatsQuery} from '../../graphql/getChats.query';
 import {AddChat, AddMessage, GetChat, GetChats, GetUsers} from '../../types';
 import {getUsersQuery} from '../../graphql/getUsers.query';
 import {ApolloQueryResult} from 'apollo-client';
-import {map} from 'rxjs/operators';
+import {concat, map, share, switchMap} from 'rxjs/operators';
 import {getChatQuery} from '../../graphql/getChat.query';
 import {addChatMutation} from '../../graphql/addChat.mutation';
 import {addMessageMutation} from '../../graphql/addMessage.mutation';
 import * as moment from 'moment';
+import {Observable} from 'rxjs/Observable';
+import {FetchResult} from 'apollo-link';
+import {of} from 'rxjs/observable/of';
+import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 
 const currentUserId = '1';
 const currentUserName = 'Ethan Gonzalez';
 
-function getRandomId() {
-  return String(Math.round(Math.random() * 1000000000000));
-}
-
 @Injectable()
 export class ChatsService {
-  constructor(private apollo: Apollo) {}
+  addChat$: Observable<FetchResult<AddChat.Mutation>>;
+  getChatsWQ: QueryRef<GetChats.Query>;
+  chats$: Observable<GetChats.Chats[]>;
+  chats: GetChats.Chats[];
 
-  getChats() {
-    const query = this.apollo.watchQuery<GetChats.Query>({
+  constructor(private apollo: Apollo) {
+    this.getChatsWQ = this.apollo.watchQuery<GetChats.Query>({
       query: getChatsQuery
     });
-
-    const chats$ = query.valueChanges.pipe(
+    this.chats$ = this.getChatsWQ.valueChanges.pipe(
       map((result: ApolloQueryResult<GetChats.Query>) => result.data.chats)
     );
-
-    return {query, chats$};
+    this.chats$.subscribe(chats => this.chats = chats);
   }
 
-  getChat(chatId: string) {
-    const query = this.apollo.watchQuery<GetChat.Query>({
-      query: getChatQuery,
-      variables: {
-        chatId,
-      }
+  static getRandomId() {
+    return String(Math.round(Math.random() * 1000000000000));
+  }
+
+  getChats() {
+    return {query: this.getChatsWQ, chats$: this.chats$, chats: this.chats};
+  }
+
+  getChat(chatId: string, oui?: boolean) {
+    const apolloWatchQuery = (id: string) => {
+      return this.apollo.watchQuery<GetChat.Query>({
+        query: getChatQuery,
+        variables: {
+          chatId: id,
+        }
+      });
+    };
+
+    let query = apolloWatchQuery(chatId);
+    const query$ = new BehaviorSubject(query);
+
+    const chat$FromCache = of<GetChat.Chat>({
+      id: chatId,
+      name: this.chats ? this.chats.find(chat => chat.id === chatId).name : '',
+      picture: this.chats ? this.chats.find(chat => chat.id === chatId).picture : '',
+      isGroup: false,
+      messages: [],
     });
 
-    const chat$ = query.valueChanges.pipe(
-      map((result: ApolloQueryResult<GetChat.Query>) => result.data.chat)
-    );
+    let chat$: Observable<GetChat.Chat>;
+
+    if (oui) {
+      chat$ = chat$FromCache.pipe(
+        concat(this.addChat$.pipe(
+          switchMap(({ data: { addChat } }) => {
+            query = apolloWatchQuery(addChat.id);
+            query$.next(query);
+            query$.complete();
+            return query.valueChanges.pipe(
+              map((result: ApolloQueryResult<GetChat.Query>) => result.data.chat)
+            );
+          }))
+        ));
+    } else {
+      query$.complete();
+      chat$ = chat$FromCache.pipe(
+        concat(query.valueChanges.pipe(
+          map((result: ApolloQueryResult<GetChat.Query>) => result.data.chat)
+        )));
+    }
 
     const messages$ = chat$.pipe(
       map((result: GetChat.Chat) => result.messages)
@@ -56,8 +96,7 @@ export class ChatsService {
     const isGroup$ = chat$.pipe(
       map((result: GetChat.Chat) => result.isGroup)
     );
-
-    return {query, chat$, messages$, title$, isGroup$};
+    return {query$, chat$, messages$, title$, isGroup$};
   }
 
   getUsers() {
@@ -71,24 +110,25 @@ export class ChatsService {
     return {query, users$};
   }
 
-  addChat(recipientId: string) {
-    return this.apollo.mutate({
+  addChat(recipientId: string, ouiId: string, users: GetUsers.Users[]) {
+    this.addChat$ = this.apollo.mutate({
       mutation: addChatMutation,
       variables: <AddChat.Variables>{
         recipientId,
       },
-      /*optimisticResponse: {
+      optimisticResponse: {
         __typename: 'Mutation',
         addChat: {
+          id: ouiId,
           __typename: 'Chat',
-          id: getRandomId(),
-          name: this.users.find(user => user.id === recipientIds[0]).name,
-          picture: this.users.find(user => user.id === recipientIds[0]).picture,
+          name: users.find(user => user.id === recipientId).name,
+          picture: users.find(user => user.id === recipientId).picture,
+          userIds: [currentUserId, recipientId],
           unreadMessages: 0,
           lastMessage: null,
           isGroup: false,
         },
-      },*/
+      },
       update: (store, { data: { addChat } }) => {
         // Read the data from our cache for this query.
         const data: GetChats.Query = store.readQuery({ query: getChatsQuery });
@@ -97,12 +137,13 @@ export class ChatsService {
         // Write our data back to the cache.
         store.writeQuery({ query: getChatsQuery, data });
       },
-    });
+    }).pipe(share());
+    return this.addChat$;
   }
 
   // Checks if the chat is listed for the current user and returns the id
-  getChatId(recipientId: string, chats: GetChats.Chats[]) {
-    const _chat = chats.find(chat => {
+  getChatId(recipientId: string) {
+    const _chat = this.chats.find(chat => {
       return !chat.isGroup && chat.userIds.includes(currentUserId) && chat.userIds.includes(recipientId);
     });
     return _chat ? _chat.id : false;
@@ -118,7 +159,7 @@ export class ChatsService {
       optimisticResponse: {
         __typename: 'Mutation',
         addMessage: {
-          id: getRandomId(),
+          id: ChatsService.getRandomId(),
           __typename: 'Message',
           senderId: currentUserId,
           sender: {

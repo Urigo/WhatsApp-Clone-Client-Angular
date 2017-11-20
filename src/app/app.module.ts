@@ -30,6 +30,7 @@ const routes: Routes = [
   {
     path: 'chat', children: [
       {path: ':id', component: ChatComponent},
+      {path: 'oui/:id', component: ChatComponent},
     ],
   },
   {path: 'new-chat', component: NewChatComponent},
