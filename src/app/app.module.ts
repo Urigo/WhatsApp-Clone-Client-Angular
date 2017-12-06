@@ -7,7 +7,12 @@ import {HttpClientModule} from '@angular/common/http';
 import {HttpLink, HttpLinkModule} from 'apollo-angular-link-http';
 import {Apollo, ApolloModule} from 'apollo-angular';
 import {InMemoryCache} from 'apollo-cache-inmemory';
+import {ChatsListerModule} from './chats-lister/chats-lister.module';
+import {RouterModule, Routes} from '@angular/router';
 
+const routes: Routes = [
+  {path: '', redirectTo: 'chats', pathMatch: 'full'},
+];
 
 @NgModule({
   declarations: [
@@ -19,6 +24,10 @@ import {InMemoryCache} from 'apollo-cache-inmemory';
     ApolloModule,
     HttpLinkModule,
     HttpClientModule,
+    // Routing
+    RouterModule.forRoot(routes),
+    // Feature modules
+    ChatsListerModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
