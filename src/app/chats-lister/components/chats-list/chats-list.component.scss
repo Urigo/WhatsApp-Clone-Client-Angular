@@ -1,0 +1,13 @@
+:host {
+  display: block;
+  height: 60px;
+}
+
+:host ::ng-deep .mat-list-item-content:first-child {
+  padding-left: 0 !important;
+  display: flow-root !important;
+}
+
+mat-list-item {
+  height: 75px !important;
+}
