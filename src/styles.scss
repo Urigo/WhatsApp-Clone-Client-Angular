@@ -1,1 +1,28 @@
 /* You can add global styles to this file, and also import other style files */
+
+/* Meterial theme */
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
+:root {
+  --primary: #2c6157;
+  --secondary: #6fd056;
+}
+
+body {
+  margin: 0;
+}
+
+.mat-primary {
+  background-color: var(--primary) !important;
+  color: white;
+}
+
+.mat-secondary {
+  background-color: var(--secondary) !important;
+  color: white;
+}
+
+.mat-toolbar {
+  color: white;
+  background-color: var(--primary) !important;
+}
