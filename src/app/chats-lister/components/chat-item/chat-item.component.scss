@@ -1,0 +1,45 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.chat-row {
+  margin: 10px 0 0 10px;
+  height: 60px;
+  display: flex;
+
+  .chat-pic {
+    height: 50px;
+    width: auto;
+    border-radius: 50%;
+  }
+
+  .chat-info {
+    width: calc(100% - 60px);
+    height: 100%;
+    margin-left: 10px;
+    border-bottom: .5px solid silver;
+    position: relative;
+
+    .chat-name {
+      margin-top: 5px;
+    }
+
+    .chat-last-message {
+      color: gray;
+      font-size: 15px;
+      margin-top: 5px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    .chat-timestamp {
+      position: absolute;
+      color: gray;
+      top: 5px;
+      right: 5px;
+      font-size: 13px;
+    }
+  }
+}
