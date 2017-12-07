@@ -6,6 +6,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { GraphQLModule } from './graphql.module';
 import {ChatsListerModule} from './chats-lister/chats-lister.module';
 import {RouterModule, Routes} from '@angular/router';
+import {ChatViewerModule} from './chat-viewer/chat-viewer.module';
 const routes: Routes = [];
 
 @NgModule({
@@ -20,6 +21,7 @@ const routes: Routes = [];
     RouterModule.forRoot(routes),
     // Feature modules
     ChatsListerModule,
+    ChatViewerModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

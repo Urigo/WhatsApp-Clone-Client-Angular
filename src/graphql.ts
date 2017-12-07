@@ -10,6 +10,26 @@ export enum MessageType {
 // Documents
 // ====================================================
 
+export namespace GetChat {
+  export type Variables = {
+    chatId: string;
+  };
+
+  export type Query = {
+    __typename?: "Query";
+
+    chat: Maybe<Chat>;
+  };
+
+  export type Chat = {
+    __typename?: "Chat";
+
+    messages: (Maybe<Messages>)[];
+  } & ChatWithoutMessages.Fragment;
+
+  export type Messages = Message.Fragment;
+}
+
 export namespace GetChats {
   export type Variables = {
     amount?: Maybe<number>;
@@ -283,6 +303,24 @@ export const MessageFragment = gql`
 // Apollo Services
 // ====================================================
 
+@Injectable({
+  providedIn: "root"
+})
+export class GetChatGQL extends Apollo.Query<GetChat.Query, GetChat.Variables> {
+  document: any = gql`
+    query GetChat($chatId: ID!) {
+      chat(chatId: $chatId) {
+        ...ChatWithoutMessages
+        messages {
+          ...Message
+        }
+      }
+    }
+
+    ${ChatWithoutMessagesFragment}
+    ${MessageFragment}
+  `;
+}
 @Injectable({
   providedIn: "root"
 })
