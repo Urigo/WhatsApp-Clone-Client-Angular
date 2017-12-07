@@ -1,14 +1,17 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {GetChats} from '../../../../types';
+import {SelectableListDirective} from 'ngx-selectable-list';
 
 @Component({
   selector: 'app-chats-list',
   template: `
     <mat-list>
       <mat-list-item *ngFor="let chat of chats">
-        <app-chat-item [item]="chat" (select)="selectChat($event)"></app-chat-item>
+        <app-chat-item [item]="chat"
+                       appSelectableItem></app-chat-item>
       </mat-list-item>
     </mat-list>
+    <ng-content *ngIf="selectableListDirective.selecting"></ng-content>
   `,
   styleUrls: ['chats-list.component.scss'],
 })
@@ -17,12 +20,5 @@ export class ChatsListComponent {
   @Input('items')
   chats: GetChats.Chats[];
 
-  @Output()
-  select = new EventEmitter<string>();
-
-  constructor() {}
-
-  selectChat(id: string) {
-    this.select.emit(id);
-  }
+  constructor(public selectableListDirective: SelectableListDirective) {}
 }

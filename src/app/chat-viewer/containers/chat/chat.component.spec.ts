@@ -17,6 +17,7 @@ import {SharedModule} from '../../../shared/shared.module';
 import {NewMessageComponent} from '../../components/new-message/new-message.component';
 import {MessagesListComponent} from '../../components/messages-list/messages-list.component';
 import {MessageItemComponent} from '../../components/message-item/message-item.component';
+import {SelectableListModule} from 'ngx-selectable-list';
 
 describe('ChatComponent', () => {
   let component: ChatComponent;
@@ -107,7 +108,8 @@ describe('ChatComponent', () => {
         SharedModule,
         HttpLinkModule,
         HttpClientTestingModule,
-        RouterTestingModule
+        RouterTestingModule,
+        SelectableListModule,
       ],
       providers: [
         ChatsService,
