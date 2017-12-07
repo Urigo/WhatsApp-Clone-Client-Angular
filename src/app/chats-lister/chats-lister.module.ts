@@ -11,6 +11,7 @@ import {ChatsComponent} from './containers/chats/chats.component';
 import {ChatsListComponent} from './components/chats-list/chats-list.component';
 import {TruncateModule} from 'ng2-truncate';
 import {SharedModule} from '../shared/shared.module';
+import {SelectableListModule} from 'ngx-selectable-list';
 
 const routes: Routes = [
   {path: 'chats', component: ChatsComponent},
@@ -39,6 +40,7 @@ const routes: Routes = [
     TruncateModule,
     // Feature modules
     SharedModule,
+    SelectableListModule,
   ],
   providers: [
     ChatsService,
