@@ -16,6 +16,7 @@ import {
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
+import { NgxSelectableListModule } from 'ngx-selectable-list';
 
 import { GetChats } from '../../../../graphql';
 import { dataIdFromObject } from '../../../graphql.module';
@@ -334,6 +335,7 @@ describe('ChatsComponent', () => {
         TruncateModule,
         ApolloTestingModule,
         RouterTestingModule,
+        NgxSelectableListModule,
       ],
       providers: [
         ChatsService,
