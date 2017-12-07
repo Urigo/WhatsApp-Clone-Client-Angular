@@ -650,6 +650,41 @@ export namespace GetChats {
   export type Messages = Message.Fragment;
 }
 
+export namespace RemoveAllMessages {
+  export type Variables = {
+    chatId: string;
+    all?: boolean | null;
+  };
+
+  export type Mutation = {
+    __typename?: "Mutation";
+    removeMessages?: (string | null)[] | null;
+  };
+}
+
+export namespace RemoveChat {
+  export type Variables = {
+    chatId: string;
+  };
+
+  export type Mutation = {
+    __typename?: "Mutation";
+    removeChat?: string | null;
+  };
+}
+
+export namespace RemoveMessages {
+  export type Variables = {
+    chatId: string;
+    messageIds?: (string | null)[] | null;
+  };
+
+  export type Mutation = {
+    __typename?: "Mutation";
+    removeMessages?: (string | null)[] | null;
+  };
+}
+
 export namespace ChatWithoutMessages {
   export type Fragment = {
     __typename?: "Chat";
@@ -828,5 +863,44 @@ export class GetChatsGQL extends Apollo.Query<
 
     ${ChatWithoutMessagesFragment}
     ${MessageFragment}
+  `;
+}
+@Injectable({
+  providedIn: "root"
+})
+export class RemoveAllMessagesGQL extends Apollo.Mutation<
+  RemoveAllMessages.Mutation,
+  RemoveAllMessages.Variables
+> {
+  document: any = gql`
+    mutation RemoveAllMessages($chatId: ID!, $all: Boolean) {
+      removeMessages(chatId: $chatId, all: $all)
+    }
+  `;
+}
+@Injectable({
+  providedIn: "root"
+})
+export class RemoveChatGQL extends Apollo.Mutation<
+  RemoveChat.Mutation,
+  RemoveChat.Variables
+> {
+  document: any = gql`
+    mutation RemoveChat($chatId: ID!) {
+      removeChat(chatId: $chatId)
+    }
+  `;
+}
+@Injectable({
+  providedIn: "root"
+})
+export class RemoveMessagesGQL extends Apollo.Mutation<
+  RemoveMessages.Mutation,
+  RemoveMessages.Variables
+> {
+  document: any = gql`
+    mutation RemoveMessages($chatId: ID!, $messageIds: [ID]) {
+      removeMessages(chatId: $chatId, messageIds: $messageIds)
+    }
   `;
 }
