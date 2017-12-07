@@ -45,6 +45,30 @@ export class ChatsService {
         chatId,
         content,
       },
+      update: (store, { data: { addMessage } }: {data: AddMessage.Mutation}) => {
+        // Update the messages cache
+        {
+          // Read the data from our cache for this query.
+          const {chat}: GetChat.Query = store.readQuery({
+            query: getChatQuery, variables: {
+              chatId,
+            }
+          });
+          // Add our message from the mutation to the end.
+          chat.messages.push(addMessage);
+          // Write our data back to the cache.
+          store.writeQuery({ query: getChatQuery, data: {chat} });
+        }
+        // Update last message cache
+        {
+          // Read the data from our cache for this query.
+          const {chats}: GetChats.Query = store.readQuery({ query: getChatsQuery });
+          // Add our comment from the mutation to the end.
+          chats.find(chat => chat.id === chatId).lastMessage = addMessage;
+          // Write our data back to the cache.
+          store.writeQuery({ query: getChatsQuery, data: {chats} });
+        }
+      },
     });
   }
 }
