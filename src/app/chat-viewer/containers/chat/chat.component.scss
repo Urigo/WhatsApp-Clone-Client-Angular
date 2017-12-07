@@ -1,0 +1,10 @@
+.container {
+  display: flex;
+  flex-flow: column;
+  justify-content: space-between;
+  height: calc(100vh - 8vh);
+
+  app-confirm-selection {
+    bottom: 10vh;
+  }
+}
