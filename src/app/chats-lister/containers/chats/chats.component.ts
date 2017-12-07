@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {ChatsService} from '../../../services/chats.service';
 import {Observable} from 'rxjs/Observable';
 import {GetChats} from '../../../../types';
+import {Router} from '@angular/router';
 
 @Component({
   template: `
@@ -27,7 +28,7 @@ import {GetChats} from '../../../../types';
       </button>
     </mat-menu>
 
-    <app-chats-list [items]="chats$ | async"></app-chats-list>
+    <app-chats-list [items]="chats$ | async" (select)="goToChat($event)"></app-chats-list>
 
     <button class="chat-button" mat-fab color="primary">
       <mat-icon aria-label="Icon-button with a + icon">add</mat-icon>
@@ -38,10 +39,15 @@ import {GetChats} from '../../../../types';
 export class ChatsComponent implements OnInit {
   chats$: Observable<GetChats.Chats[]>;
 
-  constructor(private chatsService: ChatsService) {
+  constructor(private chatsService: ChatsService,
+              private router: Router) {
   }
 
   ngOnInit() {
     this.chats$ = this.chatsService.getChats().chats$;
+  }
+
+  goToChat(chatId: string) {
+    this.router.navigate(['/chat', chatId]);
   }
 }
