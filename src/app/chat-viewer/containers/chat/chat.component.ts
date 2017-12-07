@@ -13,7 +13,10 @@ import {GetChat} from '../../../../graphql';
       <div class="title">{{ name }}</div>
     </app-toolbar>
     <div class="container">
-      <app-messages-list [items]="messages" [isGroup]="isGroup"></app-messages-list>
+      <app-messages-list [items]="messages" [isGroup]="isGroup"
+                         libSelectableList="multiple_press" (multiple)="deleteMessages($event)">
+        <app-confirm-selection #confirmSelection></app-confirm-selection>
+      </app-messages-list>
       <app-new-message (newMessage)="addMessage($event)"></app-new-message>
     </div>
   `,
@@ -47,5 +50,9 @@ export class ChatComponent implements OnInit {
 
   addMessage(content: string) {
     this.chatsService.addMessage(this.chatId, content).subscribe();
+  }
+
+  deleteMessages(messageIds: string[]) {
+    this.chatsService.removeMessages(this.chatId, this.messages, messageIds).subscribe();
   }
 }
