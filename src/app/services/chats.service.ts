@@ -2,7 +2,7 @@ import {map} from 'rxjs/operators';
 import {Apollo} from 'apollo-angular';
 import {Injectable} from '@angular/core';
 import {getChatsQuery} from '../../graphql/getChats.query';
-import {GetChats} from '../../graphql';
+import {GetChat, GetChats} from '../../graphql';
 import {getChatQuery} from '../../graphql/getChat.query';
 
 @Injectable()
@@ -26,7 +26,7 @@ export class ChatsService {
   }
 
   getChat(chatId: string) {
-    const query = this.apollo.watchQuery<any>({
+    const query = this.apollo.watchQuery<GetChat.Query>({
       query: getChatQuery,
       variables: {
         chatId: chatId,
@@ -34,7 +34,7 @@ export class ChatsService {
     });
 
     const chat$ = query.valueChanges.pipe(
-      map((result: ApolloQueryResult<any>) => result.data.chat)
+      map((result: ApolloQueryResult<GetChat.Query>) => result.data.chat)
     );
 
     return {query, chat$};
