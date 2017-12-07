@@ -600,6 +600,20 @@ export namespace SubscriptionResolvers {
   > = Resolver<R, Parent, Context>;
 }
 
+export namespace AddMessage {
+  export type Variables = {
+    chatId: string;
+    content: string;
+  };
+
+  export type Mutation = {
+    __typename?: "Mutation";
+    addMessage?: AddMessage | null;
+  };
+
+  export type AddMessage = Message.Fragment;
+}
+
 export namespace GetChat {
   export type Variables = {
     chatId: string;
@@ -760,6 +774,23 @@ const MessageFragment = gql`
   }
 `;
 
+@Injectable({
+  providedIn: "root"
+})
+export class AddMessageGQL extends Apollo.Mutation<
+  AddMessage.Mutation,
+  AddMessage.Variables
+> {
+  document: any = gql`
+    mutation AddMessage($chatId: ID!, $content: String!) {
+      addMessage(chatId: $chatId, content: $content) {
+        ...Message
+      }
+    }
+
+    ${MessageFragment}
+  `;
+}
 @Injectable({
   providedIn: "root"
 })
