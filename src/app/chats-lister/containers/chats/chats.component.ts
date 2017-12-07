@@ -28,9 +28,13 @@ import {Router} from '@angular/router';
       </button>
     </mat-menu>
 
-    <app-chats-list [items]="chats$ | async" (select)="goToChat($event)"></app-chats-list>
+    <app-chats-list [items]="chats$ | async"
+                    appSelectableList="both"
+                    (single)="goToChat($event)" (multiple)="deleteChats($event)" (isSelecting)="isSelecting = $event">
+      <app-confirm-selection #confirmSelection></app-confirm-selection>
+    </app-chats-list>
 
-    <button class="chat-button" mat-fab color="primary">
+    <button *ngIf="!isSelecting" class="chat-button" mat-fab color="primary">
       <mat-icon aria-label="Icon-button with a + icon">add</mat-icon>
     </button>
   `,
@@ -38,6 +42,7 @@ import {Router} from '@angular/router';
 })
 export class ChatsComponent implements OnInit {
   chats$: Observable<GetChats.Chats[]>;
+  isSelecting = false;
 
   constructor(private chatsService: ChatsService,
               private router: Router) {
@@ -49,5 +54,11 @@ export class ChatsComponent implements OnInit {
 
   goToChat(chatId: string) {
     this.router.navigate(['/chat', chatId]);
+  }
+
+  deleteChats(chatIds: string[]) {
+    chatIds.forEach(chatId => {
+      this.chatsService.removeChat(chatId).subscribe();
+    });
   }
 }
