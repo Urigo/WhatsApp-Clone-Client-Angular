@@ -1,0 +1,15 @@
+:host {
+  display: block;
+  height: 100%;
+  overflow-y: overlay;
+}
+
+::ng-deep .mat-list-item-content {
+  display: block !important;
+}
+
+/*
+:host::-webkit-scrollbar {
+  display: none;
+}
+*/
