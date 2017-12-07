@@ -5,7 +5,7 @@ import {GetChats} from '../../../../graphql';
 @Component({
   selector: 'app-chat-item',
   template: `
-    <div class="chat-row" (click)="selectChat()">
+    <div class="chat-row">
       <img class="chat-pic" [src]="chat.picture || 'assets/default-profile-pic.jpg'">
       <div class="chat-info">
         <div class="chat-name">{{ chat.name }}</div>
@@ -21,17 +21,10 @@ export class ChatItemComponent {
   @Input('item')
   chat: GetChats.Chats;
 
-  @Output()
-  select = new EventEmitter<string>();
-
   updatedAt: string;
 
   ngOnInit() {
     this.updatedAt = this.chat.updatedAt
       ? moment(this.chat.updatedAt).format('HH:mm') : '';
-  }
-
-  selectChat() {
-    this.select.emit(this.chat.id);
   }
 }
