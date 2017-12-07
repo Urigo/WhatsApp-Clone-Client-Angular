@@ -1,4 +1,5 @@
 import {Component, Input} from '@angular/core';
+import {GetChats} from '../../../../types';
 
 @Component({
   selector: 'app-chat-item',
@@ -16,5 +17,5 @@ import {Component, Input} from '@angular/core';
 export class ChatItemComponent {
   // tslint:disable-next-line:no-input-rename
   @Input('item')
-  chat: any;
+  chat: GetChats.Chats;
 }
