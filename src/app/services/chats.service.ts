@@ -3,8 +3,9 @@ import {map} from 'rxjs/operators';
 import {Apollo} from 'apollo-angular';
 import {Injectable} from '@angular/core';
 import {getChatsQuery} from '../../graphql/getChats.query';
-import {GetChat, GetChats} from '../../types';
+import {AddMessage, GetChat, GetChats} from '../../types';
 import {getChatQuery} from '../../graphql/getChat.query';
+import {addMessageMutation} from '../../graphql/addMessage.mutation';
 
 @Injectable()
 export class ChatsService {
@@ -39,5 +40,15 @@ export class ChatsService {
     );
 
     return {query, chat$};
+  }
+
+  addMessage(chatId: string, content: string) {
+    return this.apollo.mutate({
+      mutation: addMessageMutation,
+      variables: <AddMessage.Variables>{
+        chatId,
+        content,
+      },
+    });
   }
 }
