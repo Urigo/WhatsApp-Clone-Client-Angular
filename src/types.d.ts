@@ -54,6 +54,21 @@ export interface MessagesChatArgs {
 
 export type MessageType = "LOCATION" | "TEXT" | "PICTURE";
 
+export namespace GetChat {
+  export type Variables = {
+    chatId: string;
+  }
+
+  export type Query = {
+    chat?: Chat | null; 
+  } 
+
+  export type Chat = {
+    messages: Messages[]; 
+  } & ChatWithoutMessages.Fragment
+
+  export type Messages = Message.Fragment
+}
 export namespace GetChats {
   export type Variables = {
     amount?: number | null;
