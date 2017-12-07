@@ -1,0 +1,14 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+::ng-deep .mat-list-item-content {
+  display: block !important;
+}
+
+/*
+:host::-webkit-scrollbar {
+  display: none;
+}
+*/
