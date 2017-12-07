@@ -1,13 +1,14 @@
 import {map} from 'rxjs/operators';
 import {Injectable} from '@angular/core';
-import {GetChatsGQL} from '../../graphql';
+import {GetChatsGQL, GetChatGQL} from '../../graphql';
 
 @Injectable()
 export class ChatsService {
   messagesAmount = 3;
 
   constructor(
-    private getChatsGQL: GetChatsGQL
+    private getChatsGQL: GetChatsGQL,
+    private getChatGQL: GetChatGQL
   ) {}
 
   getChats() {
@@ -19,5 +20,17 @@ export class ChatsService {
     );
 
     return {query, chats$};
+  }
+
+  getChat(chatId: string) {
+    const query = this.getChatGQL.watch({
+      chatId: chatId,
+    });
+
+    const chat$ = query.valueChanges.pipe(
+      map((result) => result.data.chat)
+    );
+
+    return {query, chat$};
   }
 }

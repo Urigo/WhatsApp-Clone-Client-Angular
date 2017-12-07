@@ -1,0 +1,18 @@
+:host {
+  display: flex;
+  width: 100%;
+}
+
+.message {
+  max-width: 75%;
+  background-color: lightgoldenrodyellow;
+
+  &.mine {
+    background-color: lightcyan;
+    margin-left: auto;
+  }
+
+  .message-sender {
+    font-size: small;
+  }
+}
