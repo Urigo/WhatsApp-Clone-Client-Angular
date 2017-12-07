@@ -206,3 +206,32 @@ export namespace Message {
     id: string; 
   } 
 }
+export namespace RemoveAllMessages {
+  export type Variables = {
+    chatId: string;
+    all?: boolean | null;
+  }
+
+  export type Mutation = {
+    removeMessages?: string[] | null; 
+  } 
+}
+export namespace RemoveChat {
+  export type Variables = {
+    chatId: string;
+  }
+
+  export type Mutation = {
+    removeChat?: string | null; 
+  } 
+}
+export namespace RemoveMessages {
+  export type Variables = {
+    chatId: string;
+    messageIds?: string[] | null;
+  }
+
+  export type Mutation = {
+    removeMessages?: string[] | null; 
+  } 
+}
