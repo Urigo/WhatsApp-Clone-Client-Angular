@@ -168,6 +168,38 @@ export namespace GetChats {
 
   export type Messages = Message.Fragment;
 }
+export namespace RemoveAllMessages {
+  export type Variables = {
+    chatId: string;
+    all?: boolean | null;
+  };
+
+  export type Mutation = {
+    __typename?: "Mutation";
+    removeMessages?: (string | null)[] | null;
+  };
+}
+export namespace RemoveChat {
+  export type Variables = {
+    chatId: string;
+  };
+
+  export type Mutation = {
+    __typename?: "Mutation";
+    removeChat?: string | null;
+  };
+}
+export namespace RemoveMessages {
+  export type Variables = {
+    chatId: string;
+    messageIds?: (string | null)[] | null;
+  };
+
+  export type Mutation = {
+    __typename?: "Mutation";
+    removeMessages?: (string | null)[] | null;
+  };
+}
 
 export namespace ChatWithoutMessages {
   export type Fragment = {
