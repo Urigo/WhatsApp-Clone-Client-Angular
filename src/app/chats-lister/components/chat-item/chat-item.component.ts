@@ -1,5 +1,6 @@
 import {Component, Input} from '@angular/core';
 import * as moment from 'moment';
+import {GetChats} from '../../../../graphql';
 
 @Component({
   selector: 'app-chat-item',
@@ -18,7 +19,7 @@ import * as moment from 'moment';
 export class ChatItemComponent {
   // tslint:disable-next-line:no-input-rename
   @Input('item')
-  chat: any;
+  chat: GetChats.Chats;
 
   updatedAt: string;
 
