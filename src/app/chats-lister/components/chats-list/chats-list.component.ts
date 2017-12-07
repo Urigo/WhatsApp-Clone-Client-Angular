@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {GetChats} from '../../../../types';
 
 @Component({
@@ -6,7 +6,7 @@ import {GetChats} from '../../../../types';
   template: `
     <mat-list>
       <mat-list-item *ngFor="let chat of chats">
-        <app-chat-item [item]="chat"></app-chat-item>
+        <app-chat-item [item]="chat" (select)="selectChat($event)"></app-chat-item>
       </mat-list-item>
     </mat-list>
   `,
@@ -17,5 +17,12 @@ export class ChatsListComponent {
   @Input('items')
   chats: GetChats.Chats[];
 
+  @Output()
+  select = new EventEmitter<string>();
+
   constructor() {}
+
+  selectChat(id: string) {
+    this.select.emit(id);
+  }
 }
