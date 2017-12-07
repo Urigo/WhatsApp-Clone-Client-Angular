@@ -9,6 +9,7 @@ import {Apollo, ApolloModule} from 'apollo-angular';
 import {defaultDataIdFromObject, InMemoryCache} from 'apollo-cache-inmemory';
 import {ChatsListerModule} from './chats-lister/chats-lister.module';
 import {RouterModule, Routes} from '@angular/router';
+import {ChatViewerModule} from './chat-viewer/chat-viewer.module';
 
 const routes: Routes = [];
 
@@ -26,6 +27,7 @@ const routes: Routes = [];
     RouterModule.forRoot(routes),
     // Feature modules
     ChatsListerModule,
+    ChatViewerModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
