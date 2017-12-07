@@ -8,7 +8,8 @@
     "build": "ng build --prod",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "generator": "gql-gen --url http://localhost:3000/graphql --template ts --out ./src/types.d.ts \"./src/graphql/**/*.ts\""
   },
   "private": true,
   "dependencies": {
@@ -30,7 +31,7 @@
     "apollo-client": "2.2.5",
     "apollo-link": "1.1.0",
     "core-js": "2.5.3",
-    "graphql": "0.13.1",
+    "graphql": "0.12.3",
     "graphql-tag": "2.7.3",
     "hammerjs": "2.0.8",
     "ng2-truncate": "1.3.11",
