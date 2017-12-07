@@ -15,6 +15,7 @@ import {HttpLink, HttpLinkModule} from 'apollo-angular-link-http';
 import {InMemoryCache} from 'apollo-cache-inmemory';
 import {BrowserModule, By} from '@angular/platform-browser';
 import {RouterTestingModule} from '@angular/router/testing';
+import {SelectableListModule} from 'ngx-selectable-list';
 
 describe('ChatsComponent', () => {
   let component: ChatsComponent;
@@ -200,7 +201,8 @@ describe('ChatsComponent', () => {
         TruncateModule,
         HttpLinkModule,
         HttpClientTestingModule,
-        RouterTestingModule
+        RouterTestingModule,
+        SelectableListModule,
       ],
       providers: [
         ChatsService,
