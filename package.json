@@ -8,7 +8,8 @@
     "build": "ng build --prod",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "generator": "gql-gen --url http://localhost:3000/graphql --template ts --out ./src/types.d.ts \"./src/graphql/**/*.ts\""
   },
   "private": true,
   "dependencies": {
@@ -46,6 +47,7 @@
     "@types/jasminewd2": "2.0.3",
     "@types/node": "6.0.101",
     "codelyzer": "4.1.0",
+    "graphql-code-generator": "0.8.14",
     "jasmine-core": "2.8.0",
     "jasmine-spec-reporter": "4.2.1",
     "karma": "2.0.0",
