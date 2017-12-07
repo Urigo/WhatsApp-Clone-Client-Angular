@@ -28,8 +28,6 @@ export type SubscriptionResolver<
   ): R | Result | Promise<R | Result>;
 };
 
-export type Date = any;
-
 export interface Query {
   users?: User[] | null;
   chats?: Chat[] | null;
@@ -44,18 +42,17 @@ export interface User {
 }
 
 export interface Chat {
-  id: string;
-  name?: string | null;
-  picture?: string | null;
-  allTimeMembers: User[];
-  listingMembers: User[];
-  actualGroupMembers: User[];
-  admins?: User[] | null;
-  owner?: User | null;
+  id: string /** May be a chat or a group */;
+  name?: string | null /** Computed for chats */;
+  picture?: string | null /** Computed for chats */;
+  allTimeMembers: User[] /** All members, current and past ones. */;
+  listingMembers: User[] /** Whoever gets the chat listed. For groups includes past members who still didn't delete the group. */;
+  actualGroupMembers: User[] /** Actual members of the group (they are not the only ones who get the group listed). Null for chats. */;
+  admins?: User[] | null /** Null for chats */;
+  owner?: User | null /** If null the group is read-only. Null for chats. */;
   messages: (Message | null)[];
-  messageFeed?: MessageFeed | null;
-  unreadMessages: number;
-  isGroup: boolean;
+  unreadMessages: number /** Computed property */;
+  isGroup: boolean /** Computed property */;
 }
 
 export interface Message {
@@ -63,25 +60,19 @@ export interface Message {
   sender: User;
   chat: Chat;
   content: string;
-  createdAt: Date;
-  type: number;
-  recipients: Recipient[];
-  holders: User[];
-  ownership: boolean;
+  createdAt: string;
+  type: number /** FIXME: should return MessageType */;
+  recipients: Recipient[] /** Whoever received the message */;
+  holders: User[] /** Whoever still holds a copy of the message. Cannot be null because the message gets deleted otherwise */;
+  ownership: boolean /** Computed property */;
 }
 
 export interface Recipient {
   user: User;
   message: Message;
   chat: Chat;
-  receivedAt?: Date | null;
-  readAt?: Date | null;
-}
-
-export interface MessageFeed {
-  hasNextPage: boolean;
-  cursor?: string | null;
-  messages: (Message | null)[];
+  receivedAt?: string | null;
+  readAt?: string | null;
 }
 
 export interface Mutation {
@@ -109,11 +100,6 @@ export interface ChatQueryArgs {
 }
 export interface MessagesChatArgs {
   amount?: number | null;
-  before?: string | null;
-}
-export interface MessageFeedChatArgs {
-  amount?: number | null;
-  before?: string | null;
 }
 export interface AddChatMutationArgs {
   recipientId: string;
@@ -231,18 +217,41 @@ export namespace UserResolvers {
 
 export namespace ChatResolvers {
   export interface Resolvers<Context = any> {
-    id?: IdResolver<string, any, Context>;
-    name?: NameResolver<string | null, any, Context>;
-    picture?: PictureResolver<string | null, any, Context>;
-    allTimeMembers?: AllTimeMembersResolver<User[], any, Context>;
-    listingMembers?: ListingMembersResolver<User[], any, Context>;
-    actualGroupMembers?: ActualGroupMembersResolver<User[], any, Context>;
-    admins?: AdminsResolver<User[] | null, any, Context>;
-    owner?: OwnerResolver<User | null, any, Context>;
+    id?: IdResolver<string, any, Context> /** May be a chat or a group */;
+    name?: NameResolver<string | null, any, Context> /** Computed for chats */;
+    picture?: PictureResolver<
+      string | null,
+      any,
+      Context
+    > /** Computed for chats */;
+    allTimeMembers?: AllTimeMembersResolver<
+      User[],
+      any,
+      Context
+    > /** All members, current and past ones. */;
+    listingMembers?: ListingMembersResolver<
+      User[],
+      any,
+      Context
+    > /** Whoever gets the chat listed. For groups includes past members who still didn't delete the group. */;
+    actualGroupMembers?: ActualGroupMembersResolver<
+      User[],
+      any,
+      Context
+    > /** Actual members of the group (they are not the only ones who get the group listed). Null for chats. */;
+    admins?: AdminsResolver<User[] | null, any, Context> /** Null for chats */;
+    owner?: OwnerResolver<
+      User | null,
+      any,
+      Context
+    > /** If null the group is read-only. Null for chats. */;
     messages?: MessagesResolver<(Message | null)[], any, Context>;
-    messageFeed?: MessageFeedResolver<MessageFeed | null, any, Context>;
-    unreadMessages?: UnreadMessagesResolver<number, any, Context>;
-    isGroup?: IsGroupResolver<boolean, any, Context>;
+    unreadMessages?: UnreadMessagesResolver<
+      number,
+      any,
+      Context
+    > /** Computed property */;
+    isGroup?: IsGroupResolver<boolean, any, Context> /** Computed property */;
   }
 
   export type IdResolver<R = string, Parent = any, Context = any> = Resolver<
@@ -292,17 +301,6 @@ export namespace ChatResolvers {
   > = Resolver<R, Parent, Context, MessagesArgs>;
   export interface MessagesArgs {
     amount?: number | null;
-    before?: string | null;
-  }
-
-  export type MessageFeedResolver<
-    R = MessageFeed | null,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context, MessageFeedArgs>;
-  export interface MessageFeedArgs {
-    amount?: number | null;
-    before?: string | null;
   }
 
   export type UnreadMessagesResolver<
@@ -323,11 +321,27 @@ export namespace MessageResolvers {
     sender?: SenderResolver<User, any, Context>;
     chat?: ChatResolver<Chat, any, Context>;
     content?: ContentResolver<string, any, Context>;
-    createdAt?: CreatedAtResolver<Date, any, Context>;
-    type?: TypeResolver<number, any, Context>;
-    recipients?: RecipientsResolver<Recipient[], any, Context>;
-    holders?: HoldersResolver<User[], any, Context>;
-    ownership?: OwnershipResolver<boolean, any, Context>;
+    createdAt?: CreatedAtResolver<string, any, Context>;
+    type?: TypeResolver<
+      number,
+      any,
+      Context
+    > /** FIXME: should return MessageType */;
+    recipients?: RecipientsResolver<
+      Recipient[],
+      any,
+      Context
+    > /** Whoever received the message */;
+    holders?: HoldersResolver<
+      User[],
+      any,
+      Context
+    > /** Whoever still holds a copy of the message. Cannot be null because the message gets deleted otherwise */;
+    ownership?: OwnershipResolver<
+      boolean,
+      any,
+      Context
+    > /** Computed property */;
   }
 
   export type IdResolver<R = string, Parent = any, Context = any> = Resolver<
@@ -351,7 +365,7 @@ export namespace MessageResolvers {
     Context = any
   > = Resolver<R, Parent, Context>;
   export type CreatedAtResolver<
-    R = Date,
+    R = string,
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;
@@ -382,8 +396,8 @@ export namespace RecipientResolvers {
     user?: UserResolver<User, any, Context>;
     message?: MessageResolver<Message, any, Context>;
     chat?: ChatResolver<Chat, any, Context>;
-    receivedAt?: ReceivedAtResolver<Date | null, any, Context>;
-    readAt?: ReadAtResolver<Date | null, any, Context>;
+    receivedAt?: ReceivedAtResolver<string | null, any, Context>;
+    readAt?: ReadAtResolver<string | null, any, Context>;
   }
 
   export type UserResolver<R = User, Parent = any, Context = any> = Resolver<
@@ -402,36 +416,12 @@ export namespace RecipientResolvers {
     Context
   >;
   export type ReceivedAtResolver<
-    R = Date | null,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
-  export type ReadAtResolver<
-    R = Date | null,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
-}
-
-export namespace MessageFeedResolvers {
-  export interface Resolvers<Context = any> {
-    hasNextPage?: HasNextPageResolver<boolean, any, Context>;
-    cursor?: CursorResolver<string | null, any, Context>;
-    messages?: MessagesResolver<(Message | null)[], any, Context>;
-  }
-
-  export type HasNextPageResolver<
-    R = boolean,
-    Parent = any,
-    Context = any
-  > = Resolver<R, Parent, Context>;
-  export type CursorResolver<
     R = string | null,
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;
-  export type MessagesResolver<
-    R = (Message | null)[],
+  export type ReadAtResolver<
+    R = string | null,
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;
@@ -610,6 +600,24 @@ export namespace SubscriptionResolvers {
   > = Resolver<R, Parent, Context>;
 }
 
+export namespace GetChat {
+  export type Variables = {
+    chatId: string;
+  };
+
+  export type Query = {
+    __typename?: "Query";
+    chat?: Chat | null;
+  };
+
+  export type Chat = {
+    __typename?: "Chat";
+    messages: (Messages | null)[];
+  } & ChatWithoutMessages.Fragment;
+
+  export type Messages = Message.Fragment;
+}
+
 export namespace GetChats {
   export type Variables = {
     amount?: number | null;
@@ -652,7 +660,7 @@ export namespace Message {
     chat: Chat;
     sender: Sender;
     content: string;
-    createdAt: Date;
+    createdAt: string;
     type: number;
     recipients: Recipients[];
     ownership: boolean;
@@ -674,8 +682,8 @@ export namespace Message {
     user: User;
     message: Message;
     chat: __Chat;
-    receivedAt?: Date | null;
-    readAt?: Date | null;
+    receivedAt?: string | null;
+    readAt?: string | null;
   };
 
   export type User = {
@@ -752,6 +760,24 @@ const MessageFragment = gql`
   }
 `;
 
+@Injectable({
+  providedIn: "root"
+})
+export class GetChatGQL extends Apollo.Query<GetChat.Query, GetChat.Variables> {
+  document: any = gql`
+    query GetChat($chatId: ID!) {
+      chat(chatId: $chatId) {
+        ...ChatWithoutMessages
+        messages {
+          ...Message
+        }
+      }
+    }
+
+    ${ChatWithoutMessagesFragment}
+    ${MessageFragment}
+  `;
+}
 @Injectable({
   providedIn: "root"
 })
