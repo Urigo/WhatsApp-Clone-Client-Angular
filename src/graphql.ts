@@ -10,6 +10,21 @@ export enum MessageType {
 // Documents
 // ====================================================
 
+export namespace AddMessage {
+  export type Variables = {
+    chatId: string;
+    content: string;
+  };
+
+  export type Mutation = {
+    __typename?: "Mutation";
+
+    addMessage: Maybe<AddMessage>;
+  };
+
+  export type AddMessage = Message.Fragment;
+}
+
 export namespace GetChat {
   export type Variables = {
     chatId: string;
@@ -229,6 +244,34 @@ export interface Recipient {
   readAt?: Maybe<string>;
 }
 
+export interface Mutation {
+  addChat?: Maybe<Chat>;
+
+  addGroup?: Maybe<Chat>;
+
+  removeChat?: Maybe<string>;
+
+  addMessage?: Maybe<Message>;
+
+  removeMessages?: Maybe<(Maybe<string>)[]>;
+
+  addMembers?: Maybe<(Maybe<string>)[]>;
+
+  removeMembers?: Maybe<(Maybe<string>)[]>;
+
+  addAdmins?: Maybe<(Maybe<string>)[]>;
+
+  removeAdmins?: Maybe<(Maybe<string>)[]>;
+
+  setGroupName?: Maybe<string>;
+
+  setGroupPicture?: Maybe<string>;
+
+  markAsReceived?: Maybe<boolean>;
+
+  markAsRead?: Maybe<boolean>;
+}
+
 // ====================================================
 // Arguments
 // ====================================================
@@ -238,6 +281,61 @@ export interface ChatQueryArgs {
 }
 export interface MessagesChatArgs {
   amount?: Maybe<number>;
+}
+export interface AddChatMutationArgs {
+  recipientId: string;
+}
+export interface AddGroupMutationArgs {
+  recipientIds: string[];
+
+  groupName: string;
+}
+export interface RemoveChatMutationArgs {
+  chatId: string;
+}
+export interface AddMessageMutationArgs {
+  chatId: string;
+
+  content: string;
+}
+export interface RemoveMessagesMutationArgs {
+  chatId: string;
+
+  messageIds?: Maybe<(Maybe<string>)[]>;
+
+  all?: Maybe<boolean>;
+}
+export interface AddMembersMutationArgs {
+  groupId: string;
+
+  userIds: string[];
+}
+export interface RemoveMembersMutationArgs {
+  groupId: string;
+
+  userIds: string[];
+}
+export interface AddAdminsMutationArgs {
+  groupId: string;
+
+  userIds: string[];
+}
+export interface RemoveAdminsMutationArgs {
+  groupId: string;
+
+  userIds: string[];
+}
+export interface SetGroupNameMutationArgs {
+  groupId: string;
+}
+export interface SetGroupPictureMutationArgs {
+  groupId: string;
+}
+export interface MarkAsReceivedMutationArgs {
+  chatId: string;
+}
+export interface MarkAsReadMutationArgs {
+  chatId: string;
 }
 
 // ====================================================
@@ -303,6 +401,23 @@ export const MessageFragment = gql`
 // Apollo Services
 // ====================================================
 
+@Injectable({
+  providedIn: "root"
+})
+export class AddMessageGQL extends Apollo.Mutation<
+  AddMessage.Mutation,
+  AddMessage.Variables
+> {
+  document: any = gql`
+    mutation AddMessage($chatId: ID!, $content: String!) {
+      addMessage(chatId: $chatId, content: $content) {
+        ...Message
+      }
+    }
+
+    ${MessageFragment}
+  `;
+}
 @Injectable({
   providedIn: "root"
 })
