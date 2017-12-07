@@ -1,4 +1,5 @@
 import {Component, Input} from '@angular/core';
+import {GetChat} from '../../../../graphql';
 
 @Component({
   selector: 'app-message-item',
@@ -15,7 +16,7 @@ import {Component, Input} from '@angular/core';
 export class MessageItemComponent {
   // tslint:disable-next-line:no-input-rename
   @Input('item')
-  message: any;
+  message: GetChat.Messages;
 
   @Input()
   isGroup: boolean;
