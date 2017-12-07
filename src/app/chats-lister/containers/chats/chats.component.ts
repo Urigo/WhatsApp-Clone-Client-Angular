@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ChatsService} from '../../../services/chats.service';
 import {Observable} from 'rxjs/Observable';
+import {GetChats} from '../../../../types';
 
 @Component({
   template: `
@@ -35,7 +36,7 @@ import {Observable} from 'rxjs/Observable';
   styleUrls: ['./chats.component.scss'],
 })
 export class ChatsComponent implements OnInit {
-  chats$: Observable<any[]>;
+  chats$: Observable<GetChats.Chats[]>;
 
   constructor(private chatsService: ChatsService) {
   }
