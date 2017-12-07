@@ -21,7 +21,8 @@ export namespace AddMessage {
 
   export type Mutation = {
     __typename?: "Mutation";
-    addMessage?: AddMessage | null;
+
+    addMessage: Maybe<AddMessage>;
   };
 
   export type AddMessage = Message.Fragment;
@@ -65,6 +66,44 @@ export namespace GetChats {
   } & ChatWithoutMessages.Fragment;
 
   export type Messages = Message.Fragment;
+}
+
+export namespace RemoveAllMessages {
+  export type Variables = {
+    chatId: string;
+    all?: Maybe<boolean>;
+  };
+
+  export type Mutation = {
+    __typename?: "Mutation";
+
+    removeMessages: Maybe<(Maybe<string>)[]>;
+  };
+}
+
+export namespace RemoveChat {
+  export type Variables = {
+    chatId: string;
+  };
+
+  export type Mutation = {
+    __typename?: "Mutation";
+
+    removeChat: Maybe<string>;
+  };
+}
+
+export namespace RemoveMessages {
+  export type Variables = {
+    chatId: string;
+    messageIds?: Maybe<(Maybe<string>)[]>;
+  };
+
+  export type Mutation = {
+    __typename?: "Mutation";
+
+    removeMessages: Maybe<(Maybe<string>)[]>;
+  };
 }
 
 export namespace ChatWithoutMessages {
@@ -284,6 +323,45 @@ export class GetChatsGQL extends Apollo.Query<
 
     ${ChatWithoutMessagesFragment}
     ${MessageFragment}
+  `;
+}
+@Injectable({
+  providedIn: "root"
+})
+export class RemoveAllMessagesGQL extends Apollo.Mutation<
+  RemoveAllMessages.Mutation,
+  RemoveAllMessages.Variables
+> {
+  document: any = gql`
+    mutation RemoveAllMessages($chatId: ID!, $all: Boolean) {
+      removeMessages(chatId: $chatId, all: $all)
+    }
+  `;
+}
+@Injectable({
+  providedIn: "root"
+})
+export class RemoveChatGQL extends Apollo.Mutation<
+  RemoveChat.Mutation,
+  RemoveChat.Variables
+> {
+  document: any = gql`
+    mutation RemoveChat($chatId: ID!) {
+      removeChat(chatId: $chatId)
+    }
+  `;
+}
+@Injectable({
+  providedIn: "root"
+})
+export class RemoveMessagesGQL extends Apollo.Mutation<
+  RemoveMessages.Mutation,
+  RemoveMessages.Variables
+> {
+  document: any = gql`
+    mutation RemoveMessages($chatId: ID!, $messageIds: [ID]) {
+      removeMessages(chatId: $chatId, messageIds: $messageIds)
+    }
   `;
 }
 
