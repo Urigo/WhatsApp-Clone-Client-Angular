@@ -11,6 +11,7 @@ import {MessagesListComponent} from './components/messages-list/messages-list.co
 import {MessageItemComponent} from './components/message-item/message-item.component';
 import {NewMessageComponent} from './components/new-message/new-message.component';
 import {SharedModule} from '../shared/shared.module';
+import {SelectableListModule} from 'ngx-selectable-list';
 
 const routes: Routes = [
   {
@@ -44,6 +45,7 @@ const routes: Routes = [
     FormsModule,
     // Feature modules
     SharedModule,
+    SelectableListModule,
   ],
   providers: [
     ChatsService,
