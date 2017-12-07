@@ -13,7 +13,7 @@ import {GetChat} from '../../../../types';
     </app-toolbar>
     <div class="container">
       <app-messages-list [items]="messages" [isGroup]="isGroup"></app-messages-list>
-      <app-new-message></app-new-message>
+      <app-new-message (newMessage)="addMessage($event)"></app-new-message>
     </div>
   `,
   styleUrls: ['./chat.component.scss']
@@ -42,5 +42,9 @@ export class ChatComponent implements OnInit {
 
   goToChats() {
     this.router.navigate(['/chats']);
+  }
+
+  addMessage(content: string) {
+    this.chatsService.addMessage(this.chatId, content).subscribe();
   }
 }
