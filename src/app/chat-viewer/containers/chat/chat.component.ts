@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ChatsService} from '../../../services/chats.service';
+import {GetChat} from '../../../../graphql';
 
 @Component({
   template: `
@@ -20,7 +21,7 @@ import {ChatsService} from '../../../services/chats.service';
 })
 export class ChatComponent implements OnInit {
   chatId: string;
-  messages: any[];
+  messages: GetChat.Messages[];
   name: string;
   isGroup: boolean;
 
