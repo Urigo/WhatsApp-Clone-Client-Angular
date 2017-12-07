@@ -20,6 +20,7 @@ import {
   APOLLO_TESTING_CACHE,
 } from 'apollo-angular/testing';
 import { InMemoryCache } from 'apollo-cache-inmemory';
+import { NgxSelectableListModule } from 'ngx-selectable-list';
 
 import { dataIdFromObject } from '../../../graphql.module';
 import { ChatComponent } from './chat.component';
@@ -116,6 +117,7 @@ describe('ChatComponent', () => {
         SharedModule,
         ApolloTestingModule,
         RouterTestingModule,
+        NgxSelectableListModule,
       ],
       providers: [
         ChatsService,
