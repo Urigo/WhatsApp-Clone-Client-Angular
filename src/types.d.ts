@@ -114,6 +114,45 @@ export interface MarkAsReadMutationArgs {
 
 export type MessageType = "TEXT" | "LOCATION" | "PICTURE";
 
+export namespace GetChat {
+  export type Variables = {
+    chatId: string;
+  }
+
+  export type Query = {
+    chat?: Chat | null; 
+  } 
+
+  export type Chat = {
+    id: string; 
+    name?: string | null; 
+    picture?: string | null; 
+    isGroup: boolean; 
+    messages: Messages[]; 
+  } 
+
+  export type Messages = {
+    id: string; 
+    senderId: string; 
+    sender: Sender; 
+    content: string; 
+    createdAt?: number | null; 
+    type: number; 
+    recipients: Recipients[]; 
+    ownership: boolean; 
+  } 
+
+  export type Sender = {
+    id: string; 
+    name?: string | null; 
+  } 
+
+  export type Recipients = {
+    id: string; 
+    receivedAt?: number | null; 
+    readAt?: number | null; 
+  } 
+}
 export namespace GetChats {
   export type Variables = {
   }
