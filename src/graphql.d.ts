@@ -121,6 +121,19 @@ export enum MessageType {
   TEXT = "TEXT",
   PICTURE = "PICTURE"
 }
+export namespace AddMessage {
+  export type Variables = {
+    chatId: string;
+    content: string;
+  };
+
+  export type Mutation = {
+    __typename?: "Mutation";
+    addMessage?: AddMessage | null;
+  };
+
+  export type AddMessage = Message.Fragment;
+}
 export namespace GetChat {
   export type Variables = {
     chatId: string;
