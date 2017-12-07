@@ -7,7 +7,8 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "generator": "gql-gen --config codegen.yml"
   },
   "private": true,
   "dependencies": {
@@ -44,6 +45,10 @@
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.9.4",
     "codelyzer": "~4.5.0",
+    "graphql-code-generator": "^0.16.1",
+    "graphql-codegen-typescript-client": "^0.16.1",
+    "graphql-codegen-typescript-common": "^0.16.1",
+    "graphql-codegen-typescript-server": "^0.16.1",
     "jasmine-core": "~2.99.1",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~3.1.1",
