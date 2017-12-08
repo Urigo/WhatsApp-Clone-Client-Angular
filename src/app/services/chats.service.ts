@@ -2,6 +2,7 @@ import {map} from 'rxjs/operators';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {QueryRef} from 'apollo-angular';
+import * as moment from 'moment';
 import {
   GetChatsGQL,
   GetChatGQL,
@@ -17,10 +18,12 @@ import {
   GetChat,
   RemoveMessages,
   RemoveAllMessages,
+  GetUsers,
 } from '../../graphql';
 import { DataProxy } from 'apollo-cache';
 
 const currentUserId = '1';
+const currentUserName = 'Ethan Gonzalez';
 
 @Injectable()
 export class ChatsService {
@@ -49,6 +52,10 @@ export class ChatsService {
     this.chats$.subscribe(chats => this.chats = chats);
   }
 
+  static getRandomId() {
+    return String(Math.round(Math.random() * 1000000000000));
+  }
+
   getChats() {
     return {query: this.getChatsWq, chats$: this.chats$};
   }
@@ -70,6 +77,27 @@ export class ChatsService {
       chatId,
       content,
     }, {
+      optimisticResponse: {
+        __typename: 'Mutation',
+        addMessage: {
+          __typename: 'Message',
+          id: ChatsService.getRandomId(),
+          chat: {
+            __typename: 'Chat',
+            id: chatId,
+          },
+          sender: {
+            __typename: 'User',
+            id: currentUserId,
+            name: currentUserName,
+          },
+          content,
+          createdAt: moment().unix(),
+          type: 1,
+          recipients: [],
+          ownership: true,
+        },
+      },
       update: (store, { data: { addMessage } }: {data: AddMessage.Mutation}) => {
         // Update the messages cache
         {
@@ -121,6 +149,10 @@ export class ChatsService {
       {
         chatId,
       }, {
+        optimisticResponse: {
+          __typename: 'Mutation',
+          removeChat: chatId,
+        },
         update: (store, { data: { removeChat } }) => {
           // Read the data from our cache for this query.
           const {chats} = store.readQuery<GetChats.Query, GetChats.Variables>({
@@ -154,6 +186,10 @@ export class ChatsService {
     let ids: string[] = [];
 
     const options = {
+      optimisticResponse: () => ({
+        __typename: 'Mutation',
+        removeMessages: ids,
+      }),
       update: (store: DataProxy, { data: { removeMessages } }: {data: RemoveMessages.Mutation | RemoveAllMessages.Mutation}) => {
         // Update the messages cache
         {
@@ -241,11 +277,33 @@ export class ChatsService {
     return _chat ? _chat.id : false;
   }
 
-  addChat(userId: string) {
+  addChat(userId: string, users: GetUsers.Users[]) {
     return this.addChatGQL.mutate(
       {
         userId,
       }, {
+        optimisticResponse: {
+          __typename: 'Mutation',
+          addChat: {
+            __typename: 'Chat',
+            id: ChatsService.getRandomId(),
+            name: users.find(user => user.id === userId).name,
+            picture: users.find(user => user.id === userId).picture,
+            allTimeMembers: [
+              {
+                id: currentUserId,
+                __typename: 'User',
+              },
+              {
+                id: userId,
+                __typename: 'User',
+              }
+            ],
+            unreadMessages: 0,
+            messages: [],
+            isGroup: false,
+          },
+        },
         update: (store, { data: { addChat } }) => {
           // Read the data from our cache for this query.
           const {chats} = store.readQuery<GetChats.Query, GetChats.Variables>({
@@ -277,6 +335,26 @@ export class ChatsService {
         userIds,
         groupName,
       }, {
+        optimisticResponse: {
+          __typename: 'Mutation',
+          addGroup: {
+            __typename: 'Chat',
+            id: ChatsService.getRandomId(),
+            name: groupName,
+            picture: 'https://randomuser.me/api/portraits/thumb/lego/1.jpg',
+            userIds: [currentUserId, userIds],
+            allTimeMembers: [
+              {
+                id: currentUserId,
+                __typename: 'User',
+              },
+              ...userIds.map(id => ({id, __typename: 'User'})),
+            ],
+            unreadMessages: 0,
+            messages: [],
+            isGroup: true,
+          },
+        },
         update: (store, { data: { addGroup } }) => {
           // Read the data from our cache for this query.
           const {chats} = store.readQuery<GetChats.Query, GetChats.Variables>({
