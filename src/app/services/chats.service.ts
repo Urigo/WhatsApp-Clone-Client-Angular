@@ -13,8 +13,10 @@ import {getUsersQuery} from '../../graphql/getUsers.query';
 import {Observable} from 'rxjs';
 import {addChatMutation} from '../../graphql/addChat.mutation';
 import {addGroupMutation} from '../../graphql/addGroup.mutation';
+import * as moment from 'moment';
 
 const currentUserId = '1';
+const currentUserName = 'Ethan Gonzalez';
 
 @Injectable()
 export class ChatsService {
@@ -34,6 +36,10 @@ export class ChatsService {
       map((result) => result.data.chats)
     );
     this.chats$.subscribe(chats => this.chats = chats);
+  }
+
+  static getRandomId() {
+    return String(Math.round(Math.random() * 1000000000000));
   }
 
   getChats() {
@@ -61,6 +67,24 @@ export class ChatsService {
       variables: {
         chatId,
         content,
+      },
+      optimisticResponse: {
+        __typename: 'Mutation',
+        addMessage: {
+          id: ChatsService.getRandomId(),
+          __typename: 'Message',
+          senderId: currentUserId,
+          sender: {
+            id: currentUserId,
+            __typename: 'User',
+            name: currentUserName,
+          },
+          content,
+          createdAt: moment().unix(),
+          type: 0,
+          recipients: [],
+          ownership: true,
+        },
       },
       update: (store, { data: { addMessage } }: {data: AddMessage.Mutation}) => {
         // Update the messages cache
@@ -107,6 +131,10 @@ export class ChatsService {
       mutation: removeChatMutation,
       variables: {
         chatId,
+      },
+      optimisticResponse: {
+        __typename: 'Mutation',
+        removeChat: chatId,
       },
       update: (store, { data: { removeChat } }) => {
         // Read the data from our cache for this query.
@@ -157,6 +185,10 @@ export class ChatsService {
     >({
       mutation,
       variables,
+      optimisticResponse: {
+        __typename: 'Mutation',
+        removeMessages: ids,
+      },
       update: (store, { data: { removeMessages } }: {data: RemoveMessages.Mutation | RemoveAllMessages.Mutation}) => {
         // Update the messages cache
         {
@@ -225,11 +257,33 @@ export class ChatsService {
     return _chat ? _chat.id : false;
   }
 
-  addChat(recipientId: string) {
+  addChat(recipientId: string, users: GetUsers.Users[]) {
     return this.apollo.mutate<AddChat.Mutation, AddChat.Variables>({
       mutation: addChatMutation,
       variables: {
         recipientId,
+      },
+      optimisticResponse: {
+        __typename: 'Mutation',
+        addChat: {
+          id: ChatsService.getRandomId(),
+          __typename: 'Chat',
+          name: users.find(user => user.id === recipientId).name,
+          picture: users.find(user => user.id === recipientId).picture,
+          allTimeMembers: [
+            {
+              id: currentUserId,
+              __typename: 'User',
+            },
+            {
+              id: recipientId,
+              __typename: 'User',
+            }
+          ],
+          unreadMessages: 0,
+          messages: [],
+          isGroup: false,
+        },
       },
       update: (store, { data: { addChat } }) => {
         // Read the data from our cache for this query.
@@ -261,6 +315,26 @@ export class ChatsService {
       variables: {
         recipientIds,
         groupName,
+      },
+      optimisticResponse: {
+        __typename: 'Mutation',
+        addGroup: {
+          id: ChatsService.getRandomId(),
+          __typename: 'Chat',
+          name: groupName,
+          picture: 'https://randomuser.me/api/portraits/thumb/lego/1.jpg',
+          userIds: [currentUserId, recipientIds],
+          allTimeMembers: [
+            {
+              id: currentUserId,
+              __typename: 'User',
+            },
+            ...recipientIds.map(id => ({id, __typename: 'User'})),
+          ],
+          unreadMessages: 0,
+          messages: [],
+          isGroup: true,
+        },
       },
       update: (store, { data: { addGroup } }) => {
         // Read the data from our cache for this query.
