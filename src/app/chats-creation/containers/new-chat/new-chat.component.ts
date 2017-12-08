@@ -47,7 +47,7 @@ export class NewChatComponent implements OnInit {
       // Chat is already listed for the current user
       this.router.navigate(['/chat', chatId]);
     } else {
-      this.chatsService.addChat(userId).subscribe(({data: {addChat: {id}}}: { data: AddChat.Mutation }) => {
+      this.chatsService.addChat(userId, this.users).subscribe(({data: {addChat: {id}}}: { data: AddChat.Mutation }) => {
         this.router.navigate(['/chat', id]);
       });
     }
