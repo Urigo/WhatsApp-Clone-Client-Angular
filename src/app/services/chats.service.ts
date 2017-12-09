@@ -1,5 +1,5 @@
 import {ApolloQueryResult} from 'apollo-client';
-import {concat, map} from 'rxjs/operators';
+import {concat, map, share, switchMap} from 'rxjs/operators';
 import {Apollo, QueryRef} from 'apollo-angular';
 import {Injectable} from '@angular/core';
 import {getChatsQuery} from '../../graphql/getChats.query';
@@ -17,6 +17,7 @@ import {addGroupMutation} from '../../graphql/addGroup.mutation';
 import * as moment from 'moment';
 import {AsyncSubject} from 'rxjs/AsyncSubject';
 import {of} from 'rxjs/observable/of';
+import {FetchResult} from 'apollo-link';
 
 const currentUserId = '1';
 const currentUserName = 'Ethan Gonzalez';
@@ -27,6 +28,7 @@ export class ChatsService {
   chats$: Observable<GetChats.Chats[]>;
   chats: GetChats.Chats[];
   getChatWqSubject: AsyncSubject<QueryRef<GetChat.Query>>;
+  addChat$: Observable<FetchResult<AddChat.Mutation | AddGroup.Mutation>>;
 
   constructor(private apollo: Apollo) {
     this.getChatsWq = this.apollo.watchQuery<GetChats.Query>({
@@ -46,7 +48,7 @@ export class ChatsService {
     return {query: this.getChatsWq, chats$: this.chats$};
   }
 
-  getChat(chatId: string) {
+  getChat(chatId: string, oui?: boolean) {
     const _chat = this.chats && this.chats.find(chat => chat.id === chatId) || null;
     const chat$FromCache = of<GetChat.Chat>({
       id: chatId,
@@ -56,21 +58,39 @@ export class ChatsService {
       messages: this.chats && _chat.lastMessage ? [_chat.lastMessage] : [],
     });
 
-    const query = this.apollo.watchQuery<GetChat.Query>({
-      query: getChatQuery,
-      variables: {
-        chatId,
-      }
-    });
+    const getApolloWatchQuery = (id: string) => {
+      return this.apollo.watchQuery<GetChat.Query>({
+        query: getChatQuery,
+        variables: {
+          chatId: id,
+        }
+      });
+    };
 
-    const chat$ = chat$FromCache.pipe(
-      concat(query.valueChanges.pipe(
-        map((result: ApolloQueryResult<GetChat.Query>) => result.data.chat)
-      )));
-
+    let chat$: Observable<GetChat.Chat>;
     this.getChatWqSubject = new AsyncSubject();
-    this.getChatWqSubject.next(query);
-    this.getChatWqSubject.complete();
+
+    if (oui) {
+      chat$ = chat$FromCache.pipe(
+        concat(this.addChat$.pipe(
+          switchMap(({ data: { addChat, addGroup } }) => {
+            const query = getApolloWatchQuery(addChat ? addChat.id : addGroup.id);
+            this.getChatWqSubject.next(query);
+            this.getChatWqSubject.complete();
+            return query.valueChanges.pipe(
+              map((result: ApolloQueryResult<GetChat.Query>) => result.data.chat)
+            );
+          }))
+        ));
+    } else {
+      const query = getApolloWatchQuery(chatId);
+      this.getChatWqSubject.next(query);
+      this.getChatWqSubject.complete();
+      chat$ = chat$FromCache.pipe(
+        concat(query.valueChanges.pipe(
+          map((result: ApolloQueryResult<GetChat.Query>) => result.data.chat)
+        )));
+    }
 
     return {query$: this.getChatWqSubject.asObservable(), chat$};
   }
@@ -228,8 +248,8 @@ export class ChatsService {
     return _chat ? _chat.id : false;
   }
 
-  addChat(recipientId: string, users: GetUsers.Users[]) {
-    return this.apollo.mutate({
+  addChat(recipientId: string, users: GetUsers.Users[], ouiId: string) {
+    this.addChat$ = this.apollo.mutate({
       mutation: addChatMutation,
       variables: <AddChat.Variables>{
         recipientId,
@@ -237,7 +257,7 @@ export class ChatsService {
       optimisticResponse: {
         __typename: 'Mutation',
         addChat: {
-          id: ChatsService.getRandomId(),
+          id: ouiId,
           __typename: 'Chat',
           name: users.find(user => user.id === recipientId).name,
           picture: users.find(user => user.id === recipientId).picture,
@@ -255,11 +275,12 @@ export class ChatsService {
         // Write our data back to the cache.
         store.writeQuery({ query: getChatsQuery, data: {chats} });
       },
-    });
+    }).pipe(share());
+    return this.addChat$;
   }
 
-  addGroup(recipientIds: string[], groupName: string) {
-    return this.apollo.mutate({
+  addGroup(recipientIds: string[], groupName: string, ouiId: string) {
+    this.addChat$ = this.apollo.mutate({
       mutation: addGroupMutation,
       variables: <AddGroup.Variables>{
         recipientIds,
@@ -268,7 +289,7 @@ export class ChatsService {
       optimisticResponse: {
         __typename: 'Mutation',
         addGroup: {
-          id: ChatsService.getRandomId(),
+          id: ouiId,
           __typename: 'Chat',
           name: groupName,
           picture: 'https://randomuser.me/api/portraits/thumb/lego/1.jpg',
@@ -286,6 +307,7 @@ export class ChatsService {
         // Write our data back to the cache.
         store.writeQuery({ query: getChatsQuery, data: {chats} });
       },
-    });
+    }).pipe(share());
+    return this.addChat$;
   }
 }
