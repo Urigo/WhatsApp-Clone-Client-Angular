@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+
+div {
+  padding: 16px;
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.new-group {
+  position: absolute;
+  bottom: 5vw;
+  right: 5vw;
+}
+
+.users {
+  display: flex;
+  flex-flow: row wrap;
+  img {
+    flex: 0 1 8vh;
+    height: 8vh;
+  }
+}
