@@ -1,0 +1,23 @@
+.new-group {
+  display: flex;
+  height: 8vh;
+  align-items: center;
+
+  div:first-of-type {
+    height: 8vh;
+    width: 8vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    mat-icon {
+      height: 5vh;
+      width: 5vh;
+      font-size: 5vh;
+    }
+  }
+
+  div:nth-of-type(2) {
+    padding: 16px;
+  }
+}

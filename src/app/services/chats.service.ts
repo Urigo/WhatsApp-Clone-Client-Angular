@@ -1,30 +1,40 @@
 import {ApolloQueryResult} from 'apollo-client';
 import {map} from 'rxjs/operators';
-import {Apollo} from 'apollo-angular';
+import {Apollo, QueryRef} from 'apollo-angular';
 import {Injectable} from '@angular/core';
 import {getChatsQuery} from '../../graphql/getChats.query';
-import {AddMessage, GetChat, GetChats, RemoveAllMessages, RemoveChat, RemoveMessages} from '../../types';
+import {AddChat, AddGroup, AddMessage, GetChat, GetChats, GetUsers, RemoveAllMessages, RemoveChat, RemoveMessages} from '../../types';
 import {getChatQuery} from '../../graphql/getChat.query';
 import {addMessageMutation} from '../../graphql/addMessage.mutation';
 import {removeChatMutation} from '../../graphql/removeChat.mutation';
 import {DocumentNode} from 'graphql';
 import {removeAllMessagesMutation} from '../../graphql/removeAllMessages.mutation';
 import {removeMessagesMutation} from '../../graphql/removeMessages.mutation';
+import {getUsersQuery} from '../../graphql/getUsers.query';
+import {Observable} from 'rxjs/Observable';
+import {addChatMutation} from '../../graphql/addChat.mutation';
+import {addGroupMutation} from '../../graphql/addGroup.mutation';
+
+const currentUserId = '1';
 
 @Injectable()
 export class ChatsService {
+  getChatsWq: QueryRef<GetChats.Query>;
+  chats$: Observable<GetChats.Chats[]>;
+  chats: GetChats.Chats[];
 
-  constructor(private apollo: Apollo) {}
-
-  getChats() {
-    const query = this.apollo.watchQuery<GetChats.Query>({
+  constructor(private apollo: Apollo) {
+    this.getChatsWq = this.apollo.watchQuery<GetChats.Query>({
       query: getChatsQuery
     });
-    const chats$ = query.valueChanges.pipe(
+    this.chats$ = this.getChatsWq.valueChanges.pipe(
       map((result: ApolloQueryResult<GetChats.Query>) => result.data.chats)
     );
+    this.chats$.subscribe(chats => this.chats = chats);
+  }
 
-    return {query, chats$};
+  getChats() {
+    return {query: this.getChatsWq, chats$: this.chats$};
   }
 
   getChat(chatId: string) {
@@ -146,6 +156,60 @@ export class ChatsService {
           // Write our data back to the cache.
           store.writeQuery({ query: getChatsQuery, data: {chats} });
         }
+      },
+    });
+  }
+
+  getUsers() {
+    const query = this.apollo.watchQuery<GetUsers.Query>({
+      query: getUsersQuery,
+    });
+    const users$ = query.valueChanges.pipe(
+      map((result: ApolloQueryResult<GetUsers.Query>) => result.data.users)
+    );
+
+    return {query, users$};
+  }
+
+  // Checks if the chat is listed for the current user and returns the id
+  getChatId(recipientId: string) {
+    const _chat = this.chats.find(chat => {
+      return !chat.isGroup && chat.userIds.includes(currentUserId) && chat.userIds.includes(recipientId);
+    });
+    return _chat ? _chat.id : false;
+  }
+
+  addChat(recipientId: string) {
+    return this.apollo.mutate({
+      mutation: addChatMutation,
+      variables: <AddChat.Variables>{
+        recipientId,
+      },
+      update: (store, { data: { addChat } }) => {
+        // Read the data from our cache for this query.
+        const {chats}: GetChats.Query = store.readQuery({ query: getChatsQuery });
+        // Add our comment from the mutation to the end.
+        chats.push(addChat);
+        // Write our data back to the cache.
+        store.writeQuery({ query: getChatsQuery, data: {chats} });
+      },
+    });
+  }
+
+  addGroup(recipientIds: string[], groupName: string) {
+    return this.apollo.mutate({
+      mutation: addGroupMutation,
+      variables: <AddGroup.Variables>{
+        recipientIds,
+        groupName,
+      },
+      update: (store, { data: { addGroup } }) => {
+        // Read the data from our cache for this query.
+        const {chats}: GetChats.Query = store.readQuery({ query: getChatsQuery });
+        // Add our comment from the mutation to the end.
+        chats.push(addGroup);
+        // Write our data back to the cache.
+        store.writeQuery({ query: getChatsQuery, data: {chats} });
       },
     });
   }
