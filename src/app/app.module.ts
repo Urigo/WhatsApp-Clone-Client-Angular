@@ -10,6 +10,7 @@ import {defaultDataIdFromObject, InMemoryCache} from 'apollo-cache-inmemory';
 import {ChatsListerModule} from './chats-lister/chats-lister.module';
 import {RouterModule, Routes} from '@angular/router';
 import {ChatViewerModule} from './chat-viewer/chat-viewer.module';
+import {ChatsCreationModule} from './chats-creation/chats-creation.module';
 
 const routes: Routes = [];
 
@@ -28,6 +29,7 @@ const routes: Routes = [];
     // Feature modules
     ChatsListerModule,
     ChatViewerModule,
+    ChatsCreationModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
