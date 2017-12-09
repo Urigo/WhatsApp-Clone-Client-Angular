@@ -17,12 +17,14 @@ export namespace AddChat {
 
   export type Mutation = {
     __typename?: "Mutation";
-    addChat?: AddChat | null;
+
+    addChat: Maybe<AddChat>;
   };
 
   export type AddChat = {
     __typename?: "Chat";
-    messages: (Messages | null)[];
+
+    messages: (Maybe<Messages>)[];
   } & ChatWithoutMessages.Fragment;
 
   export type Messages = Message.Fragment;
@@ -36,12 +38,14 @@ export namespace AddGroup {
 
   export type Mutation = {
     __typename?: "Mutation";
-    addGroup?: AddGroup | null;
+
+    addGroup: Maybe<AddGroup>;
   };
 
   export type AddGroup = {
     __typename?: "Chat";
-    messages: (Messages | null)[];
+
+    messages: (Maybe<Messages>)[];
   } & ChatWithoutMessages.Fragment;
 
   export type Messages = Message.Fragment;
@@ -107,14 +111,18 @@ export namespace GetUsers {
 
   export type Query = {
     __typename?: "Query";
-    users?: Users[] | null;
+
+    users: Maybe<Users[]>;
   };
 
   export type Users = {
     __typename?: "User";
+
     id: string;
-    name?: string | null;
-    picture?: string | null;
+
+    name: Maybe<string>;
+
+    picture: Maybe<string>;
   };
 }
 
