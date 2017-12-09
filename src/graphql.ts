@@ -600,6 +600,43 @@ export namespace SubscriptionResolvers {
   > = Resolver<R, Parent, Context>;
 }
 
+export namespace AddChat {
+  export type Variables = {
+    recipientId: string;
+  };
+
+  export type Mutation = {
+    __typename?: "Mutation";
+    addChat?: AddChat | null;
+  };
+
+  export type AddChat = {
+    __typename?: "Chat";
+    messages: (Messages | null)[];
+  } & ChatWithoutMessages.Fragment;
+
+  export type Messages = Message.Fragment;
+}
+
+export namespace AddGroup {
+  export type Variables = {
+    recipientIds: string[];
+    groupName: string;
+  };
+
+  export type Mutation = {
+    __typename?: "Mutation";
+    addGroup?: AddGroup | null;
+  };
+
+  export type AddGroup = {
+    __typename?: "Chat";
+    messages: (Messages | null)[];
+  } & ChatWithoutMessages.Fragment;
+
+  export type Messages = Message.Fragment;
+}
+
 export namespace AddMessage {
   export type Variables = {
     chatId: string;
@@ -648,6 +685,22 @@ export namespace GetChats {
   } & ChatWithoutMessages.Fragment;
 
   export type Messages = Message.Fragment;
+}
+
+export namespace GetUsers {
+  export type Variables = {};
+
+  export type Query = {
+    __typename?: "Query";
+    users?: Users[] | null;
+  };
+
+  export type Users = {
+    __typename?: "User";
+    id: string;
+    name?: string | null;
+    picture?: string | null;
+  };
 }
 
 export namespace RemoveAllMessages {
@@ -812,6 +865,48 @@ const MessageFragment = gql`
 @Injectable({
   providedIn: "root"
 })
+export class AddChatGQL extends Apollo.Mutation<
+  AddChat.Mutation,
+  AddChat.Variables
+> {
+  document: any = gql`
+    mutation AddChat($recipientId: ID!) {
+      addChat(recipientId: $recipientId) {
+        ...ChatWithoutMessages
+        messages {
+          ...Message
+        }
+      }
+    }
+
+    ${ChatWithoutMessagesFragment}
+    ${MessageFragment}
+  `;
+}
+@Injectable({
+  providedIn: "root"
+})
+export class AddGroupGQL extends Apollo.Mutation<
+  AddGroup.Mutation,
+  AddGroup.Variables
+> {
+  document: any = gql`
+    mutation AddGroup($recipientIds: [ID!]!, $groupName: String!) {
+      addGroup(recipientIds: $recipientIds, groupName: $groupName) {
+        ...ChatWithoutMessages
+        messages {
+          ...Message
+        }
+      }
+    }
+
+    ${ChatWithoutMessagesFragment}
+    ${MessageFragment}
+  `;
+}
+@Injectable({
+  providedIn: "root"
+})
 export class AddMessageGQL extends Apollo.Mutation<
   AddMessage.Mutation,
   AddMessage.Variables
@@ -863,6 +958,23 @@ export class GetChatsGQL extends Apollo.Query<
 
     ${ChatWithoutMessagesFragment}
     ${MessageFragment}
+  `;
+}
+@Injectable({
+  providedIn: "root"
+})
+export class GetUsersGQL extends Apollo.Query<
+  GetUsers.Query,
+  GetUsers.Variables
+> {
+  document: any = gql`
+    query GetUsers {
+      users {
+        id
+        name
+        picture
+      }
+    }
   `;
 }
 @Injectable({
