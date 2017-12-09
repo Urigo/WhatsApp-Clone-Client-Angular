@@ -114,6 +114,55 @@ export interface MarkAsReadMutationArgs {
 
 export type MessageType = "TEXT" | "LOCATION" | "PICTURE";
 
+export namespace AddChat {
+  export type Variables = {
+    recipientId: string;
+  }
+
+  export type Mutation = {
+    addChat?: AddChat | null; 
+  } 
+
+  export type AddChat = {
+    id: string; 
+    name?: string | null; 
+    picture?: string | null; 
+    userIds: string[]; 
+    unreadMessages: number; 
+    lastMessage?: LastMessage | null; 
+    isGroup: boolean; 
+  } 
+
+  export type LastMessage = {
+    id: string; 
+    content: string; 
+  } 
+}
+export namespace AddGroup {
+  export type Variables = {
+    recipientIds: string[];
+    groupName: string;
+  }
+
+  export type Mutation = {
+    addGroup?: AddGroup | null; 
+  } 
+
+  export type AddGroup = {
+    id: string; 
+    name?: string | null; 
+    picture?: string | null; 
+    userIds: string[]; 
+    unreadMessages: number; 
+    lastMessage?: LastMessage | null; 
+    isGroup: boolean; 
+  } 
+
+  export type LastMessage = {
+    id: string; 
+    content: string; 
+  } 
+}
 export namespace AddMessage {
   export type Variables = {
     chatId: string;
@@ -223,6 +272,20 @@ export namespace GetChats {
     id: string; 
     receivedAt?: number | null; 
     readAt?: number | null; 
+  } 
+}
+export namespace GetUsers {
+  export type Variables = {
+  }
+
+  export type Query = {
+    users: Users[]; 
+  } 
+
+  export type Users = {
+    id: string; 
+    name?: string | null; 
+    picture?: string | null; 
   } 
 }
 export namespace RemoveAllMessages {
