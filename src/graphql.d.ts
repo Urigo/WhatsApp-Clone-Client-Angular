@@ -121,6 +121,41 @@ export enum MessageType {
   TEXT = "TEXT",
   PICTURE = "PICTURE"
 }
+export namespace AddChat {
+  export type Variables = {
+    recipientId: string;
+  };
+
+  export type Mutation = {
+    __typename?: "Mutation";
+    addChat?: AddChat | null;
+  };
+
+  export type AddChat = {
+    __typename?: "Chat";
+    messages: (Messages | null)[];
+  } & ChatWithoutMessages.Fragment;
+
+  export type Messages = Message.Fragment;
+}
+export namespace AddGroup {
+  export type Variables = {
+    recipientIds: string[];
+    groupName: string;
+  };
+
+  export type Mutation = {
+    __typename?: "Mutation";
+    addGroup?: AddGroup | null;
+  };
+
+  export type AddGroup = {
+    __typename?: "Chat";
+    messages: (Messages | null)[];
+  } & ChatWithoutMessages.Fragment;
+
+  export type Messages = Message.Fragment;
+}
 export namespace AddMessage {
   export type Variables = {
     chatId: string;
@@ -167,6 +202,21 @@ export namespace GetChats {
   } & ChatWithoutMessages.Fragment;
 
   export type Messages = Message.Fragment;
+}
+export namespace GetUsers {
+  export type Variables = {};
+
+  export type Query = {
+    __typename?: "Query";
+    users?: Users[] | null;
+  };
+
+  export type Users = {
+    __typename?: "User";
+    id: string;
+    name?: string | null;
+    picture?: string | null;
+  };
 }
 export namespace RemoveAllMessages {
   export type Variables = {
