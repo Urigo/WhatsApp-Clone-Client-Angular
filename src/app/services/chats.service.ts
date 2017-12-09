@@ -1,6 +1,6 @@
-import {map} from 'rxjs/operators';
+import {concat, map} from 'rxjs/operators';
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
+import {Observable, AsyncSubject, of} from 'rxjs';
 import {QueryRef} from 'apollo-angular';
 import * as moment from 'moment';
 import {
@@ -31,6 +31,7 @@ export class ChatsService {
   getChatsWq: QueryRef<GetChats.Query, GetChats.Variables>;
   chats$: Observable<GetChats.Chats[]>;
   chats: GetChats.Chats[];
+  getChatWqSubject: AsyncSubject<QueryRef<GetChat.Query>>;
 
   constructor(
     private getChatsGQL: GetChatsGQL,
@@ -61,15 +62,34 @@ export class ChatsService {
   }
 
   getChat(chatId: string) {
+    const _chat = this.chats && this.chats.find(chat => chat.id === chatId) || {
+      id: chatId,
+      name: '',
+      picture: null,
+      allTimeMembers: [],
+      unreadMessages: 0,
+      isGroup: false,
+      messages: [],
+    };
+    const chat$FromCache = of<GetChat.Chat>(_chat);
+
     const query = this.getChatGQL.watch({
       chatId: chatId,
     });
 
-    const chat$ = query.valueChanges.pipe(
-      map((result) => result.data.chat)
+    const chat$ = chat$FromCache.pipe(
+      concat(
+        query.valueChanges.pipe(
+          map((result) => result.data.chat)
+        )
+      )
     );
 
-    return {query, chat$};
+    this.getChatWqSubject = new AsyncSubject();
+    this.getChatWqSubject.next(query);
+    this.getChatWqSubject.complete();
+
+    return {query$: this.getChatWqSubject.asObservable(), chat$};
   }
 
   addMessage(chatId: string, content: string) {
