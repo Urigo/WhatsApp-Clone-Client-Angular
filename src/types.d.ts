@@ -117,6 +117,37 @@ export interface MarkAsReadMutationArgs {
 
 export type MessageType = "LOCATION" | "TEXT" | "PICTURE";
 
+export namespace AddChat {
+  export type Variables = {
+    recipientId: string;
+  }
+
+  export type Mutation = {
+    addChat?: AddChat | null; 
+  } 
+
+  export type AddChat = {
+    messages: Messages[]; 
+  } & ChatWithoutMessages.Fragment
+
+  export type Messages = Message.Fragment
+}
+export namespace AddGroup {
+  export type Variables = {
+    recipientIds: string[];
+    groupName: string;
+  }
+
+  export type Mutation = {
+    addGroup?: AddGroup | null; 
+  } 
+
+  export type AddGroup = {
+    messages: Messages[]; 
+  } & ChatWithoutMessages.Fragment
+
+  export type Messages = Message.Fragment
+}
 export namespace AddMessage {
   export type Variables = {
     chatId: string;
@@ -158,6 +189,49 @@ export namespace GetChats {
   } & ChatWithoutMessages.Fragment
 
   export type Messages = Message.Fragment
+}
+export namespace GetUsers {
+  export type Variables = {
+  }
+
+  export type Query = {
+    users: Users[]; 
+  } 
+
+  export type Users = {
+    id: string; 
+    name?: string | null; 
+    picture?: string | null; 
+  } 
+}
+export namespace RemoveAllMessages {
+  export type Variables = {
+    chatId: string;
+    all?: boolean | null;
+  }
+
+  export type Mutation = {
+    removeMessages?: string[] | null; 
+  } 
+}
+export namespace RemoveChat {
+  export type Variables = {
+    chatId: string;
+  }
+
+  export type Mutation = {
+    removeChat?: string | null; 
+  } 
+}
+export namespace RemoveMessages {
+  export type Variables = {
+    chatId: string;
+    messageIds?: string[] | null;
+  }
+
+  export type Mutation = {
+    removeMessages?: string[] | null; 
+  } 
 }
 
 export namespace ChatWithoutMessages {
@@ -204,34 +278,5 @@ export namespace Message {
 
   export type Message = {
     id: string; 
-  } 
-}
-export namespace RemoveAllMessages {
-  export type Variables = {
-    chatId: string;
-    all?: boolean | null;
-  }
-
-  export type Mutation = {
-    removeMessages?: string[] | null; 
-  } 
-}
-export namespace RemoveChat {
-  export type Variables = {
-    chatId: string;
-  }
-
-  export type Mutation = {
-    removeChat?: string | null; 
-  } 
-}
-export namespace RemoveMessages {
-  export type Variables = {
-    chatId: string;
-    messageIds?: string[] | null;
-  }
-
-  export type Mutation = {
-    removeMessages?: string[] | null; 
   } 
 }
