@@ -1,5 +1,7 @@
 import {map} from 'rxjs/operators';
 import {Injectable} from '@angular/core';
+import {Observable} from 'rxjs';
+import {QueryRef} from 'apollo-angular';
 import {
   GetChatsGQL,
   GetChatGQL,
@@ -7,6 +9,9 @@ import {
   RemoveChatGQL,
   RemoveMessagesGQL,
   RemoveAllMessagesGQL,
+  GetUsersGQL,
+  AddChatGQL,
+  AddGroupGQL,
   AddMessage,
   GetChats,
   GetChat,
@@ -15,9 +20,14 @@ import {
 } from '../../graphql';
 import { DataProxy } from 'apollo-cache';
 
+const currentUserId = '1';
+
 @Injectable()
 export class ChatsService {
   messagesAmount = 3;
+  getChatsWq: QueryRef<GetChats.Query, GetChats.Variables>;
+  chats$: Observable<GetChats.Chats[]>;
+  chats: GetChats.Chats[];
 
   constructor(
     private getChatsGQL: GetChatsGQL,
@@ -26,17 +36,21 @@ export class ChatsService {
     private removeChatGQL: RemoveChatGQL,
     private removeMessagesGQL: RemoveMessagesGQL,
     private removeAllMessagesGQL: RemoveAllMessagesGQL,
-  ) {}
-
-  getChats() {
-    const query = this.getChatsGQL.watch({
+    private getUsersGQL: GetUsersGQL,
+    private addChatGQL: AddChatGQL,
+    private addGroupGQL: AddGroupGQL
+  ) {
+    this.getChatsWq = this.getChatsGQL.watch({
       amount: this.messagesAmount,
     });
-    const chats$ = query.valueChanges.pipe(
+    this.chats$ = this.getChatsWq.valueChanges.pipe(
       map((result) => result.data.chats)
     );
+    this.chats$.subscribe(chats => this.chats = chats);
+  }
 
-    return {query, chats$};
+  getChats() {
+    return {query: this.getChatsWq, chats$: this.chats$};
   }
 
   getChat(chatId: string) {
@@ -207,5 +221,84 @@ export class ChatsService {
         messageIds: messageIdsOrAll,
       }, options);
     }
+  }
+
+  getUsers() {
+    const query = this.getUsersGQL.watch();
+    const users$ = query.valueChanges.pipe(
+      map((result) => result.data.users)
+    );
+
+    return {query, users$};
+  }
+
+  // Checks if the chat is listed for the current user and returns the id
+  getChatId(userId: string) {
+    const _chat = this.chats.find(chat => {
+      return !chat.isGroup && !!chat.allTimeMembers.find(user => user.id === currentUserId) &&
+        !!chat.allTimeMembers.find(user => user.id === userId);
+    });
+    return _chat ? _chat.id : false;
+  }
+
+  addChat(userId: string) {
+    return this.addChatGQL.mutate(
+      {
+        userId,
+      }, {
+        update: (store, { data: { addChat } }) => {
+          // Read the data from our cache for this query.
+          const {chats} = store.readQuery<GetChats.Query, GetChats.Variables>({
+            query: this.getChatsGQL.document,
+            variables: {
+              amount: this.messagesAmount,
+            },
+          });
+          // Add our comment from the mutation to the end.
+          chats.push(addChat);
+          // Write our data back to the cache.
+          store.writeQuery<GetChats.Query, GetChats.Variables>({
+            query: this.getChatsGQL.document,
+            variables: {
+              amount: this.messagesAmount,
+            },
+            data: {
+              chats,
+            },
+          });
+        },
+      }
+    );
+  }
+
+  addGroup(userIds: string[], groupName: string) {
+    return this.addGroupGQL.mutate(
+      {
+        userIds,
+        groupName,
+      }, {
+        update: (store, { data: { addGroup } }) => {
+          // Read the data from our cache for this query.
+          const {chats} = store.readQuery<GetChats.Query, GetChats.Variables>({
+            query: this.getChatsGQL.document,
+            variables: {
+              amount: this.messagesAmount,
+            },
+          });
+          // Add our comment from the mutation to the end.
+          chats.push(addGroup);
+          // Write our data back to the cache.
+          store.writeQuery<GetChats.Query, GetChats.Variables>({
+            query: this.getChatsGQL.document,
+            variables: {
+              amount: this.messagesAmount,
+            },
+            data: {
+              chats,
+            },
+          });
+        },
+      }
+    );
   }
 }
