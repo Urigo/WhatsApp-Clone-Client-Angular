@@ -1,0 +1,157 @@
+# Chapter 5
+
+Now we can concentrate on the client and bootstrap it using angular-cli:
+
+    $ ng new client --style scss
+
+Time to install a couple of packages:
+
+    $ npm install apollo-angular apollo-angular-link-http apollo-cache-inmemory apollo-client apollo-link graphql graphql-tag
+
+Import Apollo client from our `app.module`:
+
+{{{ diffStep "1.1" files="app.module.ts" }}}
+
+Let's create a simple service to query the chats from our just created server:
+
+{{{ diffStep "1.2" }}}
+
+We will use Materials for the UI, so let's install it:
+
+    $ npm install @angular/cdk @angular/material hammerjs ng2-truncate
+
+Let's configure Material:
+
+{{{ diffStep "1.3" files="src/index.ts, src/main.ts, src/styles.scss" }}}
+
+We're now creating a `shared` module where we will define our header component where we're going to project a different content from each component:
+
+{{{ diffStep "1.3" files="src/app/shared/*" }}}
+
+Now we want to create the `chats-lister` module, with a container component called `ChatsComponent` and a couple of presentational components.
+
+{{{ diffStep "1.3" files="src/app/chats-lister/*" }}}
+
+Finally let's wire everything up to the main module:
+
+{{{ diffStep "1.3" files="src/app/app.component.ts, src/app/app.module.ts" }}}
+
+# Chapter 6
+
+Let's do the same on the client:
+
+$ npm install graphql-code-generator
+
+{{{ diffStep "2.1" }}}
+
+Those are our generated types:
+{{{ diffStep "2.2" }}}
+
+Let's use them:
+
+{{{ diffStep "2.3" }}}
+
+# Chapter 7
+
+{{{ diffStep "3.1" }}}
+
+# Chapter 8
+
+We created a module which lists all of our chats, but we still need to show a particular chat.
+Let's create the `chat-viewer` module! We're going to create a container component called `ChatComponent` and a couple of presentational components.
+
+{{{ diffStep "4.1" }}}
+
+It's time to generate our types and use them:
+
+    $ npm run generator
+
+{{{ diffStep "4.2" files="^(?!src/types.d.ts$).*" }}}
+
+{{{ diffStep "4.3" }}}
+
+# Chapter 9
+
+In the client, let's start by wiring the addMessage mutation. We're going to write the GraphQL query and then use the generator to generate the types:
+
+{{{ diffStep "5.1" files="^(?!src/types.d.ts$).*" }}}
+
+    $ npm run generator
+
+Now let's use the just-created query:
+
+{{{ diffStep "5.2" }}}
+
+# Chapter 10
+
+Did you notice that after creating a new message you'll have to refresh the page in order to see it?
+How to fix that? If you thought about re-querying the server you would be wrong! The best solution is to use the response provided by the server to update our Apollo local cache:
+
+{{{ diffStep "6.1" }}}
+
+# Chapter 11
+
+Since we're now familiar with the way mutations work, it's time to add messages and chats removal to our list of features!
+Since the most annoying part is going to be dealing with the user interface (because a multiple selection started by a press event is involved), I created an Angular directive to ease the process.
+Let's start by installing it:
+
+    $ npm install ngx-selectable-list
+
+Now let's import it:
+
+{{{ diffStep "7.1" files="chats-lister.module.ts" }}}
+
+Let's create the mutations:
+
+{{{ diffStep "7.2" files="src/graphql" }}}
+
+Now let's update our service:
+
+{{{ diffStep "7.2" files="chats.service.ts" }}}
+
+And finally wire everything up into our components:
+
+{{{ diffStep "7.2" files="src/app/chat-viewer, src/app/chats-lister, src/app/shared" }}}
+
+We also created a `ConfirmSelectionComponent` to use for content projection, since our selectable list directive will be able to listen to its events.
+The selectable list directive supports much more different use cases, for info please read the documentation.
+
+# Chapter 12
+
+We still cannot create new chats or groups, so let's implement it.
+We're going to create a `ChatsCreation` module, with a `NewChat` and a `NewGroup` containers, along with several presentational components.
+We're going to make use of the selectable list directive once again, to ease selecting the users when we're creating a new group.
+You should also notice that we are looking for existing chats before creating a new one: if it already exists we're are simply redirecting to that chat instead of creating a new one (the server wouldn't allow that anyway and it will simply 
+return the chat id).
+
+{{{ diffStep "8.1" }}}
+
+# Chapter 13
+
+Now let's start our client in production mode:
+
+    $ ng serve --prod
+
+Now open the Chrome Developers Tools and, in the Network tab, select 'Slow 3G Network' and 'Disable cache'.
+Now refresh the page and look at the DOMContentLoaded time and at the transferred size. You'll notice that our bundle size is quite small and so the loads time.
+Now let's click on a specific chat. It will take some time to load the data. Now let's add a new message. Once again it will take some time to load the data. We could also create a new chat and the result would be the same. The whole app doesn't 
+feel as snappier as the real Whatsapp on a slow 3G Network.
+"That's normal, it's a web application with a remote db while Whatsapp is a native app with a local database..."
+That's just an excuse, because we can do as good as Whatsapp thanks to Apollo!
+
+Let's start by making our UI optimistic. We can predict most of the response we will get from our server, except for a few things like `id` of newly created messages. But since we don't really need that id, we can simply generate a fake one 
+which will be later overridden once we get the response from the server:
+
+{{{ diffStep "9.1" }}}
+
+Now let's get the chat data from our chats cache while waiting for the server response. We will initially be able to show only the chat name, the last message and a few more informations instead of the whole content from the server, but that 
+would be more than enough to entertain the user while waiting for the server's response:
+
+{{{ diffStep "9.2" }}}
+
+Now let's deal with the most difficult part: how to deal with chats creation? Now we wouldn't be able to predict the `id` of the new chat and so we cannot navigate to the chat page because it contains the chat id in the url. We could simply 
+navigate to the "optimistic" ui, but then the user wouldn't be able to navigate back to that url if he refreshes the page or bookmarks it. That's a problem we care about. How to solve it? We're going to create a landing page and we will later 
+override the url once we get the response from the server!
+
+{{{ diffStep "9.3" }}}
+
