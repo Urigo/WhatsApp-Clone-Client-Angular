@@ -34,7 +34,7 @@ import {Router} from '@angular/router';
       <app-confirm-selection #confirmSelection></app-confirm-selection>
     </app-chats-list>
 
-    <button *ngIf="!isSelecting" class="chat-button" mat-fab color="primary">
+    <button *ngIf="!isSelecting" class="chat-button" mat-fab color="primary" (click)="goToNewChat()">
       <mat-icon aria-label="Icon-button with a + icon">add</mat-icon>
     </button>
   `,
@@ -54,6 +54,10 @@ export class ChatsComponent implements OnInit {
 
   goToChat(chatId: string) {
     this.router.navigate(['/chat', chatId]);
+  }
+
+  goToNewChat() {
+    this.router.navigate(['/new-chat']);
   }
 
   deleteChats(chatIds: string[]) {
