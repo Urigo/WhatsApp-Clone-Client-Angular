@@ -1,0 +1,42 @@
+:host {
+  display: block;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+div {
+  padding: 16px;
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.new-group {
+  position: absolute;
+  bottom: 5vw;
+  right: 5vw;
+}
+
+.users {
+  display: flex;
+  overflow: overlay;
+
+  .user {
+    padding-top: 0;
+    flex-flow: row wrap;
+    text-align: center;
+  }
+
+  .user-profile-pic {
+    flex: 0 1 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .user-name {
+    line-height: 10px;
+    font-size: 14px;
+  }
+}
