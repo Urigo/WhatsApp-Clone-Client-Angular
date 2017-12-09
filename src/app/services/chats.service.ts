@@ -1,4 +1,4 @@
-import {concat, map} from 'rxjs/operators';
+import {concat, map, share, switchMap} from 'rxjs/operators';
 import {Injectable} from '@angular/core';
 import {Observable, AsyncSubject, of} from 'rxjs';
 import {QueryRef} from 'apollo-angular';
@@ -19,8 +19,11 @@ import {
   RemoveMessages,
   RemoveAllMessages,
   GetUsers,
+  AddChat,
+  AddGroup,
 } from '../../graphql';
 import { DataProxy } from 'apollo-cache';
+import { FetchResult } from 'apollo-link';
 
 const currentUserId = '1';
 const currentUserName = 'Ethan Gonzalez';
@@ -32,6 +35,7 @@ export class ChatsService {
   chats$: Observable<GetChats.Chats[]>;
   chats: GetChats.Chats[];
   getChatWqSubject: AsyncSubject<QueryRef<GetChat.Query>>;
+  addChat$: Observable<FetchResult<AddChat.Mutation | AddGroup.Mutation>>;
 
   constructor(
     private getChatsGQL: GetChatsGQL,
@@ -61,7 +65,7 @@ export class ChatsService {
     return {query: this.getChatsWq, chats$: this.chats$};
   }
 
-  getChat(chatId: string) {
+  getChat(chatId: string, oui?: boolean) {
     const _chat = this.chats && this.chats.find(chat => chat.id === chatId) || {
       id: chatId,
       name: '',
@@ -73,21 +77,43 @@ export class ChatsService {
     };
     const chat$FromCache = of<GetChat.Chat>(_chat);
 
-    const query = this.getChatGQL.watch({
-      chatId: chatId,
-    });
+    const getApolloWatchQuery = (id: string) => {
+      return this.getChatGQL.watch({
+        chatId: id,
+      });
+    };
 
-    const chat$ = chat$FromCache.pipe(
-      concat(
-        query.valueChanges.pipe(
-          map((result) => result.data.chat)
-        )
-      )
-    );
-
+    let chat$: Observable<GetChat.Chat>;
     this.getChatWqSubject = new AsyncSubject();
-    this.getChatWqSubject.next(query);
-    this.getChatWqSubject.complete();
+
+    if (oui) {
+      chat$ = chat$FromCache.pipe(
+        concat(this.addChat$.pipe(
+          switchMap(({ data: { addChat, addGroup } }) => {
+            const query = getApolloWatchQuery(addChat ? addChat.id : addGroup.id);
+
+            this.getChatWqSubject.next(query);
+            this.getChatWqSubject.complete();
+
+            return query.valueChanges.pipe(
+              map((result) => result.data.chat)
+            );
+          }))
+        ));
+    } else {
+      const query = getApolloWatchQuery(chatId);
+
+      this.getChatWqSubject.next(query);
+      this.getChatWqSubject.complete();
+
+      chat$ = chat$FromCache.pipe(
+        concat(
+          query.valueChanges.pipe(
+            map((result) => result.data.chat)
+          )
+        )
+      );
+    }
 
     return {query$: this.getChatWqSubject.asObservable(), chat$};
   }
@@ -295,15 +321,15 @@ export class ChatsService {
     return _chat ? _chat.id : false;
   }
 
-  addChat(recipientId: string, users: GetUsers.Users[]) {
-    return this.addChatGQL.mutate(
+  addChat(recipientId: string, users: GetUsers.Users[], ouiId: string) {
+    this.addChat$ = this.addChatGQL.mutate(
       {
         recipientId,
       }, {
         optimisticResponse: {
           __typename: 'Mutation',
           addChat: {
-            id: ChatsService.getRandomId(),
+            id: ouiId,
             __typename: 'Chat',
             name: users.find(user => user.id === recipientId).name,
             picture: users.find(user => user.id === recipientId).picture,
@@ -344,11 +370,12 @@ export class ChatsService {
           });
         },
       }
-    );
+    ).pipe(share());
+    return this.addChat$;
   }
 
-  addGroup(recipientIds: string[], groupName: string) {
-    return this.addGroupGQL.mutate(
+  addGroup(recipientIds: string[], groupName: string, ouiId: string) {
+    this.addChat$ = this.addGroupGQL.mutate(
       {
         recipientIds,
         groupName,
@@ -356,7 +383,7 @@ export class ChatsService {
         optimisticResponse: {
           __typename: 'Mutation',
           addGroup: {
-            id: ChatsService.getRandomId(),
+            id: ouiId,
             __typename: 'Chat',
             name: groupName,
             picture: 'https://randomuser.me/api/portraits/thumb/lego/1.jpg',
@@ -395,6 +422,7 @@ export class ChatsService {
           });
         },
       }
-    );
+    ).pipe(share());
+    return this.addChat$;
   }
 }
