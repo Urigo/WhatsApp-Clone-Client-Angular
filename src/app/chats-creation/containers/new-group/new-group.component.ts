@@ -52,9 +52,9 @@ export class NewGroupComponent implements OnInit {
 
   addGroup(groupName: string) {
     if (groupName && this.userIds.length) {
-      this.chatsService.addGroup(this.userIds, groupName).subscribe(({data: {addGroup: {id}}}: { data: AddGroup.Mutation }) => {
-        this.router.navigate(['/chat', id]);
-      });
+      const ouiId = ChatsService.getRandomId();
+      this.chatsService.addGroup(this.userIds, groupName, ouiId).subscribe();
+      this.router.navigate(['/chat', ouiId], {queryParams: {oui: true}, skipLocationChange: true});
     }
   }
 }
