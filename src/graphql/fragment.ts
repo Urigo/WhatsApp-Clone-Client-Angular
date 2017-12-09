@@ -4,6 +4,13 @@ import {DocumentNode} from 'graphql';
 export const fragments: {
   [key: string]: DocumentNode
 } = {
+  user: gql`
+    fragment User on User {
+      id
+      name
+      picture
+    }
+  `,
   chatWithoutMessages: gql`
     fragment ChatWithoutMessages on Chat {
       id
