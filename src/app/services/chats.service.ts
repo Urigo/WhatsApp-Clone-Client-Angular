@@ -1,5 +1,5 @@
 import {ApolloQueryResult, MutationOptions, WatchQueryOptions} from 'apollo-client';
-import {map} from 'rxjs/operators';
+import {concat, map} from 'rxjs/operators';
 import {Apollo, QueryRef} from 'apollo-angular';
 import {Injectable} from '@angular/core';
 import {getChatsQuery} from '../../graphql/getChats.query';
@@ -15,6 +15,8 @@ import {Observable} from 'rxjs/Observable';
 import {addChatMutation} from '../../graphql/addChat.mutation';
 import {addGroupMutation} from '../../graphql/addGroup.mutation';
 import * as moment from 'moment';
+import {AsyncSubject} from 'rxjs/AsyncSubject';
+import {of} from 'rxjs/observable/of';
 
 const currentUserId = '1';
 const currentUserName = 'Ethan Gonzalez';
@@ -25,6 +27,7 @@ export class ChatsService {
   getChatsWq: QueryRef<GetChats.Query>;
   chats$: Observable<GetChats.Chats[]>;
   chats: GetChats.Chats[];
+  getChatWqSubject: AsyncSubject<QueryRef<GetChat.Query>>;
 
   constructor(private apollo: Apollo) {
     this.getChatsWq = this.apollo.watchQuery<GetChats.Query>(<WatchQueryOptions>{
@@ -48,18 +51,34 @@ export class ChatsService {
   }
 
   getChat(chatId: string) {
+    const _chat = this.chats && this.chats.find(chat => chat.id === chatId) || {
+      id: chatId,
+      name: '',
+      picture: null,
+      allTimeMembers: [],
+      unreadMessages: 0,
+      isGroup: false,
+      messages: [],
+    };
+    const chat$FromCache = of<GetChat.Chat>(_chat);
+
     const query = this.apollo.watchQuery<GetChat.Query>({
       query: getChatQuery,
       variables: {
-        chatId: chatId,
+        chatId,
       }
     });
 
-    const chat$ = query.valueChanges.pipe(
-      map((result: ApolloQueryResult<GetChat.Query>) => result.data.chat)
-    );
+    const chat$ = chat$FromCache.pipe(
+      concat(query.valueChanges.pipe(
+        map((result: ApolloQueryResult<GetChat.Query>) => result.data.chat)
+      )));
 
-    return {query, chat$};
+    this.getChatWqSubject = new AsyncSubject();
+    this.getChatWqSubject.next(query);
+    this.getChatWqSubject.complete();
+
+    return {query$: this.getChatWqSubject.asObservable(), chat$};
   }
 
   addMessage(chatId: string, content: string) {
