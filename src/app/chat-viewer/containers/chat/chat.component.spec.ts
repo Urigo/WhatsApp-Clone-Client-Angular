@@ -129,7 +129,10 @@ describe('ChatComponent', () => {
         },
         {
           provide: ActivatedRoute,
-          useValue: { params: of({ id: chat.id }) },
+          useValue: {
+            params: of({ id: chat.id }),
+            queryParams: of({}),
+          },
         },
       ],
       schemas: [NO_ERRORS_SCHEMA],
