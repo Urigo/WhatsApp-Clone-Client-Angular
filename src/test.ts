@@ -7,6 +7,9 @@ import {
   platformBrowserDynamicTesting
 } from '@angular/platform-browser-dynamic/testing';
 
+// Material gestures
+import 'hammerjs';
+
 declare const require: any;
 
 // First, initialize the Angular testing environment.
