@@ -44,7 +44,7 @@
     "@angular/language-service": "5.2.1",
     "@types/jasmine": "2.8.4",
     "@types/jasminewd2": "2.0.3",
-    "@types/node": "6.0.96",
+    "@types/node": "9.3.0",
     "codelyzer": "4.1.0",
     "graphql-code-generator": "0.8.14",
     "jasmine-core": "2.8.0",
