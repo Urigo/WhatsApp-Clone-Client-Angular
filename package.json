@@ -29,7 +29,7 @@
     "apollo-client": "2.2.2",
     "apollo-link": "1.0.7",
     "core-js": "2.5.3",
-    "graphql": "0.12.3",
+    "graphql": "0.13.0",
     "graphql-tag": "2.6.1",
     "hammerjs": "2.0.8",
     "ng2-truncate": "1.3.11",
