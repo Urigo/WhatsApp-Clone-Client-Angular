@@ -30,7 +30,7 @@
     "apollo-link": "1.1.0",
     "core-js": "2.5.3",
     "graphql": "0.12.3",
-    "graphql-tag": "2.6.1",
+    "graphql-tag": "2.8.0",
     "hammerjs": "2.0.8",
     "ng2-truncate": "1.3.11",
     "ngx-selectable-list": "1.1.0",
