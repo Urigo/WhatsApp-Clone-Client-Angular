@@ -8,7 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "generator": "gql-gen --config codegen.yml"
+    "generator": "ts-node src/codegen.ts"
   },
   "private": true,
   "dependencies": {
@@ -17,6 +17,7 @@
     "@angular/common": "~7.2.0",
     "@angular/compiler": "~7.2.0",
     "@angular/core": "~7.2.0",
+    "@angular/flex-layout": "^7.0.0-beta.23",
     "@angular/forms": "~7.2.0",
     "@angular/material": "^7.3.2",
     "@angular/platform-browser": "~7.2.0",
@@ -59,6 +60,7 @@
     "karma-coverage-istanbul-reporter": "~2.0.1",
     "karma-jasmine": "~1.1.2",
     "karma-jasmine-html-reporter": "^0.2.2",
+    "prompt": "^1.0.0",
     "protractor": "~5.4.0",
     "ts-node": "~7.0.0",
     "tslint": "~5.11.0",
