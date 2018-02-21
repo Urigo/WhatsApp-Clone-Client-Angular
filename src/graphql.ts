@@ -69,6 +69,24 @@ export namespace AddMessage {
   export type AddMessage = Message.Fragment;
 }
 
+export namespace ChatAdded {
+  export type Variables = {};
+
+  export type Subscription = {
+    __typename?: "Subscription";
+
+    chatAdded: Maybe<ChatAdded>;
+  };
+
+  export type ChatAdded = {
+    __typename?: "Chat";
+
+    messages: (Maybe<Messages>)[];
+  } & ChatWithoutMessages.Fragment;
+
+  export type Messages = Message.Fragment;
+}
+
 export namespace GetChat {
   export type Variables = {
     chatId: string;
@@ -126,6 +144,28 @@ export namespace GetUsers {
     name: Maybe<string>;
 
     picture: Maybe<string>;
+  };
+}
+
+export namespace MessageAdded {
+  export type Variables = {};
+
+  export type Subscription = {
+    __typename?: "Subscription";
+
+    messageAdded: Maybe<MessageAdded>;
+  };
+
+  export type MessageAdded = {
+    __typename?: "Message";
+
+    chat: Chat;
+  } & Message.Fragment;
+
+  export type Chat = {
+    __typename?: "Chat";
+
+    id: string;
   };
 }
 
@@ -390,6 +430,18 @@ export interface Mutation {
   markAsRead?: Maybe<boolean>;
 }
 
+export interface Subscription {
+  messageAdded?: Maybe<Message>;
+
+  chatAdded?: Maybe<Chat>;
+
+  chatUpdated?: Maybe<Chat>;
+
+  userUpdated?: Maybe<User>;
+
+  userAdded?: Maybe<User>;
+}
+
 // ====================================================
 // Arguments
 // ====================================================
@@ -468,6 +520,9 @@ export interface MarkAsReceivedMutationArgs {
 }
 export interface MarkAsReadMutationArgs {
   chatId: string;
+}
+export interface MessageAddedSubscriptionArgs {
+  chatId?: Maybe<string>;
 }
 
 // ====================================================
@@ -595,6 +650,27 @@ export class AddMessageGQL extends Apollo.Mutation<
 @Injectable({
   providedIn: "root"
 })
+export class ChatAddedGQL extends Apollo.Subscription<
+  ChatAdded.Subscription,
+  ChatAdded.Variables
+> {
+  document: any = gql`
+    subscription chatAdded {
+      chatAdded {
+        ...ChatWithoutMessages
+        messages {
+          ...Message
+        }
+      }
+    }
+
+    ${ChatWithoutMessagesFragment}
+    ${MessageFragment}
+  `;
+}
+@Injectable({
+  providedIn: "root"
+})
 export class GetChatGQL extends Apollo.Query<GetChat.Query, GetChat.Variables> {
   document: any = gql`
     query GetChat($chatId: ID!) {
@@ -646,6 +722,26 @@ export class GetUsersGQL extends Apollo.Query<
         picture
       }
     }
+  `;
+}
+@Injectable({
+  providedIn: "root"
+})
+export class MessageAddedGQL extends Apollo.Subscription<
+  MessageAdded.Subscription,
+  MessageAdded.Variables
+> {
+  document: any = gql`
+    subscription messageAdded {
+      messageAdded {
+        ...Message
+        chat {
+          id
+        }
+      }
+    }
+
+    ${MessageFragment}
   `;
 }
 @Injectable({
