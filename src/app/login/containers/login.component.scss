@@ -1,0 +1,96 @@
+:host {
+  height: 100vh;
+  display: block;
+  background: radial-gradient(rgb(34,65,67), rgb(17,48,50)), url(/assets/chat-background.jpg) no-repeat;
+  background-size: cover;
+  background-blend-mode: multiply;
+
+  > img {
+    width: 35%;
+    height: auto;
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 70px;
+    display: block;
+  }
+
+  > h2 {
+    width: 100%;
+    text-align: center;
+    color: white;
+  }
+}
+
+form {
+  padding: 20px;
+
+  > div {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+}
+
+mat-form-field ::ng-deep {
+  width: 100%;
+  background-color: transparent !important;
+
+  mat-label {
+    color: white !important ;
+  }
+
+  .mat-form-field-underline {
+    background-color: white !important;
+  }
+
+  .mat-focused .mat-form-field-label {
+    color: white !important;
+  }
+
+  .mat-form-field-ripple {
+    background-color: var(--primary) !important;
+  }
+
+  .mat-input-element {
+    caret-color: white !important;
+  }
+
+  .mat-input-element::placeholder {
+    color: var(--primary);
+  }
+}
+
+legend {
+  font-weight: bold;
+  color: white;
+}
+
+label {
+  display: block;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+button {
+  width: 100px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.error {
+  color: red;
+  font-size: 13px;
+  margin-top: -15.5px;
+}
+
+.alternative {
+  position: fixed;
+  left: 10px;
+  bottom: 10px;
+  color: white;
+  font-size: 14px;
+
+  a {
+    color: var(--secondary);
+  }
+}
