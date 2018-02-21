@@ -11,7 +11,7 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 import { GetChats } from '../../graphql';
 import { dataIdFromObject } from '../graphql.module';
 import { ChatsService } from './chats.service';
-import {LoginService} from '../login/services/login.service';
+import { LoginService } from '../login/services/login.service';
 
 describe('ChatsService', () => {
   let controller: ApolloTestingController;
@@ -340,6 +340,9 @@ describe('ChatsService', () => {
         expect(_chats[i]).toEqual(chats[i]);
       }
     });
+
+    controller.expectOne('chatAdded', 'call to chatAdded api');
+    controller.expectOne('messageAdded', 'call to messageAdded api');
 
     const req = controller.expectOne('GetChats', 'GetChats operation');
 
