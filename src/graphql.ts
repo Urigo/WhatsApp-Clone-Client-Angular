@@ -651,6 +651,22 @@ export namespace AddMessage {
   export type AddMessage = Message.Fragment;
 }
 
+export namespace ChatAdded {
+  export type Variables = {};
+
+  export type Subscription = {
+    __typename?: "Subscription";
+    chatAdded?: ChatAdded | null;
+  };
+
+  export type ChatAdded = {
+    __typename?: "Chat";
+    messages: (Messages | null)[];
+  } & ChatWithoutMessages.Fragment;
+
+  export type Messages = Message.Fragment;
+}
+
 export namespace GetChat {
   export type Variables = {
     chatId: string;
@@ -700,6 +716,27 @@ export namespace GetUsers {
     id: string;
     name?: string | null;
     picture?: string | null;
+  };
+}
+
+export namespace MessageAdded {
+  export type Variables = {
+    chatId?: string | null;
+  };
+
+  export type Subscription = {
+    __typename?: "Subscription";
+    messageAdded?: MessageAdded | null;
+  };
+
+  export type MessageAdded = {
+    __typename?: "Message";
+    chat: Chat;
+  } & Message.Fragment;
+
+  export type Chat = {
+    __typename?: "Chat";
+    id: string;
   };
 }
 
@@ -924,6 +961,27 @@ export class AddMessageGQL extends Apollo.Mutation<
 @Injectable({
   providedIn: "root"
 })
+export class ChatAddedGQL extends Apollo.Subscription<
+  ChatAdded.Subscription,
+  ChatAdded.Variables
+> {
+  document: any = gql`
+    subscription chatAdded {
+      chatAdded {
+        ...ChatWithoutMessages
+        messages {
+          ...Message
+        }
+      }
+    }
+
+    ${ChatWithoutMessagesFragment}
+    ${MessageFragment}
+  `;
+}
+@Injectable({
+  providedIn: "root"
+})
 export class GetChatGQL extends Apollo.Query<GetChat.Query, GetChat.Variables> {
   document: any = gql`
     query GetChat($chatId: ID!) {
@@ -975,6 +1033,26 @@ export class GetUsersGQL extends Apollo.Query<
         picture
       }
     }
+  `;
+}
+@Injectable({
+  providedIn: "root"
+})
+export class MessageAddedGQL extends Apollo.Subscription<
+  MessageAdded.Subscription,
+  MessageAdded.Variables
+> {
+  document: any = gql`
+    subscription messageAdded($chatId: ID) {
+      messageAdded(chatId: $chatId) {
+        ...Message
+        chat {
+          id
+        }
+      }
+    }
+
+    ${MessageFragment}
   `;
 }
 @Injectable({
