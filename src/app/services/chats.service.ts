@@ -25,6 +25,7 @@ import {
 } from '../../graphql';
 import { DataProxy } from 'apollo-cache';
 import { FetchResult } from 'apollo-link';
+import {LoginService} from '../login/services/login.service';
 
 const currentUserId = '1';
 const currentUserName = 'Ethan Gonzalez';
@@ -51,7 +52,8 @@ export class ChatsService {
     private getUsersGQL: GetUsersGQL,
     private userAddedGQL: UserAddedGQL,
     private addChatGQL: AddChatGQL,
-    private addGroupGQL: AddGroupGQL
+    private addGroupGQL: AddGroupGQL,
+    private loginService: LoginService
   ) {
     this.getChatsWq = this.getChatsGQL.watch({
       amount: this.messagesAmount,
@@ -165,8 +167,8 @@ export class ChatsService {
           },
           sender: {
             __typename: 'User',
-            id: currentUserId,
-            name: currentUserName,
+            id: this.loginService.getUser().id,
+            name: this.loginService.getUser().name,
           },
           content,
           createdAt: moment().unix(),
@@ -351,7 +353,7 @@ export class ChatsService {
   // Checks if the chat is listed for the current user and returns the id
   getChatId(recipientId: string) {
     const _chat = this.chats.find(chat => {
-      return !chat.isGroup && !!chat.allTimeMembers.find(user => user.id === currentUserId) &&
+      return !chat.isGroup && !!chat.allTimeMembers.find(user => user.id === this.loginService.getUser().id) &&
         !!chat.allTimeMembers.find(user => user.id === recipientId);
     });
     return _chat ? _chat.id : false;
@@ -371,7 +373,7 @@ export class ChatsService {
             picture: users.find(user => user.id === recipientId).picture,
             allTimeMembers: [
               {
-                id: currentUserId,
+                id: this.loginService.getUser().id,
                 __typename: 'User',
               },
               {
@@ -425,10 +427,10 @@ export class ChatsService {
             id: ouiId,
             name: groupName,
             picture: 'https://randomuser.me/api/portraits/thumb/lego/1.jpg',
-            userIds: [currentUserId, recipientIds],
+            userIds: [this.loginService.getUser().id, recipientIds],
             allTimeMembers: [
               {
-                id: currentUserId,
+                id: this.loginService.getUser().id,
                 __typename: 'User',
               },
               ...recipientIds.map(id => ({id, __typename: 'User'})),
