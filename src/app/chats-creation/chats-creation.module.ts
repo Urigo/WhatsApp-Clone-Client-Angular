@@ -16,10 +16,11 @@ import {NewChatComponent} from './containers/new-chat/new-chat.component';
 import {NewGroupDetailsComponent} from './components/new-group-details/new-group-details.component';
 import {SharedModule} from '../shared/shared.module';
 import {SelectableListModule} from 'ngx-selectable-list';
+import {AuthGuard} from '../login/services/auth.guard';
 
 const routes: Routes = [
-  {path: 'new-chat', component: NewChatComponent},
-  {path: 'new-group', component: NewGroupComponent},
+  {path: 'new-chat', canActivate: [AuthGuard], component: NewChatComponent},
+  {path: 'new-group', canActivate: [AuthGuard], component: NewGroupComponent},
 ];
 
 @NgModule({

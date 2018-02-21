@@ -18,9 +18,7 @@ import * as moment from 'moment';
 import {AsyncSubject} from 'rxjs/AsyncSubject';
 import {of} from 'rxjs/observable/of';
 import {FetchResult} from 'apollo-link';
-
-const currentUserId = '1';
-const currentUserName = 'Ethan Gonzalez';
+import {LoginService} from '../login/services/login.service';
 
 @Injectable()
 export class ChatsService {
@@ -31,7 +29,8 @@ export class ChatsService {
   getChatWqSubject: AsyncSubject<QueryRef<GetChat.Query>>;
   addChat$: Observable<FetchResult<AddChat.Mutation | AddGroup.Mutation>>;
 
-  constructor(private apollo: Apollo) {
+  constructor(private apollo: Apollo,
+              private loginService: LoginService) {
     this.getChatsWq = this.apollo.watchQuery<GetChats.Query>(<WatchQueryOptions>{
       query: getChatsQuery,
       variables: {
@@ -113,11 +112,11 @@ export class ChatsService {
         addMessage: {
           id: ChatsService.getRandomId(),
           __typename: 'Message',
-          senderId: currentUserId,
+          senderId: this.loginService.getUser().id,
           sender: {
-            id: currentUserId,
+            id: this.loginService.getUser().id,
             __typename: 'User',
-            name: currentUserName,
+            name: this.loginService.getUser().name,
           },
           content,
           createdAt: moment().unix(),
@@ -288,7 +287,7 @@ export class ChatsService {
   // Checks if the chat is listed for the current user and returns the id
   getChatId(recipientId: string) {
     const _chat = this.chats.find(chat => {
-      return !chat.isGroup && !!chat.allTimeMembers.find(user => user.id === currentUserId) &&
+      return !chat.isGroup && !!chat.allTimeMembers.find(user => user.id === this.loginService.getUser().id) &&
         !!chat.allTimeMembers.find(user => user.id === recipientId);
     });
     return _chat ? _chat.id : false;
@@ -309,7 +308,7 @@ export class ChatsService {
           picture: users.find(user => user.id === recipientId).picture,
           allTimeMembers: [
             {
-              id: currentUserId,
+              id: this.loginService.getUser().id,
               __typename: 'User',
             },
             {
@@ -361,10 +360,10 @@ export class ChatsService {
           __typename: 'Chat',
           name: groupName,
           picture: 'https://randomuser.me/api/portraits/thumb/lego/1.jpg',
-          userIds: [currentUserId, recipientIds],
+          userIds: [this.loginService.getUser().id, recipientIds],
           allTimeMembers: [
             {
-              id: currentUserId,
+              id: this.loginService.getUser().id,
               __typename: 'User',
             },
             ...recipientIds.map(id => ({id, __typename: 'User'})),
