@@ -29,6 +29,7 @@ import { SharedModule } from '../../../shared/shared.module';
 import { NewMessageComponent } from '../../components/new-message/new-message.component';
 import { MessagesListComponent } from '../../components/messages-list/messages-list.component';
 import { MessageItemComponent } from '../../components/message-item/message-item.component';
+import { LoginService } from '../../../login/services/login.service';
 
 describe('ChatComponent', () => {
   let component: ChatComponent;
@@ -134,6 +135,7 @@ describe('ChatComponent', () => {
             queryParams: of({}),
           },
         },
+        LoginService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
