@@ -12,10 +12,11 @@ import {ChatsListComponent} from './components/chats-list/chats-list.component';
 import {TruncateModule} from 'ng2-truncate';
 import {SharedModule} from '../shared/shared.module';
 import {SelectableListModule} from 'ngx-selectable-list';
+import {AuthGuard} from '../login/services/auth.guard';
 
 const routes: Routes = [
   {path: '', redirectTo: 'chats', pathMatch: 'full'},
-  {path: 'chats', component: ChatsComponent},
+  {path: 'chats', canActivate: [AuthGuard], component: ChatsComponent},
 ];
 
 @NgModule({

@@ -18,6 +18,7 @@ import {NewMessageComponent} from '../../components/new-message/new-message.comp
 import {MessagesListComponent} from '../../components/messages-list/messages-list.component';
 import {MessageItemComponent} from '../../components/message-item/message-item.component';
 import {SelectableListModule} from 'ngx-selectable-list';
+import {LoginService} from '../../../login/services/login.service';
 
 describe('ChatComponent', () => {
   let component: ChatComponent;
@@ -120,7 +121,8 @@ describe('ChatComponent', () => {
             params: of({ id: chat.id }),
             queryParams: of({}),
           }
-        }
+        },
+        LoginService,
       ],
       schemas: [NO_ERRORS_SCHEMA]
     })

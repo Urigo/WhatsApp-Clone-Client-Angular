@@ -5,6 +5,7 @@ import {Apollo} from 'apollo-angular';
 import {HttpLink, HttpLinkModule, Options} from 'apollo-angular-link-http';
 import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
 import {defaultDataIdFromObject, InMemoryCache} from 'apollo-cache-inmemory';
+import {LoginService} from '../login/services/login.service';
 
 describe('ChatsService', () => {
   let httpMock: HttpTestingController;
@@ -312,6 +313,7 @@ describe('ChatsService', () => {
       providers: [
         ChatsService,
         Apollo,
+        LoginService,
       ]
     });
 
