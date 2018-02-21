@@ -13,6 +13,11 @@ import {ChatViewerModule} from './chat-viewer/chat-viewer.module';
 import {ChatsCreationModule} from './chats-creation/chats-creation.module';
 import {LoginModule} from './login/login.module';
 import {AuthInterceptor} from './login/services/auth.interceptor';
+import {getMainDefinition} from 'apollo-utilities';
+import {OperationDefinitionNode} from 'graphql';
+import {split} from 'apollo-link';
+import {WebSocketLink} from 'apollo-link-ws';
+import {LoginService} from './login/services/login.service';
 
 const routes: Routes = [];
 
@@ -47,9 +52,30 @@ export class AppModule {
   constructor(
     apollo: Apollo,
     httpLink: HttpLink,
+    loginService: LoginService,
   ) {
+    const subscriptionLink = new WebSocketLink({
+      uri:
+        'ws://localhost:3000/subscriptions',
+      options: {
+        reconnect: true,
+        connectionParams: () => ({
+          authToken: loginService.getAuthHeader() || null
+        })
+      }
+    });
+
+    const link = split(
+      ({ query }) => {
+        const { kind, operation } = <OperationDefinitionNode>getMainDefinition(query);
+        return kind === 'OperationDefinition' && operation === 'subscription';
+      },
+      subscriptionLink,
+      httpLink.create(<Options>{uri: 'http://localhost:3000/graphql'})
+    );
+
     apollo.create({
-      link: httpLink.create(<Options>{uri: 'http://localhost:3000/graphql'}),
+      link,
       cache: new InMemoryCache({
         dataIdFromObject: (object: any) => {
           switch (object.__typename) {
