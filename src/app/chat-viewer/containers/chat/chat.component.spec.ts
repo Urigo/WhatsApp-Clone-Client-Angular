@@ -149,6 +149,8 @@ describe('ChatComponent', () => {
     fixture = TestBed.createComponent(ChatComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+    httpMock.expectOne(httpReq => httpReq.body.operationName === 'chatAdded', 'call to chatAdded api');
+    httpMock.expectOne(httpReq => httpReq.body.operationName === 'messageAdded', 'call to messageAdded api');
     httpMock.expectOne(httpReq => httpReq.body.operationName === 'GetChats', 'call to getChats api');
     const req = httpMock.expectOne(httpReq => httpReq.body.operationName === 'GetChat', 'call to getChat api');
     req.flush({
