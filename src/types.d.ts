@@ -61,6 +61,11 @@ export interface Mutation {
   markAsReceived?: boolean | null; 
   markAsRead?: boolean | null; 
 }
+
+export interface Subscription {
+  messageAdded?: Message | null; 
+  chatAdded?: Chat | null; 
+}
 export interface ChatQueryArgs {
   chatId: string; 
 }
@@ -114,6 +119,9 @@ export interface MarkAsReceivedMutationArgs {
 export interface MarkAsReadMutationArgs {
   chatId: string; 
 }
+export interface MessageAddedSubscriptionArgs {
+  chatId?: string | null; 
+}
 
 export type MessageType = "LOCATION" | "TEXT" | "PICTURE";
 
@@ -160,6 +168,20 @@ export namespace AddMessage {
 
   export type AddMessage = Message.Fragment
 }
+export namespace ChatAdded {
+  export type Variables = {
+  }
+
+  export type Subscription = {
+    chatAdded?: ChatAdded | null; 
+  } 
+
+  export type ChatAdded = {
+    messages: Messages[]; 
+  } & ChatWithoutMessages.Fragment
+
+  export type Messages = Message.Fragment
+}
 export namespace GetChat {
   export type Variables = {
     chatId: string;
@@ -202,6 +224,23 @@ export namespace GetUsers {
     id: string; 
     name?: string | null; 
     picture?: string | null; 
+  } 
+}
+export namespace MessageAdded {
+  export type Variables = {
+    chatId?: string | null;
+  }
+
+  export type Subscription = {
+    messageAdded?: MessageAdded | null; 
+  } 
+
+  export type MessageAdded = {
+    chat: Chat; 
+  } & Message.Fragment
+
+  export type Chat = {
+    id: string; 
   } 
 }
 export namespace RemoveAllMessages {
