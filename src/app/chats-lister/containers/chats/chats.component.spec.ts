@@ -358,8 +358,10 @@ describe('ChatsComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
 
-    const req = controller.expectOne('GetChats', 'GetChats operation');
+    controller.expectOne('chatAdded', 'call to chatAdded api');
+    controller.expectOne('messageAdded', 'call to messageAdded api');
 
+    const req = controller.expectOne('GetChats', 'GetChats operation');
     req.flush({
       data: {
         chats,
