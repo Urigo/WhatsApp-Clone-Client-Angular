@@ -1,7 +1,7 @@
 import {concat, map, share, switchMap} from 'rxjs/operators';
 import {Injectable} from '@angular/core';
 import {Observable, AsyncSubject, of} from 'rxjs';
-import {QueryRef} from 'apollo-angular';
+import {Apollo, QueryRef} from 'apollo-angular';
 import * as moment from 'moment';
 import {
   GetChatsGQL,
@@ -13,6 +13,8 @@ import {
   GetUsersGQL,
   AddChatGQL,
   AddGroupGQL,
+  ChatAddedGQL,
+  MessageAddedGQL,
   AddMessage,
   GetChats,
   GetChat,
@@ -21,6 +23,7 @@ import {
   GetUsers,
   AddChat,
   AddGroup,
+  MessageAdded,
 } from '../../graphql';
 import { DataProxy } from 'apollo-cache';
 import { FetchResult } from 'apollo-link';
@@ -48,11 +51,69 @@ export class ChatsService {
     private getUsersGQL: GetUsersGQL,
     private addChatGQL: AddChatGQL,
     private addGroupGQL: AddGroupGQL,
+    private chatAddedGQL: ChatAddedGQL,
+    private messageAddedGQL: MessageAddedGQL,
+    private apollo: Apollo,
     private loginService: LoginService
   ) {
     this.getChatsWq = this.getChatsGQL.watch({
       amount: this.messagesAmount,
     });
+
+    this.getChatsWq.subscribeToMore({
+      document: this.chatAddedGQL.document,
+      updateQuery: (prev: GetChats.Query, { subscriptionData }) => {
+        if (!subscriptionData.data) {
+          return prev;
+        }
+
+        const newChat: GetChats.Chats = (<any>subscriptionData).data.chatAdded;
+
+        return Object.assign({}, prev, {
+          chats: [...prev.chats, newChat]
+        });
+      }
+    });
+
+    this.getChatsWq.subscribeToMore({
+      document: this.messageAddedGQL.document,
+      updateQuery: (prev: GetChats.Query, { subscriptionData }) => {
+        if (!subscriptionData.data) {
+          return prev;
+        }
+
+        const newMessage: MessageAdded.MessageAdded = (<any>subscriptionData).data.messageAdded;
+
+        // We need to update the cache for both Chat and Chats. The following updates the cache for Chat.
+        try {
+          // Read the data from our cache for this query.
+          const {chat}: GetChat.Query = this.apollo.getClient().readQuery({
+            query: this.getChatGQL.document,
+            variables: {
+              chatId: newMessage.chat.id,
+            }
+          });
+
+          // Add our message from the mutation to the end.
+          chat.messages.push(newMessage);
+          // Write our data back to the cache.
+          this.apollo.getClient().writeQuery({
+            query: this.getChatGQL.document,
+            data: {
+              chat
+            }
+          });
+        } catch {
+          console.error('The chat we received an update for does not exist in the store');
+        }
+
+        return Object.assign({}, prev, {
+          chats: [...prev.chats.map(_chat =>
+            _chat.id === newMessage.chat.id ? {..._chat, messages: [..._chat.messages, newMessage]} : _chat)]
+        });
+      }
+    });
+
     this.chats$ = this.getChatsWq.valueChanges.pipe(
       map((result) => result.data.chats)
     );
