@@ -11,6 +11,7 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 import { GetChats } from '../../graphql';
 import { dataIdFromObject } from '../graphql.module';
 import { ChatsService } from './chats.service';
+import {LoginService} from '../login/services/login.service';
 
 describe('ChatsService', () => {
   let controller: ApolloTestingController;
@@ -312,6 +313,7 @@ describe('ChatsService', () => {
       imports: [ApolloTestingModule],
       providers: [
         ChatsService,
+        LoginService,
         {
           provide: APOLLO_TESTING_CACHE,
           useFactory() {

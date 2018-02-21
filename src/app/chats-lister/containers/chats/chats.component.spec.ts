@@ -23,6 +23,7 @@ import { ChatsComponent } from './chats.component';
 import { ChatsListComponent } from '../../components/chats-list/chats-list.component';
 import { ChatItemComponent } from '../../components/chat-item/chat-item.component';
 import { ChatsService } from '../../../services/chats.service';
+import { LoginService } from '../../../login/services/login.service';
 
 describe('ChatsComponent', () => {
   let component: ChatsComponent;
@@ -343,6 +344,7 @@ describe('ChatsComponent', () => {
             return new InMemoryCache({ dataIdFromObject });
           },
         },
+        LoginService,
       ],
       schemas: [NO_ERRORS_SCHEMA],
     }).compileComponents();
