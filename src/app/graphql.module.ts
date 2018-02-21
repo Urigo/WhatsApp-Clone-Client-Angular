@@ -2,12 +2,36 @@ import { NgModule} from '@angular/core';
 import { ApolloModule, APOLLO_OPTIONS } from 'apollo-angular';
 import { HttpLinkModule, HttpLink } from 'apollo-angular-link-http';
 import { InMemoryCache, defaultDataIdFromObject } from 'apollo-cache-inmemory';
+import {getMainDefinition} from 'apollo-utilities';
+import {OperationDefinitionNode} from 'graphql';
+import {split} from 'apollo-link';
+import {WebSocketLink} from 'apollo-link-ws';
+import {LoginService} from './login/services/login.service';
 
 const uri = 'http://localhost:3000/graphql';
 
-export function createApollo(httpLink: HttpLink) {
+export function createApollo(httpLink: HttpLink, loginService: LoginService) {
+  const subscriptionLink = new WebSocketLink({
+    uri: uri.replace('http', 'ws'),
+    options: {
+      reconnect: true,
+      connectionParams: () => ({
+        authToken: loginService.getAuthHeader() || null
+      })
+    }
+  });
+
+  const link = split(
+    ({ query }) => {
+      const { kind, operation } = getMainDefinition(query) as OperationDefinitionNode;
+      return kind === 'OperationDefinition' && operation === 'subscription';
+    },
+    subscriptionLink,
+    httpLink.create({uri})
+  );
+
   return {
-    link: httpLink.create({uri}),
+    link,
     cache: new InMemoryCache({
       dataIdFromObject: (object: any) => {
         switch (object.__typename) {
@@ -25,7 +49,7 @@ export function createApollo(httpLink: HttpLink) {
     {
       provide: APOLLO_OPTIONS,
       useFactory: createApollo,
-      deps: [HttpLink],
+      deps: [HttpLink, LoginService],
     },
   ],
 })
