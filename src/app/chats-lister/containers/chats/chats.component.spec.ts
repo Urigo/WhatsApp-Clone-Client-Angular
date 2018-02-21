@@ -364,7 +364,9 @@ describe('ChatsComponent', () => {
     fixture = TestBed.createComponent(ChatsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    const req = httpMock.expectOne('http://localhost:3000/graphql', 'call to api');
+    httpMock.expectOne(httpReq => httpReq.body.operationName === 'chatAdded', 'call to chatAdded api');
+    httpMock.expectOne(httpReq => httpReq.body.operationName === 'messageAdded', 'call to messageAdded api');
+    const req = httpMock.expectOne(httpReq => httpReq.body.operationName === 'GetChats', 'call to getChats api');
     req.flush({
       data: {
         chats
