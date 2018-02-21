@@ -14,6 +14,7 @@ import {defaultDataIdFromObject, InMemoryCache} from 'apollo-cache-inmemory';
 import {By} from '@angular/platform-browser';
 import {RouterTestingModule} from '@angular/router/testing';
 import {SelectableListModule} from 'ngx-selectable-list';
+import {LoginService} from '../../../login/services/login.service';
 
 describe('ChatsComponent', () => {
   let component: ChatsComponent;
@@ -336,6 +337,7 @@ describe('ChatsComponent', () => {
       providers: [
         ChatsService,
         Apollo,
+        LoginService,
       ],
       schemas: [NO_ERRORS_SCHEMA]
     })
