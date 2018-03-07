@@ -29,7 +29,7 @@
     "apollo-angular": "1.0.1",
     "apollo-angular-link-http": "1.0.2-beta.0",
     "apollo-cache-inmemory": "1.1.10",
-    "apollo-client": "2.2.5",
+    "apollo-client": "2.2.6",
     "apollo-link": "1.2.1",
     "apollo-link-ws": "1.0.7",
     "apollo-utilities": "1.0.8",
