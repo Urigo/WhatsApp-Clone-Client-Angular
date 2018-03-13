@@ -50,7 +50,7 @@
     "@types/jasminewd2": "2.0.3",
     "@types/node": "6.0.102",
     "codelyzer": "4.2.1",
-    "graphql-code-generator": "0.8.14",
+    "graphql-code-generator": "0.8.15",
     "jasmine-core": "2.99.1",
     "jasmine-spec-reporter": "4.2.1",
     "karma": "2.0.0",
