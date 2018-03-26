@@ -27,7 +27,7 @@
     "ajv": "6.4.0",
     "apollo-angular": "1.0.1",
     "apollo-angular-link-http": "1.0.2",
-    "apollo-cache-inmemory": "1.1.11",
+    "apollo-cache-inmemory": "1.1.12",
     "apollo-client": "2.2.7",
     "apollo-link": "1.2.1",
     "core-js": "2.5.3",
