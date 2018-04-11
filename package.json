@@ -42,7 +42,7 @@
     "ngx-selectable-list": "1.1.0",
     "rxjs": "5.5.9",
     "subscriptions-transport-ws": "0.9.7",
-    "zone.js": "0.8.25"
+    "zone.js": "0.8.26"
   },
   "devDependencies": {
     "@angular/cli": "1.7.4",
