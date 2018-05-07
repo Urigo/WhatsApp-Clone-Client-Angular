@@ -28,6 +28,9 @@ export type SubscriptionResolver<
   ): R | Result | Promise<R | Result>;
 };
 
+/** A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
+export type DateTime = any;
+
 export interface Query {
   users?: User[] | null;
   chats?: Chat[] | null;
@@ -51,6 +54,7 @@ export interface Chat {
   admins?: User[] | null /** Null for chats */;
   owner?: User | null /** If null the group is read-only. Null for chats. */;
   messages: (Message | null)[];
+  messageFeed?: MessageFeed | null /** Return messages in a a Feed Wrapper with cursor based pagination */;
   unreadMessages: number /** Computed property */;
   isGroup: boolean /** Computed property */;
 }
@@ -60,7 +64,7 @@ export interface Message {
   sender: User;
   chat: Chat;
   content: string;
-  createdAt: string;
+  createdAt: DateTime;
   type: number /** FIXME: should return MessageType */;
   recipients: Recipient[] /** Whoever received the message */;
   holders: User[] /** Whoever still holds a copy of the message. Cannot be null because the message gets deleted otherwise */;
@@ -71,8 +75,14 @@ export interface Recipient {
   user: User;
   message: Message;
   chat: Chat;
-  receivedAt?: string | null;
-  readAt?: string | null;
+  receivedAt?: DateTime | null;
+  readAt?: DateTime | null;
+}
+
+export interface MessageFeed {
+  hasNextPage: boolean;
+  cursor?: string | null;
+  messages: (Message | null)[];
 }
 
 export interface Mutation {
@@ -100,6 +110,11 @@ export interface ChatQueryArgs {
 }
 export interface MessagesChatArgs {
   amount?: number | null;
+  before?: string | null;
+}
+export interface MessageFeedChatArgs {
+  amount?: number | null;
+  before?: string | null;
 }
 export interface AddChatMutationArgs {
   recipientId: string;
@@ -246,6 +261,11 @@ export namespace ChatResolvers {
       Context
     > /** If null the group is read-only. Null for chats. */;
     messages?: MessagesResolver<(Message | null)[], any, Context>;
+    messageFeed?: MessageFeedResolver<
+      MessageFeed | null,
+      any,
+      Context
+    > /** Return messages in a a Feed Wrapper with cursor based pagination */;
     unreadMessages?: UnreadMessagesResolver<
       number,
       any,
@@ -301,6 +321,17 @@ export namespace ChatResolvers {
   > = Resolver<R, Parent, Context, MessagesArgs>;
   export interface MessagesArgs {
     amount?: number | null;
+    before?: string | null;
+  }
+
+  export type MessageFeedResolver<
+    R = MessageFeed | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context, MessageFeedArgs>;
+  export interface MessageFeedArgs {
+    amount?: number | null;
+    before?: string | null;
   }
 
   export type UnreadMessagesResolver<
@@ -321,7 +352,7 @@ export namespace MessageResolvers {
     sender?: SenderResolver<User, any, Context>;
     chat?: ChatResolver<Chat, any, Context>;
     content?: ContentResolver<string, any, Context>;
-    createdAt?: CreatedAtResolver<string, any, Context>;
+    createdAt?: CreatedAtResolver<DateTime, any, Context>;
     type?: TypeResolver<
       number,
       any,
@@ -365,7 +396,7 @@ export namespace MessageResolvers {
     Context = any
   > = Resolver<R, Parent, Context>;
   export type CreatedAtResolver<
-    R = string,
+    R = DateTime,
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;
@@ -396,8 +427,8 @@ export namespace RecipientResolvers {
     user?: UserResolver<User, any, Context>;
     message?: MessageResolver<Message, any, Context>;
     chat?: ChatResolver<Chat, any, Context>;
-    receivedAt?: ReceivedAtResolver<string | null, any, Context>;
-    readAt?: ReadAtResolver<string | null, any, Context>;
+    receivedAt?: ReceivedAtResolver<DateTime | null, any, Context>;
+    readAt?: ReadAtResolver<DateTime | null, any, Context>;
   }
 
   export type UserResolver<R = User, Parent = any, Context = any> = Resolver<
@@ -416,12 +447,36 @@ export namespace RecipientResolvers {
     Context
   >;
   export type ReceivedAtResolver<
-    R = string | null,
+    R = DateTime | null,
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;
   export type ReadAtResolver<
+    R = DateTime | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+}
+
+export namespace MessageFeedResolvers {
+  export interface Resolvers<Context = any> {
+    hasNextPage?: HasNextPageResolver<boolean, any, Context>;
+    cursor?: CursorResolver<string | null, any, Context>;
+    messages?: MessagesResolver<(Message | null)[], any, Context>;
+  }
+
+  export type HasNextPageResolver<
+    R = boolean,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type CursorResolver<
     R = string | null,
+    Parent = any,
+    Context = any
+  > = Resolver<R, Parent, Context>;
+  export type MessagesResolver<
+    R = (Message | null)[],
     Parent = any,
     Context = any
   > = Resolver<R, Parent, Context>;
@@ -612,8 +667,15 @@ export namespace AddChat {
 
   export type AddChat = {
     __typename?: "Chat";
-    messages: (Messages | null)[];
+    messageFeed?: MessageFeed | null;
   } & ChatWithoutMessages.Fragment;
+
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+    hasNextPage: boolean;
+    cursor?: string | null;
+    messages: (Messages | null)[];
+  };
 
   export type Messages = Message.Fragment;
 }
@@ -631,8 +693,15 @@ export namespace AddGroup {
 
   export type AddGroup = {
     __typename?: "Chat";
-    messages: (Messages | null)[];
+    messageFeed?: MessageFeed | null;
   } & ChatWithoutMessages.Fragment;
+
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+    hasNextPage: boolean;
+    cursor?: string | null;
+    messages: (Messages | null)[];
+  };
 
   export type Messages = Message.Fragment;
 }
@@ -652,7 +721,9 @@ export namespace AddMessage {
 }
 
 export namespace ChatAdded {
-  export type Variables = {};
+  export type Variables = {
+    amount: number;
+  };
 
   export type Subscription = {
     __typename?: "Subscription";
@@ -661,8 +732,15 @@ export namespace ChatAdded {
 
   export type ChatAdded = {
     __typename?: "Chat";
-    messages: (Messages | null)[];
+    messageFeed?: MessageFeed | null;
   } & ChatWithoutMessages.Fragment;
+
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+    hasNextPage: boolean;
+    cursor?: string | null;
+    messages: (Messages | null)[];
+  };
 
   export type Messages = Message.Fragment;
 }
@@ -670,6 +748,7 @@ export namespace ChatAdded {
 export namespace GetChat {
   export type Variables = {
     chatId: string;
+    amount: number;
   };
 
   export type Query = {
@@ -679,15 +758,22 @@ export namespace GetChat {
 
   export type Chat = {
     __typename?: "Chat";
-    messages: (Messages | null)[];
+    messageFeed?: MessageFeed | null;
   } & ChatWithoutMessages.Fragment;
+
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+    hasNextPage: boolean;
+    cursor?: string | null;
+    messages: (Messages | null)[];
+  };
 
   export type Messages = Message.Fragment;
 }
 
 export namespace GetChats {
   export type Variables = {
-    amount?: number | null;
+    amount: number;
   };
 
   export type Query = {
@@ -697,8 +783,15 @@ export namespace GetChats {
 
   export type Chats = {
     __typename?: "Chat";
-    messages: (Messages | null)[];
+    messageFeed?: MessageFeed | null;
   } & ChatWithoutMessages.Fragment;
+
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+    hasNextPage: boolean;
+    cursor?: string | null;
+    messages: (Messages | null)[];
+  };
 
   export type Messages = Message.Fragment;
 }
@@ -738,6 +831,33 @@ export namespace MessageAdded {
     __typename?: "Chat";
     id: string;
   };
+}
+
+export namespace MoreMessages {
+  export type Variables = {
+    chatId: string;
+    amount: number;
+    before: string;
+  };
+
+  export type Query = {
+    __typename?: "Query";
+    chat?: Chat | null;
+  };
+
+  export type Chat = {
+    __typename?: "Chat";
+    messageFeed?: MessageFeed | null;
+  };
+
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+    hasNextPage: boolean;
+    cursor?: string | null;
+    messages: (Messages | null)[];
+  };
+
+  export type Messages = Message.Fragment;
 }
 
 export namespace RemoveAllMessages {
@@ -799,7 +919,7 @@ export namespace Message {
     chat: Chat;
     sender: Sender;
     content: string;
-    createdAt: string;
+    createdAt: DateTime;
     type: number;
     recipients: Recipients[];
     ownership: boolean;
@@ -821,8 +941,8 @@ export namespace Message {
     user: User;
     message: Message;
     chat: __Chat;
-    receivedAt?: string | null;
-    readAt?: string | null;
+    receivedAt?: DateTime | null;
+    readAt?: DateTime | null;
   };
 
   export type User = {
@@ -910,8 +1030,12 @@ export class AddChatGQL extends Apollo.Mutation<
     mutation AddChat($recipientId: ID!) {
       addChat(recipientId: $recipientId) {
         ...ChatWithoutMessages
-        messages {
-          ...Message
+        messageFeed {
+          hasNextPage
+          cursor
+          messages {
+            ...Message
+          }
         }
       }
     }
@@ -931,8 +1055,12 @@ export class AddGroupGQL extends Apollo.Mutation<
     mutation AddGroup($recipientIds: [ID!]!, $groupName: String!) {
       addGroup(recipientIds: $recipientIds, groupName: $groupName) {
         ...ChatWithoutMessages
-        messages {
-          ...Message
+        messageFeed {
+          hasNextPage
+          cursor
+          messages {
+            ...Message
+          }
         }
       }
     }
@@ -966,11 +1094,15 @@ export class ChatAddedGQL extends Apollo.Subscription<
   ChatAdded.Variables
 > {
   document: any = gql`
-    subscription chatAdded {
+    subscription chatAdded($amount: Int!) {
       chatAdded {
         ...ChatWithoutMessages
-        messages {
-          ...Message
+        messageFeed(amount: $amount) {
+          hasNextPage
+          cursor
+          messages {
+            ...Message
+          }
         }
       }
     }
@@ -984,11 +1116,15 @@ export class ChatAddedGQL extends Apollo.Subscription<
 })
 export class GetChatGQL extends Apollo.Query<GetChat.Query, GetChat.Variables> {
   document: any = gql`
-    query GetChat($chatId: ID!) {
+    query GetChat($chatId: ID!, $amount: Int!) {
       chat(chatId: $chatId) {
         ...ChatWithoutMessages
-        messages {
-          ...Message
+        messageFeed(amount: $amount) {
+          hasNextPage
+          cursor
+          messages {
+            ...Message
+          }
         }
       }
     }
@@ -1005,11 +1141,15 @@ export class GetChatsGQL extends Apollo.Query<
   GetChats.Variables
 > {
   document: any = gql`
-    query GetChats($amount: Int) {
+    query GetChats($amount: Int!) {
       chats {
         ...ChatWithoutMessages
-        messages(amount: $amount) {
-          ...Message
+        messageFeed(amount: $amount) {
+          hasNextPage
+          cursor
+          messages {
+            ...Message
+          }
         }
       }
     }
@@ -1048,6 +1188,29 @@ export class MessageAddedGQL extends Apollo.Subscription<
         ...Message
         chat {
           id
+        }
+      }
+    }
+
+    ${MessageFragment}
+  `;
+}
+@Injectable({
+  providedIn: "root"
+})
+export class MoreMessagesGQL extends Apollo.Query<
+  MoreMessages.Query,
+  MoreMessages.Variables
+> {
+  document: any = gql`
+    query MoreMessages($chatId: ID!, $amount: Int!, $before: String!) {
+      chat(chatId: $chatId) {
+        messageFeed(amount: $amount, before: $before) {
+          hasNextPage
+          cursor
+          messages {
+            ...Message
+          }
         }
       }
     }
