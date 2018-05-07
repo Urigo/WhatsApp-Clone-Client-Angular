@@ -2,11 +2,10 @@ import gql from 'graphql-tag';
 import {fragments} from './fragment';
 
 // We use the gql tag to parse our query string into a query document
-export const addGroupMutation = gql`
-  mutation AddGroup($recipientIds: [ID!]!, $groupName: String!) {
-    addGroup(recipientIds: $recipientIds, groupName: $groupName) {
-      ...ChatWithoutMessages
-      messageFeed {
+export const moreMessagesQuery = gql`
+  query MoreMessages($chatId: ID!, $amount: Int!, $before: String!) {
+    chat(chatId: $chatId) {
+      messageFeed(amount: $amount, before: $before) {
         hasNextPage,
         cursor,
         messages {
@@ -16,6 +15,5 @@ export const addGroupMutation = gql`
     }
   }
 
-  ${fragments['chatWithoutMessages']}
   ${fragments['message']}
 `;

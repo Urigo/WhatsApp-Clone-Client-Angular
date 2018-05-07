@@ -20,13 +20,25 @@ export namespace AddChat {
 
   export type Mutation = {
     __typename?: "Mutation";
-    addChat?: AddChat | null;
+
+    addChat: Maybe<AddChat>;
   };
 
   export type AddChat = {
     __typename?: "Chat";
-    messages: (Messages | null)[];
+
+    messageFeed: Maybe<MessageFeed>;
   } & ChatWithoutMessages.Fragment;
+
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+
+    hasNextPage: boolean;
+
+    cursor: Maybe<string>;
+
+    messages: (Maybe<Messages>)[];
+  };
 
   export type Messages = Message.Fragment;
 }
@@ -39,13 +51,25 @@ export namespace AddGroup {
 
   export type Mutation = {
     __typename?: "Mutation";
-    addGroup?: AddGroup | null;
+
+    addGroup: Maybe<AddGroup>;
   };
 
   export type AddGroup = {
     __typename?: "Chat";
-    messages: (Messages | null)[];
+
+    messageFeed: Maybe<MessageFeed>;
   } & ChatWithoutMessages.Fragment;
+
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+
+    hasNextPage: boolean;
+
+    cursor: Maybe<string>;
+
+    messages: (Maybe<Messages>)[];
+  };
 
   export type Messages = Message.Fragment;
 }
@@ -66,17 +90,31 @@ export namespace AddMessage {
 }
 
 export namespace ChatAdded {
-  export type Variables = {};
+  export type Variables = {
+    amount: number;
+  };
 
   export type Subscription = {
     __typename?: "Subscription";
-    chatAdded?: ChatAdded | null;
+
+    chatAdded: Maybe<ChatAdded>;
   };
 
   export type ChatAdded = {
     __typename?: "Chat";
-    messages: (Messages | null)[];
+
+    messageFeed: Maybe<MessageFeed>;
   } & ChatWithoutMessages.Fragment;
+
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+
+    hasNextPage: boolean;
+
+    cursor: Maybe<string>;
+
+    messages: (Maybe<Messages>)[];
+  };
 
   export type Messages = Message.Fragment;
 }
@@ -84,6 +122,7 @@ export namespace ChatAdded {
 export namespace GetChat {
   export type Variables = {
     chatId: string;
+    amount: number;
   };
 
   export type Query = {
@@ -95,15 +134,25 @@ export namespace GetChat {
   export type Chat = {
     __typename?: "Chat";
 
-    messages: (Maybe<Messages>)[];
+    messageFeed: Maybe<MessageFeed>;
   } & ChatWithoutMessages.Fragment;
+
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+
+    hasNextPage: boolean;
+
+    cursor: Maybe<string>;
+
+    messages: (Maybe<Messages>)[];
+  };
 
   export type Messages = Message.Fragment;
 }
 
 export namespace GetChats {
   export type Variables = {
-    amount?: Maybe<number>;
+    amount: number;
   };
 
   export type Query = {
@@ -115,8 +164,18 @@ export namespace GetChats {
   export type Chats = {
     __typename?: "Chat";
 
-    messages: (Maybe<Messages>)[];
+    messageFeed: Maybe<MessageFeed>;
   } & ChatWithoutMessages.Fragment;
+
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+
+    hasNextPage: boolean;
+
+    cursor: Maybe<string>;
+
+    messages: (Maybe<Messages>)[];
+  };
 
   export type Messages = Message.Fragment;
 }
@@ -126,36 +185,75 @@ export namespace GetUsers {
 
   export type Query = {
     __typename?: "Query";
-    users?: Users[] | null;
+
+    users: Maybe<Users[]>;
   };
 
   export type Users = {
     __typename?: "User";
+
     id: string;
-    name?: string | null;
-    picture?: string | null;
+
+    name: Maybe<string>;
+
+    picture: Maybe<string>;
   };
 }
 
 export namespace MessageAdded {
   export type Variables = {
-    chatId?: string | null;
+    chatId?: Maybe<string>;
   };
 
   export type Subscription = {
     __typename?: "Subscription";
-    messageAdded?: MessageAdded | null;
+
+    messageAdded: Maybe<MessageAdded>;
   };
 
   export type MessageAdded = {
     __typename?: "Message";
+
     chat: Chat;
   } & Message.Fragment;
 
   export type Chat = {
     __typename?: "Chat";
+
     id: string;
   };
+}
+
+export namespace MoreMessages {
+  export type Variables = {
+    chatId: string;
+    amount: number;
+    before: string;
+  };
+
+  export type Query = {
+    __typename?: "Query";
+
+    chat: Maybe<Chat>;
+  };
+
+  export type Chat = {
+    __typename?: "Chat";
+
+    messageFeed: Maybe<MessageFeed>;
+  };
+
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+
+    hasNextPage: boolean;
+
+    cursor: Maybe<string>;
+
+    messages: (Maybe<Messages>)[];
+  };
+
+  export type Messages = Message.Fragment;
 }
 
 export namespace RemoveAllMessages {
@@ -370,8 +468,12 @@ export class AddChatGQL extends Apollo.Mutation<
     mutation AddChat($recipientId: ID!) {
       addChat(recipientId: $recipientId) {
         ...ChatWithoutMessages
-        messages {
-          ...Message
+        messageFeed {
+          hasNextPage
+          cursor
+          messages {
+            ...Message
+          }
         }
       }
     }
@@ -391,8 +493,12 @@ export class AddGroupGQL extends Apollo.Mutation<
     mutation AddGroup($recipientIds: [ID!]!, $groupName: String!) {
       addGroup(recipientIds: $recipientIds, groupName: $groupName) {
         ...ChatWithoutMessages
-        messages {
-          ...Message
+        messageFeed {
+          hasNextPage
+          cursor
+          messages {
+            ...Message
+          }
         }
       }
     }
@@ -426,11 +532,15 @@ export class ChatAddedGQL extends Apollo.Subscription<
   ChatAdded.Variables
 > {
   document: any = gql`
-    subscription chatAdded {
+    subscription chatAdded($amount: Int!) {
       chatAdded {
         ...ChatWithoutMessages
-        messages {
-          ...Message
+        messageFeed(amount: $amount) {
+          hasNextPage
+          cursor
+          messages {
+            ...Message
+          }
         }
       }
     }
@@ -444,11 +554,15 @@ export class ChatAddedGQL extends Apollo.Subscription<
 })
 export class GetChatGQL extends Apollo.Query<GetChat.Query, GetChat.Variables> {
   document: any = gql`
-    query GetChat($chatId: ID!) {
+    query GetChat($chatId: ID!, $amount: Int!) {
       chat(chatId: $chatId) {
         ...ChatWithoutMessages
-        messages {
-          ...Message
+        messageFeed(amount: $amount) {
+          hasNextPage
+          cursor
+          messages {
+            ...Message
+          }
         }
       }
     }
@@ -465,11 +579,15 @@ export class GetChatsGQL extends Apollo.Query<
   GetChats.Variables
 > {
   document: any = gql`
-    query GetChats($amount: Int) {
+    query GetChats($amount: Int!) {
       chats {
         ...ChatWithoutMessages
-        messages(amount: $amount) {
-          ...Message
+        messageFeed(amount: $amount) {
+          hasNextPage
+          cursor
+          messages {
+            ...Message
+          }
         }
       }
     }
@@ -508,6 +626,29 @@ export class MessageAddedGQL extends Apollo.Subscription<
         ...Message
         chat {
           id
+        }
+      }
+    }
+
+    ${MessageFragment}
+  `;
+}
+@Injectable({
+  providedIn: "root"
+})
+export class MoreMessagesGQL extends Apollo.Query<
+  MoreMessages.Query,
+  MoreMessages.Variables
+> {
+  document: any = gql`
+    query MoreMessages($chatId: ID!, $amount: Int!, $before: String!) {
+      chat(chatId: $chatId) {
+        messageFeed(amount: $amount, before: $before) {
+          hasNextPage
+          cursor
+          messages {
+            ...Message
+          }
         }
       }
     }
