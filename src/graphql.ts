@@ -6,6 +6,9 @@ export enum MessageType {
   Picture = "PICTURE"
 }
 
+/** A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
+export type DateTime = any;
+
 // ====================================================
 // Documents
 // ====================================================
@@ -24,8 +27,18 @@ export namespace AddChat {
   export type AddChat = {
     __typename?: "Chat";
 
-    messages: (Maybe<Messages>)[];
+    messageFeed: Maybe<MessageFeed>;
   } & ChatWithoutMessages.Fragment;
+
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+
+    hasNextPage: boolean;
+
+    cursor: Maybe<string>;
+
+    messages: (Maybe<Messages>)[];
+  };
 
   export type Messages = Message.Fragment;
 }
@@ -45,8 +58,18 @@ export namespace AddGroup {
   export type AddGroup = {
     __typename?: "Chat";
 
-    messages: (Maybe<Messages>)[];
+    messageFeed: Maybe<MessageFeed>;
   } & ChatWithoutMessages.Fragment;
+
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+
+    hasNextPage: boolean;
+
+    cursor: Maybe<string>;
+
+    messages: (Maybe<Messages>)[];
+  };
 
   export type Messages = Message.Fragment;
 }
@@ -67,7 +90,9 @@ export namespace AddMessage {
 }
 
 export namespace ChatAdded {
-  export type Variables = {};
+  export type Variables = {
+    amount: number;
+  };
 
   export type Subscription = {
     __typename?: "Subscription";
@@ -78,8 +103,18 @@ export namespace ChatAdded {
   export type ChatAdded = {
     __typename?: "Chat";
 
-    messages: (Maybe<Messages>)[];
+    messageFeed: Maybe<MessageFeed>;
   } & ChatWithoutMessages.Fragment;
+
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+
+    hasNextPage: boolean;
+
+    cursor: Maybe<string>;
+
+    messages: (Maybe<Messages>)[];
+  };
 
   export type Messages = Message.Fragment;
 }
@@ -87,6 +122,7 @@ export namespace ChatAdded {
 export namespace GetChat {
   export type Variables = {
     chatId: string;
+    amount: number;
   };
 
   export type Query = {
@@ -98,15 +134,25 @@ export namespace GetChat {
   export type Chat = {
     __typename?: "Chat";
 
-    messages: (Maybe<Messages>)[];
+    messageFeed: Maybe<MessageFeed>;
   } & ChatWithoutMessages.Fragment;
+
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+
+    hasNextPage: boolean;
+
+    cursor: Maybe<string>;
+
+    messages: (Maybe<Messages>)[];
+  };
 
   export type Messages = Message.Fragment;
 }
 
 export namespace GetChats {
   export type Variables = {
-    amount?: Maybe<number>;
+    amount: number;
   };
 
   export type Query = {
@@ -118,8 +164,18 @@ export namespace GetChats {
   export type Chats = {
     __typename?: "Chat";
 
-    messages: (Maybe<Messages>)[];
+    messageFeed: Maybe<MessageFeed>;
   } & ChatWithoutMessages.Fragment;
+
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+
+    hasNextPage: boolean;
+
+    cursor: Maybe<string>;
+
+    messages: (Maybe<Messages>)[];
+  };
 
   export type Messages = Message.Fragment;
 }
@@ -166,6 +222,38 @@ export namespace MessageAdded {
 
     id: string;
   };
+}
+
+export namespace MoreMessages {
+  export type Variables = {
+    chatId: string;
+    amount: number;
+    before: string;
+  };
+
+  export type Query = {
+    __typename?: "Query";
+
+    chat: Maybe<Chat>;
+  };
+
+  export type Chat = {
+    __typename?: "Chat";
+
+    messageFeed: Maybe<MessageFeed>;
+  };
+
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+
+    hasNextPage: boolean;
+
+    cursor: Maybe<string>;
+
+    messages: (Maybe<Messages>)[];
+  };
+
+  export type Messages = Message.Fragment;
 }
 
 export namespace RemoveAllMessages {
@@ -242,7 +330,7 @@ export namespace Message {
 
     content: string;
 
-    createdAt: string;
+    createdAt: DateTime;
 
     type: number;
 
@@ -274,9 +362,9 @@ export namespace Message {
 
     chat: __Chat;
 
-    receivedAt: Maybe<string>;
+    receivedAt: Maybe<DateTime>;
 
-    readAt: Maybe<string>;
+    readAt: Maybe<DateTime>;
   };
 
   export type User = {
@@ -305,6 +393,10 @@ export namespace Message {
     id: string;
   };
 }
+
+// ====================================================
+// Scalars
+// ====================================================
 
 // ====================================================
 // Types
@@ -347,6 +439,8 @@ export interface Chat {
   owner?: Maybe<User>;
 
   messages: (Maybe<Message>)[];
+  /** Return messages in a a Feed Wrapper with cursor based pagination */
+  messageFeed?: Maybe<MessageFeed>;
   /** Computed property */
   unreadMessages: number;
   /** Computed property */
@@ -362,7 +456,7 @@ export interface Message {
 
   content: string;
 
-  createdAt: string;
+  createdAt: DateTime;
   /** FIXME: should return MessageType */
   type: number;
   /** Whoever received the message */
@@ -380,9 +474,17 @@ export interface Recipient {
 
   chat: Chat;
 
-  receivedAt?: Maybe<string>;
+  receivedAt?: Maybe<DateTime>;
 
-  readAt?: Maybe<string>;
+  readAt?: Maybe<DateTime>;
+}
+
+export interface MessageFeed {
+  hasNextPage: boolean;
+
+  cursor?: Maybe<string>;
+
+  messages: (Maybe<Message>)[];
 }
 
 export interface Mutation {
@@ -428,6 +530,13 @@ export interface ChatQueryArgs {
 }
 export interface MessagesChatArgs {
   amount?: Maybe<number>;
+
+  before?: Maybe<string>;
+}
+export interface MessageFeedChatArgs {
+  amount?: Maybe<number>;
+
+  before?: Maybe<string>;
 }
 export interface AddChatMutationArgs {
   recipientId: string;
@@ -562,8 +671,12 @@ export class AddChatGQL extends Apollo.Mutation<
     mutation AddChat($recipientId: ID!) {
       addChat(recipientId: $recipientId) {
         ...ChatWithoutMessages
-        messages {
-          ...Message
+        messageFeed {
+          hasNextPage
+          cursor
+          messages {
+            ...Message
+          }
         }
       }
     }
@@ -583,8 +696,12 @@ export class AddGroupGQL extends Apollo.Mutation<
     mutation AddGroup($recipientIds: [ID!]!, $groupName: String!) {
       addGroup(recipientIds: $recipientIds, groupName: $groupName) {
         ...ChatWithoutMessages
-        messages {
-          ...Message
+        messageFeed {
+          hasNextPage
+          cursor
+          messages {
+            ...Message
+          }
         }
       }
     }
@@ -618,11 +735,15 @@ export class ChatAddedGQL extends Apollo.Subscription<
   ChatAdded.Variables
 > {
   document: any = gql`
-    subscription chatAdded {
+    subscription chatAdded($amount: Int!) {
       chatAdded {
         ...ChatWithoutMessages
-        messages {
-          ...Message
+        messageFeed(amount: $amount) {
+          hasNextPage
+          cursor
+          messages {
+            ...Message
+          }
         }
       }
     }
@@ -636,11 +757,15 @@ export class ChatAddedGQL extends Apollo.Subscription<
 })
 export class GetChatGQL extends Apollo.Query<GetChat.Query, GetChat.Variables> {
   document: any = gql`
-    query GetChat($chatId: ID!) {
+    query GetChat($chatId: ID!, $amount: Int!) {
       chat(chatId: $chatId) {
         ...ChatWithoutMessages
-        messages {
-          ...Message
+        messageFeed(amount: $amount) {
+          hasNextPage
+          cursor
+          messages {
+            ...Message
+          }
         }
       }
     }
@@ -657,11 +782,15 @@ export class GetChatsGQL extends Apollo.Query<
   GetChats.Variables
 > {
   document: any = gql`
-    query GetChats($amount: Int) {
+    query GetChats($amount: Int!) {
       chats {
         ...ChatWithoutMessages
-        messages(amount: $amount) {
-          ...Message
+        messageFeed(amount: $amount) {
+          hasNextPage
+          cursor
+          messages {
+            ...Message
+          }
         }
       }
     }
@@ -700,6 +829,29 @@ export class MessageAddedGQL extends Apollo.Subscription<
         ...Message
         chat {
           id
+        }
+      }
+    }
+
+    ${MessageFragment}
+  `;
+}
+@Injectable({
+  providedIn: "root"
+})
+export class MoreMessagesGQL extends Apollo.Query<
+  MoreMessages.Query,
+  MoreMessages.Variables
+> {
+  document: any = gql`
+    query MoreMessages($chatId: ID!, $amount: Int!, $before: String!) {
+      chat(chatId: $chatId) {
+        messageFeed(amount: $amount, before: $before) {
+          hasNextPage
+          cursor
+          messages {
+            ...Message
+          }
         }
       }
     }
