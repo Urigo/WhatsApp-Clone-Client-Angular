@@ -26,7 +26,7 @@
     "@angular/platform-browser-dynamic": "5.2.9",
     "@angular/router": "5.2.9",
     "ajv": "6.4.0",
-    "apollo-angular": "1.0.1",
+    "apollo-angular": "1.1.0",
     "apollo-angular-link-http": "1.1.0",
     "apollo-cache-inmemory": "1.2.1",
     "apollo-client": "2.3.1",
