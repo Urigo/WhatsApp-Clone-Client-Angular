@@ -51,7 +51,7 @@
     "@types/graphql": "0.13.0",
     "@types/jasmine": "2.8.7",
     "@types/jasminewd2": "2.0.3",
-    "@types/node": "6.0.110",
+    "@types/node": "6.0.111",
     "codelyzer": "4.3.0",
     "graphql-code-generator": "0.9.1",
     "jasmine-core": "2.99.1",
