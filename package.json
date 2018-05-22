@@ -35,7 +35,7 @@
     "graphql-tag": "2.9.2",
     "hammerjs": "2.0.8",
     "ng2-truncate": "1.3.17",
-    "rxjs": "5.5.10",
+    "rxjs": "5.5.11",
     "zone.js": "0.8.26"
   },
   "devDependencies": {
