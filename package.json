@@ -50,7 +50,7 @@
     "@types/node": "8.9.5",
     "codelyzer": "4.3.0",
     "graphql-code-generator": "0.10.3",
-    "graphql-codegen-typescript-template": "0.10.1",
+    "graphql-codegen-typescript-template": "0.10.3",
     "jasmine-core": "2.99.1",
     "jasmine-spec-reporter": "4.2.1",
     "karma": "2.0.2",
