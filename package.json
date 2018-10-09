@@ -8,7 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "generator": "gql-gen --schema http://localhost:3000/graphql --template graphql-codegen-typescript-template --out ./src/graphql.ts ./src/graphql/**/*.ts"
+    "generator": "gql-gen --schema http://localhost:3000/graphql --template graphql-codegen-apollo-angular-template --out ./src/graphql.ts ./src/graphql/**/*.ts"
   },
   "private": true,
   "dependencies": {
@@ -48,6 +48,7 @@
     "codelyzer": "4.2.1",
     "graphql-code-generator": "0.12.6",
     "graphql-codegen-typescript-template": "0.12.6",
+    "graphql-codegen-apollo-angular-template": "0.12.6",
     "jasmine-core": "2.99.1",
     "jasmine-spec-reporter": "4.2.1",
     "karma": "1.7.1",
