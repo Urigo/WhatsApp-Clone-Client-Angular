@@ -234,3 +234,92 @@ export interface ChatQueryArgs {
 export interface MessagesChatArgs {
   amount?: Maybe<number>;
 }
+
+// ====================================================
+// START: Apollo Angular template
+// ====================================================
+
+import { Injectable } from "@angular/core";
+import * as Apollo from "apollo-angular";
+
+import gql from "graphql-tag";
+
+// ====================================================
+// GraphQL Fragments
+// ====================================================
+
+export const ChatWithoutMessagesFragment = gql`
+  fragment ChatWithoutMessages on Chat {
+    id
+    name
+    picture
+    allTimeMembers {
+      id
+    }
+    unreadMessages
+    isGroup
+  }
+`;
+
+export const MessageFragment = gql`
+  fragment Message on Message {
+    id
+    chat {
+      id
+    }
+    sender {
+      id
+      name
+    }
+    content
+    createdAt
+    type
+    recipients {
+      user {
+        id
+      }
+      message {
+        id
+        chat {
+          id
+        }
+      }
+      chat {
+        id
+      }
+      receivedAt
+      readAt
+    }
+    ownership
+  }
+`;
+
+// ====================================================
+// Apollo Services
+// ====================================================
+
+@Injectable({
+  providedIn: "root"
+})
+export class GetChatsGQL extends Apollo.Query<
+  GetChats.Query,
+  GetChats.Variables
+> {
+  document: any = gql`
+    query GetChats($amount: Int) {
+      chats {
+        ...ChatWithoutMessages
+        messages(amount: $amount) {
+          ...Message
+        }
+      }
+    }
+
+    ${ChatWithoutMessagesFragment}
+    ${MessageFragment}
+  `;
+}
+
+// ====================================================
+// END: Apollo Angular template
+// ====================================================
