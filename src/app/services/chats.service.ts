@@ -1,21 +1,18 @@
 import {map} from 'rxjs/operators';
-import {Apollo} from 'apollo-angular';
 import {Injectable} from '@angular/core';
-import {getChatsQuery} from '../../graphql/getChats.query';
-import {GetChats} from '../../graphql';
+import {GetChatsGQL} from '../../graphql';
 
 @Injectable()
 export class ChatsService {
   messagesAmount = 3;
 
-  constructor(private apollo: Apollo) {}
+  constructor(
+    private getChatsGQL: GetChatsGQL
+  ) {}
 
   getChats() {
-    const query = this.apollo.watchQuery<GetChats.Query>({
-      query: getChatsQuery,
-      variables: {
-        amount: this.messagesAmount,
-      },
+    const query = this.getChatsGQL.watch({
+      amount: this.messagesAmount,
     });
     const chats$ = query.valueChanges.pipe(
       map((result) => result.data.chats)
