@@ -23,7 +23,7 @@
     "@angular/platform-browser": "6.1.10",
     "@angular/platform-browser-dynamic": "6.1.10",
     "@angular/router": "6.1.10",
-    "apollo-angular": "1.1.0",
+    "apollo-angular": "1.4.1",
     "apollo-angular-link-http": "1.1.0",
     "apollo-cache-inmemory": "1.2.2",
     "apollo-client": "2.3.2",
