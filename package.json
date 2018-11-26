@@ -17,7 +17,7 @@
     "@angular/cdk": "7.0.0-rc.0",
     "@angular/compiler": "7.0.0-rc.0",
     "@angular/core": "7.0.0-rc.0",
-    "@angular/flex-layout": "angular/flex-layout-builds#3a09d1d",
+    "@angular/flex-layout": "angular/flex-layout-builds#277a103",
     "@angular/forms": "7.0.0-rc.0",
     "@angular/http": "7.0.0-rc.0",
     "@angular/material": "7.0.0-rc.0",
