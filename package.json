@@ -59,7 +59,7 @@
     "ts-node": "7.0.1",
     "tslint": "5.9.1",
     "typescript": "3.1.1",
-    "graphql-codegen-typescript-common": "0.16.0-alpha.207cae5d",
+    "graphql-codegen-typescript-common": "0.16.0-alpha.f90b9fc8",
     "graphql-codegen-typescript-client": "0.16.0-alpha.207cae5d",
     "graphql-codegen-typescript-apollo-angular": "0.16.0-alpha.207cae5d"
   }
