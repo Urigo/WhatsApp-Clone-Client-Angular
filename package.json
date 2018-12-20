@@ -60,6 +60,6 @@
     "typescript": "3.2.2",
     "graphql-codegen-typescript-common": "0.16.0-alpha.f90b9fc8",
     "graphql-codegen-typescript-client": "0.16.0-alpha.f90b9fc8",
-    "graphql-codegen-typescript-apollo-angular": "0.16.0-alpha.f90b9fc8"
+    "graphql-codegen-typescript-apollo-angular": "0.16.0-alpha.fe0675f8"
   }
 }
