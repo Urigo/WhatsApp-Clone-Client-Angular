@@ -44,7 +44,7 @@
     "@angular/cli": "7.1.4",
     "@angular/compiler-cli": "7.2.0",
     "@angular/language-service": "7.2.0",
-    "@types/graphql": "14.0.3",
+    "@types/graphql": "14.0.4",
     "@types/jasmine": "2.8.7",
     "@types/jasminewd2": "2.0.6",
     "@types/node": "8.9.5",
