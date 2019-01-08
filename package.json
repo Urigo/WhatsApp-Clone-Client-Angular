@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "0.11.4",
-    "@angular/cli": "7.0.0-rc.2",
+    "@angular/cli": "7.1.4",
     "@angular/compiler-cli": "7.0.0-rc.0",
     "@angular/language-service": "7.0.0-rc.0",
     "@types/graphql": "14.0.3",
