@@ -6,12 +6,8 @@ export const addChatMutation = gql`
   mutation AddChat($recipientId: ID!) {
     addChat(recipientId: $recipientId) {
       ...ChatWithoutMessages
-      messageFeed {
-        hasNextPage,
-        cursor,
-        messages {
-          ...Message
-        }
+      messages {
+        ...Message
       }
     }
   }

@@ -6,12 +6,8 @@ export const addGroupMutation = gql`
   mutation AddGroup($recipientIds: [ID!]!, $groupName: String!) {
     addGroup(recipientIds: $recipientIds, groupName: $groupName) {
       ...ChatWithoutMessages
-      messageFeed {
-        hasNextPage,
-        cursor,
-        messages {
-          ...Message
-        }
+      messages {
+        ...Message
       }
     }
   }
