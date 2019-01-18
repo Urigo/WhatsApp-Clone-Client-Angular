@@ -12,7 +12,7 @@ export enum MessageType {
 
 export namespace AddChat {
   export type Variables = {
-    recipientId: string;
+    userId: string;
   };
 
   export type Mutation = {
@@ -32,7 +32,7 @@ export namespace AddChat {
 
 export namespace AddGroup {
   export type Variables = {
-    recipientIds: string[];
+    userIds: string[];
     groupName: string;
   };
 
@@ -345,12 +345,12 @@ export interface Chat {
   admins?: Maybe<User[]>;
   /** If null the group is read-only. Null for chats. */
   owner?: Maybe<User>;
+  /** Computed property */
+  isGroup: boolean;
 
   messages: (Maybe<Message>)[];
   /** Computed property */
   unreadMessages: number;
-  /** Computed property */
-  isGroup: boolean;
 }
 
 export interface Message {
@@ -365,12 +365,12 @@ export interface Message {
   createdAt: string;
   /** FIXME: should return MessageType */
   type: number;
-  /** Whoever received the message */
-  recipients: Recipient[];
   /** Whoever still holds a copy of the message. Cannot be null because the message gets deleted otherwise */
   holders: User[];
   /** Computed property */
   ownership: boolean;
+  /** Whoever received the message */
+  recipients: Recipient[];
 }
 
 export interface Recipient {
@@ -392,10 +392,6 @@ export interface Mutation {
 
   removeChat?: Maybe<string>;
 
-  addMessage?: Maybe<Message>;
-
-  removeMessages?: Maybe<(Maybe<string>)[]>;
-
   addMembers?: Maybe<(Maybe<string>)[]>;
 
   removeMembers?: Maybe<(Maybe<string>)[]>;
@@ -408,15 +404,19 @@ export interface Mutation {
 
   setGroupPicture?: Maybe<string>;
 
+  addMessage?: Maybe<Message>;
+
+  removeMessages?: Maybe<(Maybe<string>)[]>;
+
   markAsReceived?: Maybe<boolean>;
 
   markAsRead?: Maybe<boolean>;
 }
 
 export interface Subscription {
-  messageAdded?: Maybe<Message>;
-
   chatAdded?: Maybe<Chat>;
+
+  messageAdded?: Maybe<Message>;
 }
 
 // ====================================================
@@ -430,27 +430,15 @@ export interface MessagesChatArgs {
   amount?: Maybe<number>;
 }
 export interface AddChatMutationArgs {
-  recipientId: string;
+  userId: string;
 }
 export interface AddGroupMutationArgs {
-  recipientIds: string[];
+  userIds: string[];
 
   groupName: string;
 }
 export interface RemoveChatMutationArgs {
   chatId: string;
-}
-export interface AddMessageMutationArgs {
-  chatId: string;
-
-  content: string;
-}
-export interface RemoveMessagesMutationArgs {
-  chatId: string;
-
-  messageIds?: Maybe<(Maybe<string>)[]>;
-
-  all?: Maybe<boolean>;
 }
 export interface AddMembersMutationArgs {
   groupId: string;
@@ -477,6 +465,18 @@ export interface SetGroupNameMutationArgs {
 }
 export interface SetGroupPictureMutationArgs {
   groupId: string;
+}
+export interface AddMessageMutationArgs {
+  chatId: string;
+
+  content: string;
+}
+export interface RemoveMessagesMutationArgs {
+  chatId: string;
+
+  messageIds?: Maybe<(Maybe<string>)[]>;
+
+  all?: Maybe<boolean>;
 }
 export interface MarkAsReceivedMutationArgs {
   chatId: string;
@@ -559,8 +559,8 @@ export class AddChatGQL extends Apollo.Mutation<
   AddChat.Variables
 > {
   document: any = gql`
-    mutation AddChat($recipientId: ID!) {
-      addChat(recipientId: $recipientId) {
+    mutation AddChat($userId: ID!) {
+      addChat(userId: $userId) {
         ...ChatWithoutMessages
         messages {
           ...Message
@@ -580,8 +580,8 @@ export class AddGroupGQL extends Apollo.Mutation<
   AddGroup.Variables
 > {
   document: any = gql`
-    mutation AddGroup($recipientIds: [ID!]!, $groupName: String!) {
-      addGroup(recipientIds: $recipientIds, groupName: $groupName) {
+    mutation AddGroup($userIds: [ID!]!, $groupName: String!) {
+      addGroup(userIds: $userIds, groupName: $groupName) {
         ...ChatWithoutMessages
         messages {
           ...Message
