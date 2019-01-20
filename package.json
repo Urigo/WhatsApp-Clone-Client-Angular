@@ -29,9 +29,9 @@
     "zone.js": "0.8.26",
     "apollo-angular-link-http": "1.4.0",
     "apollo-link": "1.2.6",
-    "apollo-client": "2.4.8",
-    "apollo-cache-inmemory": "1.3.12",
-    "graphql-tag": "2.10.0",
+    "apollo-client": "2.4.12",
+    "apollo-cache-inmemory": "1.4.2",
+    "graphql-tag": "2.10.1",
     "graphql": "14.1.1",
     "hammerjs": "2.0.8",
     "ng2-truncate": "1.3.17"
