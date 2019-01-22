@@ -1,4 +1,5 @@
 import {Component, Input} from '@angular/core';
+import * as moment from 'moment';
 import {GetChat} from '../../../../graphql';
 
 @Component({
@@ -8,7 +9,7 @@ import {GetChat} from '../../../../graphql';
          [ngClass]="message.ownership ? 'message-mine' : 'message-other'">
       <div *ngIf="isGroup && !message.ownership" class="message-sender">{{ message.sender.name }}</div>
       <div class="message-content">{{ message.content }}</div>
-      <span class="message-timestamp">00:00</span>
+      <span class="message-timestamp">{{ createdAt }}</span>
     </div>
   `,
   styleUrls: ['message-item.component.scss'],
@@ -20,4 +21,10 @@ export class MessageItemComponent {
 
   @Input()
   isGroup: boolean;
+
+  createdAt: string;
+
+  ngOnInit() {
+    this.createdAt = moment(this.message.createdAt).format('HH:mm');
+  }
 }

@@ -1,4 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
+import * as moment from 'moment';
 import {GetChats} from '../../../../graphql';
 
 @Component({
@@ -9,7 +10,7 @@ import {GetChats} from '../../../../graphql';
       <div class="chat-info">
         <div class="chat-name">{{ chat.name }}</div>
         <div class="chat-last-message">{{ chat.messages[chat.messages.length - 1]?.content }}</div>
-        <div class="chat-timestamp">00:00</div>
+        <div class="chat-timestamp">{{ updatedAt }}</div>
       </div>
     </div>
   `,
@@ -19,4 +20,10 @@ export class ChatItemComponent {
   // tslint:disable-next-line:no-input-rename
   @Input('item')
   chat: GetChats.Chats;
+
+  updatedAt: string;
+
+  ngOnInit() {
+    this.updatedAt = moment(this.chat.updatedAt).format('HH:mm');
+  }
 }

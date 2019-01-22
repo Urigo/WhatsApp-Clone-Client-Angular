@@ -2,7 +2,6 @@ import {concat, map, share, switchMap} from 'rxjs/operators';
 import {Injectable} from '@angular/core';
 import {Observable, AsyncSubject, of} from 'rxjs';
 import {Apollo, QueryRef} from 'apollo-angular';
-import * as moment from 'moment';
 import {
   GetChatsGQL,
   GetChatGQL,
@@ -133,6 +132,7 @@ export class ChatsService {
       id: chatId,
       name: '',
       picture: null,
+      updatedAt: new Date(),
       allTimeMembers: [],
       unreadMessages: 0,
       isGroup: false,
@@ -202,7 +202,7 @@ export class ChatsService {
             name: this.loginService.getUser().name,
           },
           content,
-          createdAt: moment().unix(),
+          createdAt: new Date(),
           recipients: [],
           ownership: true,
         },
@@ -218,14 +218,16 @@ export class ChatsService {
             }
           });
           // Add our message from the mutation to the end.
-          chat.messages.push(addMessage);
-          // Write our data back to the cache.
-          store.writeQuery({
-            query: this.getChatGQL.document,
-            data: {
-              chat
-            }
-          });
+          if (!chat.messages.some(message => message.id === addMessage.id)) {
+            chat.messages.push(addMessage);
+            // Write our data back to the cache.
+            store.writeQuery({
+              query: this.getChatGQL.document,
+              data: {
+                chat
+              }
+            });
+          }
         }
         // Update last message cache
         {
@@ -236,18 +238,20 @@ export class ChatsService {
               amount: this.messagesAmount,
             },
           });
+          const chat = chats.find(chat => chat.id === chatId);
           // Add our comment from the mutation to the end.
-          chats.find(chat => chat.id === chatId).messages.push(addMessage);
-          // Write our data back to the cache.
-          store.writeQuery<GetChats.Query, GetChats.Variables>({
-            query: this.getChatsGQL.document,
-            variables: {
-              amount: this.messagesAmount,
-            },
-            data: {
-              chats,
-            },
-          });
+          if (!chat.messages.some(message => message.id === addMessage.id)) {
+            // Write our data back to the cache.
+            store.writeQuery<GetChats.Query, GetChats.Variables>({
+              query: this.getChatsGQL.document,
+              variables: {
+                amount: this.messagesAmount,
+              },
+              data: {
+                chats,
+              },
+            });
+          }
         }
       }
     });
@@ -411,6 +415,7 @@ export class ChatsService {
             unreadMessages: 0,
             messages: [],
             isGroup: false,
+            updatedAt: new Date(),
           },
         },
         update: (store, { data: { addChat } }) => {

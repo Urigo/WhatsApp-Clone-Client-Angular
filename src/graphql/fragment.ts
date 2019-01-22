@@ -9,6 +9,7 @@ export const fragments: {
       id
       name
       picture
+      updatedAt
       allTimeMembers {
         id
       }

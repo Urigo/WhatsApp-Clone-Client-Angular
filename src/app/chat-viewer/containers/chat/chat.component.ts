@@ -11,7 +11,7 @@ import {Location} from '@angular/common';
       <button class="navigation" mat-button (click)="goToChats()">
         <mat-icon aria-label="Icon-button with an arrow back icon">arrow_back</mat-icon>
       </button>
-      <img class="profile-pic" src="assets/default-profile-pic.jpg">
+      <img class="profile-pic" [src]="picture || 'assets/default-profile-pic.jpg'">
       <div class="title">{{ name }}</div>
     </app-toolbar>
     <div class="container">
@@ -28,6 +28,7 @@ export class ChatComponent implements OnInit {
   chatId: string;
   messages: GetChat.Messages[];
   name: string;
+  picture: string;
   isGroup: boolean;
   optimisticUI: boolean;
 
@@ -60,6 +61,7 @@ export class ChatComponent implements OnInit {
         this.chatsService.getChat(chatId, this.optimisticUI).chat$.subscribe(chat => {
           this.messages = chat.messages;
           this.name = chat.name;
+          this.picture = chat.picture;
           this.isGroup = chat.isGroup;
         });
       });

@@ -229,6 +229,8 @@ export namespace ChatWithoutMessages {
 
     picture: Maybe<string>;
 
+    updatedAt: Maybe<DateTime>;
+
     allTimeMembers: AllTimeMembers[];
 
     unreadMessages: number;
@@ -525,6 +527,7 @@ export const ChatWithoutMessagesFragment = gql`
     id
     name
     picture
+    updatedAt
     allTimeMembers {
       id
     }
