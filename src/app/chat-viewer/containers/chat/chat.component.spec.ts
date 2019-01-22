@@ -70,7 +70,6 @@ describe('ChatComponent', () => {
         },
         content: 'Yep!',
         createdAt: '1514035700',
-        type: 0,
         recipients: [
           {
             user: {

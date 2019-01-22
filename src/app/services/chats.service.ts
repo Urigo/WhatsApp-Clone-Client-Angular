@@ -203,7 +203,6 @@ export class ChatsService {
           },
           content,
           createdAt: moment().unix(),
-          type: 1,
           recipients: [],
           ownership: true,
         },
@@ -273,7 +272,7 @@ export class ChatsService {
           });
           // Remove the chat (mutable)
           for (const index of chats.keys()) {
-            if (chats[index].id === removeChat) {
+            if (chats[index].id === removeChat.id) {
               chats.splice(index, 1);
             }
           }
@@ -292,7 +291,7 @@ export class ChatsService {
     );
   }
 
-  removeMessages(chatId: string, messages: GetChat.Messages[], messageIdsOrAll: string[] | boolean) {
+  removeMessages(chatId: string, messages: GetChat.Messages[], messagesIdsOrAll: string[] | boolean) {
     let ids: string[] = [];
 
     const options = {
@@ -311,9 +310,9 @@ export class ChatsService {
             }
           });
           // Remove the messages (mutable)
-          removeMessages.forEach(messageId => {
+          removeMessages.forEach(removedMessage => {
             for (const index of chat.messages.keys()) {
-              if (chat.messages[index].id === messageId) {
+              if (chat.messages[index].id === removedMessage.id) {
                 chat.messages.splice(index, 1);
               }
             }
@@ -352,19 +351,19 @@ export class ChatsService {
       }
     };
 
-    if (typeof messageIdsOrAll === 'boolean') {
+    if (typeof messagesIdsOrAll === 'boolean') {
       ids = messages.map(message => message.id);
 
       return this.removeAllMessagesGQL.mutate({
         chatId,
-        all: messageIdsOrAll
+        all: messagesIdsOrAll
       }, options);
     } else {
-      ids = messageIdsOrAll;
+      ids = messagesIdsOrAll;
 
       return this.removeMessagesGQL.mutate({
         chatId,
-        messageIds: messageIdsOrAll,
+        messagesIds: messagesIdsOrAll,
       }, options);
     }
   }

@@ -73,7 +73,7 @@ export class ChatComponent implements OnInit {
     this.chatsService.addMessage(this.chatId, content).subscribe();
   }
 
-  deleteMessages(messageIds: string[]) {
-    this.chatsService.removeMessages(this.chatId, this.messages, messageIds).subscribe();
+  deleteMessages(messagesIds: string[]) {
+    this.chatsService.removeMessages(this.chatId, this.messages, messagesIds).subscribe();
   }
 }

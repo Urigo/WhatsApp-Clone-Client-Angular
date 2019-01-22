@@ -66,7 +66,6 @@ describe('ChatsComponent', () => {
           },
           content: 'Yep!',
           createdAt: '1514035700',
-          type: 0,
           recipients: [
             {
               user: {
@@ -126,7 +125,6 @@ describe('ChatsComponent', () => {
           },
           content: `Hey, it's me`,
           createdAt: '1514031800',
-          type: 0,
           recipients: [
             {
               user: {
@@ -186,7 +184,6 @@ describe('ChatsComponent', () => {
           },
           content: 'You still there?',
           createdAt: '1514010200',
-          type: 0,
           recipients: [
             {
               user: {
@@ -273,7 +270,6 @@ describe('ChatsComponent', () => {
           },
           content: 'Awesome!',
           createdAt: '1512830000',
-          type: 0,
           recipients: [
             {
               user: {

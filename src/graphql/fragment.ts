@@ -28,7 +28,6 @@ export const fragments: {
       }
       content
       createdAt
-      type
       recipients {
         user {
           id

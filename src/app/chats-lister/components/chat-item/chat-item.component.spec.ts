@@ -41,7 +41,6 @@ describe('ChatItemComponent', () => {
         },
         content: 'Hello! How are you? A lot happened since last time',
         createdAt: '1513435525',
-        type: 1,
         recipients: [
           {
             user: {
