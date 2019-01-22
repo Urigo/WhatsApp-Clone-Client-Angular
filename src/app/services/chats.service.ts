@@ -33,7 +33,7 @@ const currentUserName = 'Ethan Gonzalez';
 
 @Injectable()
 export class ChatsService {
-  messagesAmount = 3;
+  messagesAmount = 10;
   getChatsWq: QueryRef<GetChats.Query, GetChats.Variables>;
   chats$: Observable<GetChats.Chats[]>;
   chats: GetChats.Chats[];

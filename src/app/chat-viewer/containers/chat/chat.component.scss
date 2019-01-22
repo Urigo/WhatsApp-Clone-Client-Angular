@@ -11,8 +11,10 @@ app-toolbar {
 
   .profile-pic {
     height: calc(100% - 10px);
-    width: auto;
+    width: 40px;
+    height: 40px;
     padding: 5px;
+    object-fit: cover;
     border-radius: 50%;
   }
 }

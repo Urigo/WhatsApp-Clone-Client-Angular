@@ -9,7 +9,6 @@ button {
   outline: none !important;
   margin: 10px;
   height: 50px;
-  padding: 1px 6px;
   line-height: 50px;
   border: none;
   margin: 0;
@@ -23,6 +22,7 @@ button {
     text-align: center;
     line-height: inherit;
     border-radius: 50%;
+    object-fit: cover;
   }
 
   div {

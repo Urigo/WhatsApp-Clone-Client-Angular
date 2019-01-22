@@ -24,6 +24,7 @@ export class ChatItemComponent {
   updatedAt: string;
 
   ngOnInit() {
-    this.updatedAt = moment(this.chat.updatedAt).format('HH:mm');
+    this.updatedAt = this.chat.updatedAt
+      ? moment(this.chat.updatedAt).format('HH:mm') : '';
   }
 }

@@ -29,10 +29,12 @@ div {
   .user-profile-pic {
     flex: 0 1 50px;
     height: 50px;
+    width: 50px;
     border-radius: 50%;
     display: block;
     margin-left: auto;
     margin-right: auto;
+    object-fit: cover;
   }
 
   .user-name {

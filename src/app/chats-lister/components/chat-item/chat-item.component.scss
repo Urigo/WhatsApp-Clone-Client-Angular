@@ -10,8 +10,9 @@
 
   .chat-pic {
     height: 50px;
-    width: auto;
+    width: 50px;
     border-radius: 50%;
+    object-fit: cover;
   }
 
   .chat-info {
