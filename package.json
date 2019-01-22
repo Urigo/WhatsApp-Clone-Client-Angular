@@ -27,7 +27,7 @@
     "apollo-angular": "1.5.0",
     "core-js": "2.6.2",
     "rxjs": "6.3.3",
-    "zone.js": "0.8.28",
+    "zone.js": "0.8.29",
     "apollo-angular-link-http": "1.4.0",
     "apollo-link": "1.2.6",
     "apollo-link-ws": "1.0.12",
