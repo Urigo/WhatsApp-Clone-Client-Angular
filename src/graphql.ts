@@ -172,13 +172,7 @@ export namespace RemoveAllMessages {
   export type Mutation = {
     __typename?: "Mutation";
 
-    removeMessages: RemoveMessages[];
-  };
-
-  export type RemoveMessages = {
-    __typename?: "Message";
-
-    id: string;
+    removeMessages: string[];
   };
 }
 
@@ -190,13 +184,7 @@ export namespace RemoveChat {
   export type Mutation = {
     __typename?: "Mutation";
 
-    removeChat: Maybe<RemoveChat>;
-  };
-
-  export type RemoveChat = {
-    __typename?: "Chat";
-
-    id: string;
+    removeChat: Maybe<string>;
   };
 }
 
@@ -209,13 +197,7 @@ export namespace RemoveMessages {
   export type Mutation = {
     __typename?: "Mutation";
 
-    removeMessages: RemoveMessages[];
-  };
-
-  export type RemoveMessages = {
-    __typename?: "Message";
-
-    id: string;
+    removeMessages: string[];
   };
 }
 
@@ -408,7 +390,7 @@ export interface Mutation {
 
   addMessage?: Maybe<Message>;
 
-  removeMessages: Message[];
+  removeMessages: string[];
 
   addChat?: Maybe<Chat>;
 
@@ -416,7 +398,7 @@ export interface Mutation {
 
   updateChat?: Maybe<Chat>;
 
-  removeChat?: Maybe<Chat>;
+  removeChat?: Maybe<string>;
 
   addAdmins: (Maybe<string>)[];
 
@@ -737,9 +719,7 @@ export class RemoveAllMessagesGQL extends Apollo.Mutation<
 > {
   document: any = gql`
     mutation RemoveAllMessages($chatId: ID!, $all: Boolean) {
-      removeMessages(chatId: $chatId, all: $all) {
-        id
-      }
+      removeMessages(chatId: $chatId, all: $all)
     }
   `;
 }
@@ -752,9 +732,7 @@ export class RemoveChatGQL extends Apollo.Mutation<
 > {
   document: any = gql`
     mutation RemoveChat($chatId: ID!) {
-      removeChat(chatId: $chatId) {
-        id
-      }
+      removeChat(chatId: $chatId)
     }
   `;
 }
@@ -767,9 +745,7 @@ export class RemoveMessagesGQL extends Apollo.Mutation<
 > {
   document: any = gql`
     mutation RemoveMessages($chatId: ID!, $messagesIds: [ID!]) {
-      removeMessages(chatId: $chatId, messagesIds: $messagesIds) {
-        id
-      }
+      removeMessages(chatId: $chatId, messagesIds: $messagesIds)
     }
   `;
 }

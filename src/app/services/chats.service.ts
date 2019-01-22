@@ -3,6 +3,7 @@ import {Injectable} from '@angular/core';
 import {Observable, AsyncSubject, of} from 'rxjs';
 import {Apollo, QueryRef} from 'apollo-angular';
 import {
+  Message,
   GetChatsGQL,
   GetChatGQL,
   AddMessageGQL,
@@ -68,9 +69,11 @@ export class ChatsService {
 
         const newChat: GetChats.Chats = (<any>subscriptionData).data.chatAdded;
 
-        return Object.assign({}, prev, {
-          chats: [...prev.chats, newChat]
-        });
+        if (!prev.chats.some(chat => chat.id === newChat.id)) {
+          return Object.assign({}, prev, {
+            chats: [...prev.chats, newChat]
+          });
+        }
       }
     });
 
@@ -94,14 +97,16 @@ export class ChatsService {
           });
 
           // Add our message from the mutation to the end.
-          chat.messages.push(newMessage);
-          // Write our data back to the cache.
-          this.apollo.getClient().writeQuery({
-            query: this.getChatGQL.document,
-            data: {
-              chat
-            }
-          });
+          if (!chat.messages.some(message => message.id === newMessage.id)) {
+            chat.messages.push(newMessage);
+            // Write our data back to the cache.
+            this.apollo.getClient().writeQuery({
+              query: this.getChatGQL.document,
+              data: {
+                chat
+              }
+            });
+          }
         } catch {
           console.error('The chat we received an update for does not exist in the store');
         }
@@ -276,7 +281,7 @@ export class ChatsService {
           });
           // Remove the chat (mutable)
           for (const index of chats.keys()) {
-            if (chats[index].id === removeChat.id) {
+            if (chats[index].id === removeChat) {
               chats.splice(index, 1);
             }
           }
@@ -314,9 +319,9 @@ export class ChatsService {
             }
           });
           // Remove the messages (mutable)
-          removeMessages.forEach(removedMessage => {
+          removeMessages.forEach(messageId => {
             for (const index of chat.messages.keys()) {
-              if (chat.messages[index].id === removedMessage.id) {
+              if (chat.messages[index].id === messageId) {
                 chat.messages.splice(index, 1);
               }
             }
@@ -427,17 +432,19 @@ export class ChatsService {
             },
           });
           // Add our comment from the mutation to the end.
-          chats.push(addChat);
-          // Write our data back to the cache.
-          store.writeQuery<GetChats.Query, GetChats.Variables>({
-            query: this.getChatsGQL.document,
-            variables: {
-              amount: this.messagesAmount,
-            },
-            data: {
-              chats,
-            },
-          });
+          if (!chats.some(chat => chat.id === addChat.id)) {
+            chats.push(addChat);
+            // Write our data back to the cache.
+            store.writeQuery<GetChats.Query, GetChats.Variables>({
+              query: this.getChatsGQL.document,
+              variables: {
+                amount: this.messagesAmount,
+              },
+              data: {
+                chats,
+              },
+            });
+          }
         },
       }
     ).pipe(share());
@@ -479,17 +486,19 @@ export class ChatsService {
             },
           });
           // Add our comment from the mutation to the end.
-          chats.push(addGroup);
-          // Write our data back to the cache.
-          store.writeQuery<GetChats.Query, GetChats.Variables>({
-            query: this.getChatsGQL.document,
-            variables: {
-              amount: this.messagesAmount,
-            },
-            data: {
-              chats,
-            },
-          });
+          if (!chats.some(chat => chat.id === addGroup.id)) {
+            chats.push(addGroup);
+            // Write our data back to the cache.
+            store.writeQuery<GetChats.Query, GetChats.Variables>({
+              query: this.getChatsGQL.document,
+              variables: {
+                amount: this.messagesAmount,
+              },
+              data: {
+                chats,
+              },
+            });
+          }
         },
       }
     ).pipe(share());
