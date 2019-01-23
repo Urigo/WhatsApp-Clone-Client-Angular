@@ -14,7 +14,10 @@ import {
   AddChatGQL,
   AddGroupGQL,
   ChatAddedGQL,
+  ChatUpdatedGQL,
   MessageAddedGQL,
+  UserAddedGQL,
+  UserUpdatedGQL,
   AddMessage,
   GetChats,
   GetChat,
@@ -27,17 +30,17 @@ import {
 } from '../../graphql';
 import { DataProxy } from 'apollo-cache';
 import { FetchResult } from 'apollo-link';
-import {LoginService} from '../login/services/login.service';
-
-const currentUserId = '1';
-const currentUserName = 'Ethan Gonzalez';
+import { LoginService } from '../login/services/login.service';
 
 @Injectable()
 export class ChatsService {
   messagesAmount = 10;
   getChatsWq: QueryRef<GetChats.Query, GetChats.Variables>;
+  getUsersWq: QueryRef<GetUsers.Query, GetUsers.Variables>;
   chats$: Observable<GetChats.Chats[]>;
   chats: GetChats.Chats[];
+  users$: Observable<GetUsers.Users[]>;
+  users: GetUsers.Users[];
   getChatWqSubject: AsyncSubject<QueryRef<GetChat.Query>>;
   addChat$: Observable<FetchResult<AddChat.Mutation | AddGroup.Mutation>>;
 
@@ -52,9 +55,12 @@ export class ChatsService {
     private addChatGQL: AddChatGQL,
     private addGroupGQL: AddGroupGQL,
     private chatAddedGQL: ChatAddedGQL,
+    private chatUpdatedGQL: ChatUpdatedGQL,
     private messageAddedGQL: MessageAddedGQL,
+    private userAddedGQL: UserAddedGQL,
+    private userUpdatedGQL: UserUpdatedGQL,
+    private loginService: LoginService,
     private apollo: Apollo,
-    private loginService: LoginService
   ) {
     this.getChatsWq = this.getChatsGQL.watch({
       amount: this.messagesAmount,
@@ -71,8 +77,27 @@ export class ChatsService {
 
         if (!prev.chats.some(chat => chat.id === newChat.id)) {
           return Object.assign({}, prev, {
-            chats: [...prev.chats, newChat]
+            chats: [newChat, ...prev.chats]
           });
+        }
+      }
+    });
+
+    this.getChatsWq.subscribeToMore({
+      document: this.chatUpdatedGQL.document,
+      updateQuery: (prev: GetChats.Query, { subscriptionData }) => {
+        if (!subscriptionData.data) {
+          return prev;
+        }
+
+        const updatedChat: GetChats.Chats = (<any>subscriptionData).data.chatUpdated;
+        const index = prev.chats.findIndex(chat => chat.id === updatedChat.id);
+
+        if (index !== -1) {
+          const chats = [...prev.chats];
+          chats.splice(index, 1, updatedChat);
+
+          return Object.assign({}, prev, { chats });
         }
       }
     });
@@ -122,6 +147,49 @@ export class ChatsService {
       map((result) => result.data.chats)
     );
     this.chats$.subscribe(chats => this.chats = chats);
+
+    this.getUsersWq = this.getUsersGQL.watch();
+
+    this.getUsersWq.subscribeToMore({
+      document: this.userAddedGQL.document,
+      updateQuery: (prev: GetUsers.Query, { subscriptionData }) => {
+        if (!subscriptionData.data) {
+          return prev;
+        }
+
+        const newUser: GetUsers.Users = (<any>subscriptionData).data.userAdded;
+
+        if (!prev.users.some(user => user.id === newUser.id)) {
+          return Object.assign({}, prev, {
+            users: [newUser, ...prev.users]
+          });
+        }
+      }
+    });
+
+    this.getUsersWq.subscribeToMore({
+      document: this.userUpdatedGQL.document,
+      updateQuery: (prev: GetUsers.Query, { subscriptionData }) => {
+        if (!subscriptionData.data) {
+          return prev;
+        }
+
+        const updatedUser: GetUsers.Users = (<any>subscriptionData).data.userUpdated;
+        const index = prev.users.findIndex(user => user.id === updatedUser.id);
+
+        if (index !== -1) {
+          const users = [...prev.users];
+          users.splice(index, 1, updatedUser);
+
+          return Object.assign({}, prev, { users });
+        }
+      }
+    });
+
+    this.users$ = this.getUsersWq.valueChanges.pipe(
+      map((result) => result.data.users)
+    );
+    this.users$.subscribe(users => this.users = users);
   }
 
   static getRandomId() {
@@ -382,12 +450,7 @@ export class ChatsService {
   }
 
   getUsers() {
-    const query = this.getUsersGQL.watch();
-    const users$ = query.valueChanges.pipe(
-      map((result) => result.data.users)
-    );
-
-    return {query, users$};
+    return {query: this.getUsersWq, users$: this.users$};
   }
 
   // Checks if the chat is listed for the current user and returns the id
