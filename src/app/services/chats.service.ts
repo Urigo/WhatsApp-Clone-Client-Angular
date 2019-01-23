@@ -246,6 +246,10 @@ export class ChatsService {
           const chat = chats.find(chat => chat.id === chatId);
           // Add our comment from the mutation to the end.
           if (!chat.messages.some(message => message.id === addMessage.id)) {
+            // Move chat to the top of the list
+            const index = chats.findIndex(candi => candi.id === chat.id)
+            chats.splice(index, 1)
+            chats.unshift(chat)
             // Write our data back to the cache.
             store.writeQuery<GetChats.Query, GetChats.Variables>({
               query: this.getChatsGQL.document,
