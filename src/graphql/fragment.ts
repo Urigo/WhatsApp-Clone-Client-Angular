@@ -29,22 +29,6 @@ export const fragments: {
       content
       createdAt
       type
-      recipients {
-        user {
-          id
-        }
-        message {
-          id
-          chat {
-            id
-          }
-        }
-        chat {
-          id
-        }
-        receivedAt
-        readAt
-      }
       ownership
     }
   `,
