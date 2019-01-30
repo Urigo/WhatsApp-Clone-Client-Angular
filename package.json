@@ -48,7 +48,7 @@
     "graphql-code-generator": "0.16.0",
     "graphql-codegen-typescript-apollo-angular": "0.16.0",
     "graphql-codegen-typescript-client": "0.16.0",
-    "graphql-codegen-typescript-common": "0.15.2",
+    "graphql-codegen-typescript-common": "0.16.0",
     "graphql-codegen-typescript-server": "0.16.0",
     "jasmine-core": "2.99.1",
     "jasmine-spec-reporter": "4.2.1",
