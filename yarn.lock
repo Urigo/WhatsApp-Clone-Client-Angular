@@ -3543,14 +3543,14 @@ graphql-codegen-typescript-apollo-angular@0.15.2:
     graphql-codegen-plugin-helpers "0.15.2"
     graphql-codegen-typescript-common "0.15.2"
 
-graphql-codegen-typescript-client@0.15.2:
-  version "0.15.2"
-  resolved "https://registry.yarnpkg.com/graphql-codegen-typescript-client/-/graphql-codegen-typescript-client-0.15.2.tgz#37fab175306e37a2b814f84361f1ec4c3db06dc1"
-  integrity sha512-aPmIU4t6nYi9/rDgGm/WopHk7WHO5S93H7HS6WJwVb/VNbOaoz/Buvtb/jt4ljD+30kdaFMOoTFB3P8Zwg0i5g==
+graphql-codegen-typescript-client@0.16.0:
+  version "0.16.0"
+  resolved "https://registry.yarnpkg.com/graphql-codegen-typescript-client/-/graphql-codegen-typescript-client-0.16.0.tgz#65e0ded7671c6c1039b897def53cf3a73f280a96"
+  integrity sha512-0uChi7XI+aSniXekiqQkJ58FlUgHMWW+ZxcoNYUZn0DOVdYhzYPAhuZdKMK2/bSpxnxn0kWG6hSGMrRu7GMNTw==
   dependencies:
-    graphql-codegen-core "0.15.2"
-    graphql-codegen-plugin-helpers "0.15.2"
-    graphql-codegen-typescript-common "0.15.2"
+    graphql-codegen-core "0.16.0"
+    graphql-codegen-plugin-helpers "0.16.0"
+    graphql-codegen-typescript-common "0.16.0"
 
 graphql-codegen-typescript-common@0.15.2:
   version "0.15.2"
