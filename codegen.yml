@@ -1,0 +1,8 @@
+overwrite: true
+schema: http://localhost:4000/graphql
+documents: ./src/graphql/**/*.ts
+generates:
+  ./src/graphql.ts:
+    - typescript-common
+    - typescript-client
+    - typescript-apollo-angular

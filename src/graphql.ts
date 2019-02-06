@@ -1,5 +1,59 @@
 export type Maybe<T> = T | null;
 
+export interface CreateUserInput {
+  username?: Maybe<string>;
+
+  email?: Maybe<string>;
+
+  password?: Maybe<string>;
+
+  name?: Maybe<string>;
+
+  picture?: Maybe<string>;
+
+  phone?: Maybe<string>;
+}
+
+export interface TwoFactorSecretKeyInput {
+  ascii?: Maybe<string>;
+
+  base32?: Maybe<string>;
+
+  hex?: Maybe<string>;
+
+  qr_code_ascii?: Maybe<string>;
+
+  qr_code_hex?: Maybe<string>;
+
+  qr_code_base32?: Maybe<string>;
+
+  google_auth_qr?: Maybe<string>;
+
+  otpauth_url?: Maybe<string>;
+}
+
+export interface AuthenticateParamsInput {
+  access_token?: Maybe<string>;
+
+  access_token_secret?: Maybe<string>;
+
+  provider?: Maybe<string>;
+
+  password?: Maybe<string>;
+
+  user?: Maybe<UserInput>;
+
+  code?: Maybe<string>;
+}
+
+export interface UserInput {
+  id?: Maybe<string>;
+
+  email?: Maybe<string>;
+
+  username?: Maybe<string>;
+}
+
 export enum MessageType {
   Location = "LOCATION",
   Text = "TEXT",
@@ -8,6 +62,9 @@ export enum MessageType {
 
 /** A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
 export type DateTime = any;
+
+/** The `Upload` scalar type represents a file upload. */
+export type Upload = any;
 
 // ====================================================
 // Documents
@@ -125,6 +182,30 @@ export namespace GetChats {
   } & ChatWithoutMessages.Fragment;
 
   export type Messages = Message.Fragment;
+}
+
+export namespace GetUser {
+  export type Variables = {};
+
+  export type Query = {
+    __typename?: "Query";
+
+    getUser: Maybe<GetUser>;
+  };
+
+  export type GetUser = {
+    __typename?: "User";
+
+    id: string;
+
+    username: Maybe<string>;
+
+    name: Maybe<string>;
+
+    picture: Maybe<string>;
+
+    phone: Maybe<string>;
+  };
 }
 
 export namespace GetUsers {
@@ -263,211 +344,6 @@ export namespace Message {
 
     name: Maybe<string>;
   };
-}
-
-// ====================================================
-// Scalars
-// ====================================================
-
-// ====================================================
-// Types
-// ====================================================
-
-export interface Query {
-  me?: Maybe<User>;
-
-  users?: Maybe<User[]>;
-
-  chats: Chat[];
-
-  chat?: Maybe<Chat>;
-}
-
-export interface User {
-  id: string;
-
-  name?: Maybe<string>;
-
-  picture?: Maybe<string>;
-
-  phone?: Maybe<string>;
-}
-
-export interface Chat {
-  /** May be a chat or a group */
-  id: string;
-
-  createdAt: DateTime;
-  /** Computed for chats */
-  name?: Maybe<string>;
-  /** Computed for chats */
-  picture?: Maybe<string>;
-  /** All members, current and past ones. Includes users who still didn't get the chat listed. */
-  allTimeMembers: User[];
-  /** Whoever gets the chat listed. For groups includes past members who still didn't delete the group. For chats they are the only ones who can send messages. */
-  listingMembers: User[];
-  /** Actual members of the group. Null for chats. For groups they are the only ones who can send messages. They aren't the only ones who get the group listed. */
-  actualGroupMembers?: Maybe<User[]>;
-  /** Null for chats */
-  admins?: Maybe<User[]>;
-  /** If null the group is read-only. Null for chats. */
-  owner?: Maybe<User>;
-  /** Computed property */
-  isGroup: boolean;
-
-  messages: (Maybe<Message>)[];
-
-  lastMessage?: Maybe<Message>;
-
-  updatedAt: DateTime;
-  /** Computed property */
-  unreadMessages: number;
-}
-
-export interface Message {
-  id: string;
-
-  sender: User;
-
-  chat: Chat;
-
-  content: string;
-
-  createdAt: DateTime;
-  /** FIXME: should return MessageType */
-  type: number;
-  /** Whoever still holds a copy of the message. Cannot be null because the message gets deleted otherwise */
-  holders: User[];
-  /** Computed property */
-  ownership: boolean;
-  /** Whoever received the message */
-  recipients: Recipient[];
-}
-
-export interface Recipient {
-  user: User;
-
-  message: Message;
-
-  chat: Chat;
-
-  receivedAt?: Maybe<DateTime>;
-
-  readAt?: Maybe<DateTime>;
-}
-
-export interface Mutation {
-  updateUser: User;
-
-  addChat?: Maybe<Chat>;
-
-  addGroup?: Maybe<Chat>;
-
-  updateChat?: Maybe<Chat>;
-
-  removeChat?: Maybe<string>;
-
-  addAdmins: (Maybe<string>)[];
-
-  removeAdmins: (Maybe<string>)[];
-
-  addMembers: (Maybe<string>)[];
-
-  removeMembers: (Maybe<string>)[];
-
-  addMessage?: Maybe<Message>;
-
-  removeMessages: (Maybe<string>)[];
-
-  markAsReceived?: Maybe<boolean>;
-
-  markAsRead?: Maybe<boolean>;
-}
-
-export interface Subscription {
-  userAdded?: Maybe<User>;
-
-  userUpdated?: Maybe<User>;
-
-  chatAdded?: Maybe<Chat>;
-
-  chatUpdated?: Maybe<Chat>;
-
-  messageAdded?: Maybe<Message>;
-}
-
-// ====================================================
-// Arguments
-// ====================================================
-
-export interface ChatQueryArgs {
-  chatId: string;
-}
-export interface MessagesChatArgs {
-  amount?: Maybe<number>;
-}
-export interface UpdateUserMutationArgs {
-  name?: Maybe<string>;
-
-  picture?: Maybe<string>;
-}
-export interface AddChatMutationArgs {
-  userId: string;
-}
-export interface AddGroupMutationArgs {
-  userIds: string[];
-
-  groupName: string;
-
-  groupPicture?: Maybe<string>;
-}
-export interface UpdateChatMutationArgs {
-  chatId: string;
-
-  name?: Maybe<string>;
-
-  picture?: Maybe<string>;
-}
-export interface RemoveChatMutationArgs {
-  chatId: string;
-}
-export interface AddAdminsMutationArgs {
-  groupId: string;
-
-  userIds: string[];
-}
-export interface RemoveAdminsMutationArgs {
-  groupId: string;
-
-  userIds: string[];
-}
-export interface AddMembersMutationArgs {
-  groupId: string;
-
-  userIds: string[];
-}
-export interface RemoveMembersMutationArgs {
-  groupId: string;
-
-  userIds: string[];
-}
-export interface AddMessageMutationArgs {
-  chatId: string;
-
-  content: string;
-}
-export interface RemoveMessagesMutationArgs {
-  chatId: string;
-
-  messageIds?: Maybe<string[]>;
-
-  all?: Maybe<boolean>;
-}
-export interface MarkAsReceivedMutationArgs {
-  chatId: string;
-}
-export interface MarkAsReadMutationArgs {
-  chatId: string;
 }
 
 // ====================================================
@@ -634,6 +510,22 @@ export class GetChatsGQL extends Apollo.Query<
 
     ${ChatWithoutMessagesFragment}
     ${MessageFragment}
+  `;
+}
+@Injectable({
+  providedIn: "root"
+})
+export class GetUserGQL extends Apollo.Query<GetUser.Query, GetUser.Variables> {
+  document: any = gql`
+    query getUser {
+      getUser {
+        id
+        username
+        name
+        picture
+        phone
+      }
+    }
   `;
 }
 @Injectable({

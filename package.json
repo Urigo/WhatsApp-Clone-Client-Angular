@@ -3,15 +3,20 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "serve": "ng serve",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "generator": "ts-node src/codegen.ts"
+    "generate": "gql-gen",
+    "generate:watch": "gql-gen -w",
+    "start": "concurrently \"yarn serve\" \"yarn generate:watch\""
   },
   "private": true,
   "dependencies": {
+    "@accounts/client": "^0.9.3",
+    "@accounts/client-password": "^0.9.3",
+    "@accounts/graphql-client": "^0.9.3",
     "@angular/animations": "~7.2.0-rc.0",
     "@angular/cdk": "^7.2.1",
     "@angular/common": "~7.2.0-rc.0",
@@ -30,6 +35,7 @@
     "apollo-link": "^1.2.0",
     "apollo-link-ws": "^1.0.12",
     "apollo-utilities": "^1.0.27",
+    "concurrently": "^4.1.0",
     "core-js": "^2.5.4",
     "graphql": "^14.0.2",
     "graphql-tag": "^2.10.0",
@@ -65,7 +71,6 @@
     "karma-jasmine-html-reporter": "^0.2.2",
     "prompt": "^1.0.0",
     "protractor": "~5.4.0",
-    "ts-node": "~7.0.0",
     "tslint": "~5.11.0",
     "typescript": "~3.2.2"
   }

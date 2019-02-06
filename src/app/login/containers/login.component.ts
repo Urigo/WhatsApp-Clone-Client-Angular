@@ -1,10 +1,8 @@
 import {Component} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
 import {FormBuilder, Validators} from '@angular/forms';
 // import {matchOtherValidator} from '@moebius/ng-validators';
 import {Router} from '@angular/router';
-import {User} from '../../../graphql';
-import {LoginService} from '../services/login.service';
+import { AccountsClientPassword } from '@accounts/client-password';
 
 @Component({
   selector: 'app-login',
@@ -97,40 +95,36 @@ export class LoginComponent {
 
   public signingIn = true;
 
-  constructor(private http: HttpClient,
-              private fb: FormBuilder,
+  constructor(private fb: FormBuilder,
               private router: Router,
-              private loginService: LoginService) {}
+              private accountsClientPassword: AccountsClientPassword) {}
 
-  signIn() {
-    const {username, password} = this.signInForm.value;
-    const auth = `Basic ${btoa(`${username}:${password}`)}`;
-    this.http.post('http://localhost:4000/signin', null, {
-      headers: {
-        Authorization: auth,
-      }
-    }).subscribe((user: User) => {
-      this.loginService.storeAuthHeader(auth);
-      this.loginService.storeUser(user);
-      this.router.navigate(['/chats']);
-    }, err => console.error(err));
+  async signIn() {
+    const { username, password } = this.signInForm.value;
+    try {
+      await this.accountsClientPassword.login({
+        password,
+        user: {
+          username,
+        },
+      });
+      this.router.navigateByUrl('/');
+    } catch (err) {
+      console.error(err.message);
+    }
   }
 
-  signUp() {
+  async signUp() {
     const {username, newPassword: password, name} = this.signUpForm.value;
-    const auth = this.loginService.createBase64Auth(username, password);
-    this.http.post('http://localhost:4000/signup', {
-      name,
-      username,
-      password,
-    }, {
-      headers: {
-        Authorization: auth,
-      }
-    }).subscribe((user: User) => {
-      this.loginService.storeAuthHeader(auth);
-      this.loginService.storeUser(user);
-      this.router.navigate(['/chats']);
-    }, err => console.error(err));
+    try {
+      await this.accountsClientPassword.createUser({
+        password,
+        username,
+        name,
+      });
+      this.router.navigateByUrl('/login');
+    } catch (err) {
+      console.error(err.message);
+    }
   }
 }

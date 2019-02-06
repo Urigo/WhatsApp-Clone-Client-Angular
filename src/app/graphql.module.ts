@@ -6,7 +6,6 @@ import {getMainDefinition} from 'apollo-utilities';
 import {OperationDefinitionNode} from 'graphql';
 import {split} from 'apollo-link';
 import {WebSocketLink} from 'apollo-link-ws';
-import {LoginService} from './login/services/login.service';
 
 const uri = 'http://localhost:4000/graphql';
 
@@ -19,13 +18,13 @@ export const dataIdFromObject = (object: any) => {
   }
 };
 
-export function createApollo(httpLink: HttpLink, loginService: LoginService) {
+export function createApollo(httpLink: HttpLink) {
   const subscriptionLink = new WebSocketLink({
     uri: uri.replace('http', 'ws'),
     options: {
       reconnect: true,
       connectionParams: () => ({
-        authToken: loginService.getAuthHeader() || null
+        'accounts-access-token': localStorage.getItem('accounts:accessToken') || null
       })
     }
   });
@@ -53,7 +52,7 @@ export function createApollo(httpLink: HttpLink, loginService: LoginService) {
     {
       provide: APOLLO_OPTIONS,
       useFactory: createApollo,
-      deps: [HttpLink, LoginService],
+      deps: [HttpLink],
     },
   ],
 })

@@ -24,13 +24,11 @@ import {
   AddChat,
   AddGroup,
   MessageAdded,
+  GetUserGQL,
+  GetUser,
 } from '../../graphql';
 import { DataProxy } from 'apollo-cache';
 import { FetchResult } from 'apollo-link';
-import {LoginService} from '../login/services/login.service';
-
-const currentUserId = '1';
-const currentUserName = 'Ethan Gonzalez';
 
 @Injectable()
 export class ChatsService {
@@ -40,6 +38,7 @@ export class ChatsService {
   chats: GetChats.Chats[];
   getChatWqSubject: AsyncSubject<QueryRef<GetChat.Query>>;
   addChat$: Observable<FetchResult<AddChat.Mutation | AddGroup.Mutation>>;
+  user: GetUser.GetUser;
 
   constructor(
     private getChatsGQL: GetChatsGQL,
@@ -53,8 +52,8 @@ export class ChatsService {
     private addGroupGQL: AddGroupGQL,
     private chatAddedGQL: ChatAddedGQL,
     private messageAddedGQL: MessageAddedGQL,
-    private apollo: Apollo,
-    private loginService: LoginService
+    private getUserGQL: GetUserGQL,
+    private apollo: Apollo
   ) {
     this.getChatsWq = this.getChatsGQL.watch({
       amount: this.messagesAmount,
@@ -118,6 +117,8 @@ export class ChatsService {
       map((result) => result.data.chats)
     );
     this.chats$.subscribe(chats => this.chats = chats);
+
+    this.getUserGQL.watch().valueChanges.subscribe(result => this.user = result.data.getUser);
   }
 
   static getRandomId() {
@@ -198,8 +199,8 @@ export class ChatsService {
           },
           sender: {
             __typename: 'User',
-            id: this.loginService.getUser().id,
-            name: this.loginService.getUser().name,
+            id: this.user.id,
+            name: this.user.name,
           },
           content,
           createdAt: moment().unix(),
@@ -381,7 +382,7 @@ export class ChatsService {
   // Checks if the chat is listed for the current user and returns the id
   getChatId(recipientId: string) {
     const _chat = this.chats.find(chat => {
-      return !chat.isGroup && !!chat.allTimeMembers.find(user => user.id === this.loginService.getUser().id) &&
+      return !chat.isGroup && !!chat.allTimeMembers.find(user => user.id === this.user.id) &&
         !!chat.allTimeMembers.find(user => user.id === recipientId);
     });
     return _chat ? _chat.id : false;
@@ -401,7 +402,7 @@ export class ChatsService {
             picture: users.find(user => user.id === userId).picture,
             allTimeMembers: [
               {
-                id: this.loginService.getUser().id,
+                id: this.user.id,
                 __typename: 'User',
               },
               {
@@ -453,10 +454,10 @@ export class ChatsService {
             id: ouiId,
             name: groupName,
             picture: 'https://randomuser.me/api/portraits/thumb/lego/1.jpg',
-            userIds: [this.loginService.getUser().id, userIds],
+            userIds: [this.user.id, userIds],
             allTimeMembers: [
               {
-                id: this.loginService.getUser().id,
+                id: this.user.id,
                 __typename: 'User',
               },
               ...userIds.map(id => ({id, __typename: 'User'})),
