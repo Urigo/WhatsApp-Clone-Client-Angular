@@ -9,8 +9,8 @@ import {RouterModule, Routes} from '@angular/router';
 import {ChatViewerModule} from './chat-viewer/chat-viewer.module';
 import {ChatsCreationModule} from './chats-creation/chats-creation.module';
 import {LoginModule} from './login/login.module';
-import {AuthInterceptor} from './login/services/auth.interceptor';
 import { ErrorInterceptor } from './login/services/error.interceptor';
+import { AccountsModule } from './accounts.module';
 const routes: Routes = [];
 
 @NgModule({
@@ -21,6 +21,7 @@ const routes: Routes = [];
     BrowserModule,
     HttpClientModule,
     GraphQLModule,
+    AccountsModule,
     // Routing
     RouterModule.forRoot(routes),
     // Feature modules
@@ -30,11 +31,6 @@ const routes: Routes = [];
     LoginModule,
   ],
   providers: [
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
-      multi: true,
-    },
     {
       provide: HTTP_INTERCEPTORS,
       useClass: ErrorInterceptor,

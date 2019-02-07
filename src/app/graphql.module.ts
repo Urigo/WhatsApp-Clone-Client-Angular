@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, Injector } from '@angular/core';
 import { ApolloModule, APOLLO_OPTIONS } from 'apollo-angular';
 import { HttpLinkModule, HttpLink } from 'apollo-angular-link-http';
 import { InMemoryCache, defaultDataIdFromObject } from 'apollo-cache-inmemory';
@@ -6,7 +6,8 @@ import {getMainDefinition} from 'apollo-utilities';
 import {OperationDefinitionNode} from 'graphql';
 import {split} from 'apollo-link';
 import {WebSocketLink} from 'apollo-link-ws';
-import {LoginService} from './login/services/login.service';
+import { accountsLink } from '@accounts/apollo-link';
+import { AccountsClient } from '@accounts/client';
 
 const uri = 'http://localhost:4000/graphql';
 
@@ -19,16 +20,26 @@ export const dataIdFromObject = (object: any) => {
   }
 };
 
-export function createApollo(httpLink: HttpLink, loginService: LoginService) {
+export function createApollo(httpLink: HttpLink, injector: Injector) {
   const subscriptionLink = new WebSocketLink({
     uri: uri.replace('http', 'ws'),
     options: {
       reconnect: true,
-      connectionParams: () => ({
-        authToken: loginService.getAuthHeader() || null
-      })
+      connectionParams: async () => {
+        const accountsClient = injector.get(AccountsClient);
+        const tokens = await accountsClient.getTokens();
+        if (tokens) {
+          return {
+            Authorization: 'Bearer ' + tokens.accessToken
+          };
+        } else {
+          return {};
+        }
+      }
     }
   });
+
+  const authLink = accountsLink(() => injector.get(AccountsClient));
 
   const link = split(
     ({ query }) => {
@@ -36,7 +47,7 @@ export function createApollo(httpLink: HttpLink, loginService: LoginService) {
       return kind === 'OperationDefinition' && operation === 'subscription';
     },
     subscriptionLink,
-    httpLink.create({uri})
+    authLink.concat(httpLink.create({uri}))
   );
 
   return {
@@ -53,7 +64,7 @@ export function createApollo(httpLink: HttpLink, loginService: LoginService) {
     {
       provide: APOLLO_OPTIONS,
       useFactory: createApollo,
-      deps: [HttpLink, LoginService],
+      deps: [HttpLink, Injector],
     },
   ],
 })
