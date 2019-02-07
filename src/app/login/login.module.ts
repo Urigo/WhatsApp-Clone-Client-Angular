@@ -8,7 +8,6 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {LoginComponent} from './containers/login.component';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import { AccountsModule } from '../accounts.module';
-import {AuthInterceptor} from './services/auth.interceptor';
 import {AuthGuard} from './services/auth.guard';
 import { ErrorInterceptor } from './services/error.interceptor';
 
@@ -44,7 +43,6 @@ const routes: Routes = [
     AccountsModule
   ],
   providers: [
-    AuthInterceptor,
     ErrorInterceptor,
     AuthGuard,
   ],

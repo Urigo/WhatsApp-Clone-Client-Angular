@@ -14,9 +14,10 @@
   },
   "private": true,
   "dependencies": {
-    "@accounts/client": "^0.9.3",
-    "@accounts/client-password": "^0.9.3",
-    "@accounts/graphql-client": "^0.9.3",
+    "@accounts/apollo-link": "^0.11.1",
+    "@accounts/client": "^0.11.1",
+    "@accounts/client-password": "^0.11.1",
+    "@accounts/graphql-client": "^0.11.1",
     "@angular/animations": "~7.2.0-rc.0",
     "@angular/cdk": "^7.2.1",
     "@angular/common": "~7.2.0-rc.0",

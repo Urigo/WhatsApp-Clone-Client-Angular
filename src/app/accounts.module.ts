@@ -6,10 +6,20 @@ import { AccountsGraphQLClient } from '@accounts/graphql-client';
 import { Apollo } from 'apollo-angular';
 import { AccountsClient } from '@accounts/client';
 import { AccountsClientPassword } from '@accounts/client-password';
+import gql from 'graphql-tag';
 
 function createGraphQLClient(apollo: Apollo) {
   return new AccountsGraphQLClient({
-    graphQLClient: apollo.getClient()
+    graphQLClient: apollo.getClient(),
+    userFieldsFragment: gql`
+      fragment userFields on User {
+        id
+        name
+        username
+        picture
+        phone
+      }
+    `
   });
 }
 
@@ -18,7 +28,7 @@ function createAccountsClient(accountsGraphQL: AccountsGraphQLClient) {
 }
 
 function createAccountsPassword(accountsClient: AccountsClient) {
-  return new AccountsClientPassword(accountsClient, { hashPassword: a => a});
+  return new AccountsClientPassword(accountsClient);
 }
 
 @NgModule({
