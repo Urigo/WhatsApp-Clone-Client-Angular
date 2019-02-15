@@ -30,7 +30,7 @@
     "apollo-link": "1.2.8",
     "apollo-link-ws": "1.0.14",
     "apollo-utilities": "1.1.3",
-    "core-js": "2.6.4",
+    "core-js": "2.6.5",
     "graphql": "14.0.2",
     "graphql-tag": "2.10.1",
     "hammerjs": "2.0.8",
