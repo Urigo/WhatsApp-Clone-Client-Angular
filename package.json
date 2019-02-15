@@ -28,7 +28,7 @@
     "apollo-cache-inmemory": "1.4.3",
     "apollo-client": "2.4.13",
     "apollo-link": "1.2.8",
-    "core-js": "2.6.4",
+    "core-js": "2.6.5",
     "graphql": "14.0.2",
     "graphql-tag": "2.10.1",
     "hammerjs": "2.0.8",
