@@ -45,7 +45,7 @@
     "@types/jasminewd2": "2.0.6",
     "@types/node": "8.9.5",
     "codelyzer": "4.5.0",
-    "graphql-code-generator": "0.15.2",
+    "graphql-code-generator": "0.16.1",
     "graphql-codegen-typescript-apollo-angular": "0.15.2",
     "graphql-codegen-typescript-client": "0.15.2",
     "graphql-codegen-typescript-common": "0.15.2",
