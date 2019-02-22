@@ -3354,14 +3354,22 @@ graphql-codegen-plugin-helpers@0.16.1:
     graphql-codegen-core "0.16.1"
     import-from "2.1.0"
 
-graphql-codegen-typescript-apollo-angular@^0.16.1:
-  version "0.16.1"
-  resolved "https://registry.yarnpkg.com/graphql-codegen-typescript-apollo-angular/-/graphql-codegen-typescript-apollo-angular-0.16.1.tgz#a2778afb248419a8a2b6ddcc4ad32268621ab9cc"
-  integrity sha512-Xg1eUJlox+yGEJ2cottdUBh4P0efqKzYHU4YrkJru+Cmk0mXKgrHC3sjzugZel6Ws2scMZ2nRXPfCIdQbOUbmA==
+graphql-codegen-plugin-helpers@0.17.0:
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/graphql-codegen-plugin-helpers/-/graphql-codegen-plugin-helpers-0.17.0.tgz#f65edde8a0810c457a85171d2e8bd0d29c8c7ac3"
+  integrity sha512-zcTvtvJqGrGTUjM9qz4vGml967uORX5yeSBc9n4du+Ah+y4TLG0GdjmEqfP7Jokwb8YpCGKivY6hXF8AZ7yPdw==
+  dependencies:
+    graphql-codegen-core "0.17.0"
+    import-from "2.1.0"
+
+graphql-codegen-typescript-apollo-angular@^0.17.0:
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/graphql-codegen-typescript-apollo-angular/-/graphql-codegen-typescript-apollo-angular-0.17.0.tgz#c3a9825b66dba99f8a1259bd986c49d88b5f524f"
+  integrity sha512-e5zddWaEUxSJGJ0cByhwctLhRJ7N0c6lu/TqhmJeotXsrfNBLPGYuAaPm/K9SfyODCMjAUQSp7IiHra2biZPvw==
   dependencies:
     dependency-graph "0.8.0"
-    graphql-codegen-plugin-helpers "0.16.1"
-    graphql-codegen-typescript-common "0.16.1"
+    graphql-codegen-plugin-helpers "0.17.0"
+    graphql-codegen-typescript-common "0.17.0"
 
 graphql-codegen-typescript-client@^0.16.1:
   version "0.16.1"
@@ -3381,6 +3389,16 @@ graphql-codegen-typescript-common@0.16.1, graphql-codegen-typescript-common@^0.1
     common-tags "1.8.0"
     graphql-codegen-core "0.16.1"
     graphql-codegen-plugin-helpers "0.16.1"
+
+graphql-codegen-typescript-common@0.17.0:
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/graphql-codegen-typescript-common/-/graphql-codegen-typescript-common-0.17.0.tgz#76cfeefa92ee8420f2c9a687576fd5ac3d6e14fb"
+  integrity sha512-tUaJB4fuHHgZa1JFroe5V4kIn69HKmKwaHEvizXhuAmJUnHGThzjnn71Ot0FMSpF6RLcMf/adDsNts/BQrUEYg==
+  dependencies:
+    change-case "3.1.0"
+    common-tags "1.8.0"
+    graphql-codegen-core "0.17.0"
+    graphql-codegen-plugin-helpers "0.17.0"
 
 graphql-codegen-typescript-server@^0.16.1:
   version "0.16.1"
