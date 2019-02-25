@@ -1,0 +1,13 @@
+:host {
+  display: block;
+  height: 8vh;
+}
+
+.mat-toolbar {
+  justify-content: space-between;
+  height: 100%;
+
+  .left-block {
+    display: flex;
+  }
+}
