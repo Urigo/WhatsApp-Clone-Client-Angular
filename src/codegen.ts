@@ -18,12 +18,15 @@ async function getCredentials(): Promise<Credentials> {
   });
 }
 
-function generateHeaders({ username, password }: Credentials): string[] {
+function generateHeaders({
+  username,
+  password,
+}: Credentials): Record<string, any> {
   const Authorization = `Basic ${Buffer.from(
     `${username}:${password}`,
   ).toString('base64')}`;
 
-  return [`Authorization: ${Authorization}`];
+  return { Authorization };
 }
 
 async function main() {
@@ -32,11 +35,21 @@ async function main() {
 
   await generate(
     {
-      schema: 'http://localhost:3000/graphql',
-      template: 'graphql-codegen-apollo-angular-template',
-      out: './src/graphql.ts',
-      args: ['./src/graphql/**/*.ts'],
-      header: headers,
+      schema: {
+        'http://localhost:3000/graphql': {
+          headers,
+        },
+      },
+      documents: './src/graphql/**/*.ts',
+      generates: {
+        './src/graphql.ts': {
+          plugins: [
+            'typescript-common',
+            'typescript-client',
+            'typescript-apollo-angular',
+          ],
+        },
+      },
       overwrite: true,
     },
     true,

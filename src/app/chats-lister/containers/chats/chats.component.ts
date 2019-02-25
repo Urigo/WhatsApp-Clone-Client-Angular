@@ -34,8 +34,8 @@ import {Router} from '@angular/router';
       <app-confirm-selection #confirmSelection></app-confirm-selection>
     </app-chats-list>
 
-    <button *ngIf="!isSelecting" class="chat-button" mat-fab color="primary" (click)="goToNewChat()">
-      <mat-icon aria-label="Icon-button with a + icon">add</mat-icon>
+    <button *ngIf="!isSelecting" class="chat-button" mat-fab color="secondary" (click)="goToNewChat()">
+      <mat-icon aria-label="Icon-button with a + icon">chat</mat-icon>
     </button>
   `,
   styleUrls: ['./chats.component.scss'],

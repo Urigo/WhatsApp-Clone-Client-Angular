@@ -12,14 +12,10 @@ import {ChatsService} from '../../../services/chats.service';
       </button>
       <div class="title">New chat</div>
     </app-toolbar>
-
     <div class="new-group" (click)="goToNewGroup()">
-      <div>
-        <mat-icon aria-label="Icon-button with a group add icon">group_add</mat-icon>
-      </div>
+      <mat-icon color="secondary" aria-label="Icon-button with a group add icon">group_add</mat-icon>
       <div>New group</div>
     </div>
-
     <app-users-list [items]="users"
                     libSelectableList="single" (single)="addChat($event)">
     </app-users-list>

@@ -3,7 +3,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 @Component({
   selector: 'app-confirm-selection',
   template: `
-    <button mat-fab color="primary" (click)="handleClick()">
+    <button mat-fab color="secondary" (click)="handleClick()">
       <mat-icon aria-label="Icon-button">{{ icon }}</mat-icon>
     </button>
   `,

@@ -12,6 +12,7 @@ import {QueryRef} from 'apollo-angular';
       <button class="navigation" mat-button (click)="goToChats()">
         <mat-icon aria-label="Icon-button with an arrow back icon">arrow_back</mat-icon>
       </button>
+      <img class="profile-pic" src="assets/default-profile-pic.jpg">
       <div class="title">{{ name }}</div>
     </app-toolbar>
     <div class="container">

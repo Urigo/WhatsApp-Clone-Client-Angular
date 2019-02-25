@@ -5,9 +5,10 @@ import {GetChat} from '../../../../graphql';
   selector: 'app-message-item',
   template: `
     <div class="message"
-         [ngClass]="{'mine': message.ownership}">
+         [ngClass]="message.ownership ? 'message-mine' : 'message-other'">
       <div *ngIf="isGroup && !message.ownership" class="message-sender">{{ message.sender.name }}</div>
-      <div>{{ message.content }}</div>
+      <div class="message-content">{{ message.content }}</div>
+      <span class="message-timestamp">00:00</span>
     </div>
   `,
   styleUrls: ['message-item.component.scss'],

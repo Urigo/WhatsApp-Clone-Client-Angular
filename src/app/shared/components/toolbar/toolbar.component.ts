@@ -6,6 +6,7 @@ import {Component} from '@angular/core';
     <mat-toolbar>
       <div class="left-block">
         <ng-content select=".navigation"></ng-content>
+        <ng-content select=".profile-pic"></ng-content>
         <ng-content select=".title"></ng-content>
       </div>
       <ng-content select=".menu"></ng-content>

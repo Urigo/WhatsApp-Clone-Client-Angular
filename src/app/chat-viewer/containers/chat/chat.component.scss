@@ -1,8 +1,31 @@
+app-toolbar {
+  .navigation {
+    padding: 0;
+    display: inherit;
+    margin-right: -40px;
+  }
+
+  .title {
+    line-height: 8vh;
+  }
+
+  .profile-pic {
+    height: calc(100% - 10px);
+    width: auto;
+    padding: 5px;
+    border-radius: 50%;
+  }
+}
+
 .container {
   display: flex;
   flex-flow: column;
   justify-content: space-between;
   height: calc(100vh - 8vh);
+  background-image: url(/assets/chat-background.jpg);
+  background-color: #E0DAD6;
+  background-repeat: no-repeat;
+  background-size: cover;
 
   app-confirm-selection {
     bottom: 10vh;

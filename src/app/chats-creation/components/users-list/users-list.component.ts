@@ -8,6 +8,7 @@ import {SelectableListDirective} from 'ngx-selectable-list';
     <mat-list>
       <mat-list-item *ngFor="let user of users">
         <app-user-item [item]="user"
+                       [selected]="selectableListDirective.selectedItemIds.includes(user.id)"
                        libSelectableItem></app-user-item>
       </mat-list-item>
     </mat-list>

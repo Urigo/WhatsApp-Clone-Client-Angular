@@ -1,23 +1,23 @@
 .new-group {
-  display: flex;
-  height: 8vh;
-  align-items: center;
+  margin: 10px;
+  height: 50px;
+  line-height: 50px;
+  margin-top: 20px;
 
-  div:first-of-type {
-    height: 8vh;
-    width: 8vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    mat-icon {
-      height: 5vh;
-      width: 5vh;
-      font-size: 5vh;
-    }
+  mat-icon {
+    float: left;
+    margin-right: 10px;
+    height: 50px;
+    width: 50px;
+    text-align: center;
+    line-height: inherit;
+    border-radius: 50%;
   }
 
-  div:nth-of-type(2) {
-    padding: 16px;
+  div {
+    float: left;
+    line-height: inherit;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    font-weight: bold;
   }
 }

@@ -5,17 +5,20 @@ import {GetUsers} from '../../../../graphql';
   selector: 'app-new-group-details',
   template: `
     <div>
-      <mat-form-field>
+      <mat-form-field color="default">
         <input matInput placeholder="Group name" [(ngModel)]="groupName">
       </mat-form-field>
     </div>
-    <button [disabled]="!groupName" class="new-group" mat-fab color="primary" (click)="emitGroupDetails()">
+    <button *ngIf="groupName" class="new-group" mat-fab color="secondary" (click)="emitGroupDetails()">
       <mat-icon aria-label="Icon-button with a + icon">arrow_forward</mat-icon>
     </button>
-    <div>Members</div>
-    <div class="users">
-      <img *ngFor="let user of users;" [src]="user.picture"/>
-    </div>
+    <div>Participants: {{ users.length }}</div>
+    <span class="users">
+      <div class="user" *ngFor="let user of users">
+        <img class="user-profile-pic" [src]="user.picture || 'assets/default-profile-pic.jpg'"/>
+        <span class="user-name">{{ user.name }}</span>
+      </div>
+    </span>
   `,
   styleUrls: ['new-group-details.component.scss'],
 })

@@ -5,24 +5,39 @@
 }
 
 button {
-  padding: 0;
-  display: flex;
-  align-items: center;
-  height: 100%;
-  width: 100%;
+  background-color: inherit !important;
+  outline: none !important;
+  margin: 10px;
+  height: 50px;
+  padding: 1px 6px;
+  line-height: 50px;
   border: none;
+  margin: 0;
+  position: relative;
 
-  div:first-of-type {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    img {
-      max-width: 100%;
-    }
+  img {
+    float: left;
+    margin-right: 10px;
+    height: 50px;
+    width: 50px;
+    text-align: center;
+    line-height: inherit;
+    border-radius: 50%;
   }
 
-  div:nth-of-type(2) {
-    padding-left: 16px;
+  div {
+    float: left;
+    line-height: inherit;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+  }
+
+  mat-icon {
+    color: var(--primary) !important;
+    opacity: .7;
+    position: absolute;
+    left: 40px;
+    top: 30px;
   }
 }

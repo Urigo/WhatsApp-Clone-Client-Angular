@@ -1,7 +1,7 @@
 import {RouterModule, Routes} from '@angular/router';
 import {NgModule} from '@angular/core';
 import {TruncateModule} from 'ng2-truncate';
-import {MatButtonModule, MatIconModule, MatListModule, MatMenuModule} from '@angular/material';
+import {MatButtonModule, MatIconModule, MatListModule, MatMenuModule, MatFormFieldModule, MatInputModule} from '@angular/material';
 import {SharedModule} from '../shared/shared.module';
 import {BrowserModule} from '@angular/platform-browser';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -24,6 +24,8 @@ const routes: Routes = [
   imports: [
     BrowserModule,
     // Material
+    MatInputModule,
+    MatFormFieldModule,
     MatMenuModule,
     MatIconModule,
     MatButtonModule,

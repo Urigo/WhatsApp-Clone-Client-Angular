@@ -52,9 +52,7 @@
     "@types/jasminewd2": "2.0.3",
     "@types/node": "8.9.5",
     "codelyzer": "4.2.1",
-    "graphql-code-generator": "0.12.6",
-    "graphql-codegen-typescript-template": "0.12.6",
-    "graphql-codegen-apollo-angular-template": "0.12.6",
+    "graphql-code-generator": "0.16.0-alpha.207cae5d",
     "jasmine-core": "2.99.1",
     "jasmine-spec-reporter": "4.2.1",
     "karma": "1.7.1",
@@ -66,6 +64,9 @@
     "protractor": "5.3.1",
     "ts-node": "7.0.1",
     "tslint": "5.9.1",
-    "typescript": "3.1.1"
+    "typescript": "3.1.1",
+    "graphql-codegen-typescript-common": "0.16.0-alpha.207cae5d",
+    "graphql-codegen-typescript-client": "0.16.0-alpha.207cae5d",
+    "graphql-codegen-typescript-apollo-angular": "0.16.0-alpha.207cae5d"
   }
 }

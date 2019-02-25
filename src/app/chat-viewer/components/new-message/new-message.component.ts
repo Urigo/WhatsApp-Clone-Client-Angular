@@ -3,7 +3,7 @@ import {Component, EventEmitter, Input, Output} from '@angular/core';
 @Component({
   selector: 'app-new-message',
   template: `
-    <input type="text" [(ngModel)]="message" (keyup)="onInputKeyup($event)"/>
+    <input type="text" placeholder="Type a message" [(ngModel)]="message" (keyup)="onInputKeyup($event)"/>
     <button mat-button (click)="emitMessage()" [disabled]="disabled">
       <mat-icon aria-label="Icon-button with a send icon">send</mat-icon>
     </button>
