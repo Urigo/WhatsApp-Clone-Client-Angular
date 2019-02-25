@@ -14,7 +14,7 @@ import {ChatsService} from '../../../services/chats.service';
     </app-toolbar>
 
     <app-users-list *ngIf="!recipientIds.length" [items]="users"
-                    appSelectableList="multiple_tap" (multiple)="selectUsers($event)">
+                    libSelectableList="multiple_tap" (multiple)="selectUsers($event)">
       <app-confirm-selection #confirmSelection icon="arrow_forward"></app-confirm-selection>
     </app-users-list>
     <app-new-group-details *ngIf="recipientIds.length" [users]="getSelectedUsers()"

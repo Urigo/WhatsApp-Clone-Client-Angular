@@ -21,7 +21,7 @@ import {ChatsService} from '../../../services/chats.service';
     </div>
 
     <app-users-list [items]="users"
-                    appSelectableList="single" (single)="addChat($event)">
+                    libSelectableList="single" (single)="addChat($event)">
     </app-users-list>
   `,
   styleUrls: ['new-chat.component.scss'],

@@ -8,7 +8,7 @@ import {SelectableListDirective} from 'ngx-selectable-list';
     <mat-list>
       <mat-list-item *ngFor="let user of users">
         <app-user-item [item]="user"
-                       appSelectableItem></app-user-item>
+                       libSelectableItem></app-user-item>
       </mat-list-item>
     </mat-list>
     <ng-content *ngIf="selectableListDirective.selecting"></ng-content>

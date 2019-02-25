@@ -8,7 +8,7 @@ import {SelectableListDirective} from 'ngx-selectable-list';
     <mat-list>
       <mat-list-item *ngFor="let chat of chats">
         <app-chat-item [item]="chat"
-                       appSelectableItem></app-chat-item>
+                       libSelectableItem></app-chat-item>
       </mat-list-item>
     </mat-list>
     <ng-content *ngIf="selectableListDirective.selecting"></ng-content>

@@ -15,7 +15,7 @@ import {NewGroupComponent} from './containers/new-group/new-group.component';
 import {NewChatComponent} from './containers/new-chat/new-chat.component';
 import {NewGroupDetailsComponent} from './components/new-group-details/new-group-details.component';
 import {SharedModule} from '../shared/shared.module';
-import {SelectableListModule} from 'ngx-selectable-list';
+import {NgxSelectableListModule} from 'ngx-selectable-list';
 import {AuthGuard} from '../login/services/auth.guard';
 
 const routes: Routes = [
@@ -50,7 +50,7 @@ const routes: Routes = [
     // Forms
     FormsModule,
     // Feature modules
-    SelectableListModule,
+    NgxSelectableListModule,
     SharedModule,
   ],
   providers: [

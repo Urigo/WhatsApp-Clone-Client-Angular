@@ -2,8 +2,9 @@ import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ChatsService} from '../../../services/chats.service';
 import {GetChat} from '../../../../types';
-import {combineLatest} from 'rxjs/observable/combineLatest';
+import {combineLatest} from 'rxjs';
 import {Location} from '@angular/common';
+import {QueryRef} from 'apollo-angular';
 
 @Component({
   template: `
@@ -15,7 +16,7 @@ import {Location} from '@angular/common';
     </app-toolbar>
     <div class="container">
       <app-messages-list [items]="messages" [isGroup]="isGroup"
-                         appSelectableList="multiple_press" (multiple)="deleteMessages($event)">
+                         libSelectableList="multiple_press" (multiple)="deleteMessages($event)">
         <app-confirm-selection #confirmSelection></app-confirm-selection>
       </app-messages-list>
       <app-new-message (newMessage)="addMessage($event)"></app-new-message>
@@ -29,6 +30,7 @@ export class ChatComponent implements OnInit {
   name: string;
   isGroup: boolean;
   optimisticUI: boolean;
+  query: QueryRef<GetChat.Query>;
 
   constructor(private route: ActivatedRoute,
               private router: Router,
@@ -56,8 +58,12 @@ export class ChatComponent implements OnInit {
           });
         }
 
-        this.chatsService.getChat(chatId, this.optimisticUI).chat$.subscribe(chat => {
-          this.messages = chat.messages;
+        const {query$, chat$} = this.chatsService.getChat(chatId, this.optimisticUI);
+
+        query$.subscribe(query => this.query = query);
+
+        chat$.subscribe(chat => {
+          this.messages = chat.messageFeed.messages;
           this.name = chat.name;
           this.isGroup = chat.isGroup;
         });
@@ -69,7 +75,8 @@ export class ChatComponent implements OnInit {
   }
 
   addMessage(content: string) {
-    this.chatsService.addMessage(this.chatId, content).subscribe();
+    // this.chatsService.addMessage(this.chatId, content).subscribe();
+    this.chatsService.moreMessages(this.query, this.chatId);
   }
 
   deleteMessages(messageIds: string[]) {

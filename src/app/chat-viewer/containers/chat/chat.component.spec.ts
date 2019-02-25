@@ -10,14 +10,14 @@ import {HttpLink, HttpLinkModule, Options} from 'apollo-angular-link-http';
 import {defaultDataIdFromObject, InMemoryCache} from 'apollo-cache-inmemory';
 import {RouterTestingModule} from '@angular/router/testing';
 import {ActivatedRoute} from '@angular/router';
-import {of} from 'rxjs/observable/of';
+import {of} from 'rxjs';
 import {By} from '@angular/platform-browser';
 import {FormsModule} from '@angular/forms';
 import {SharedModule} from '../../../shared/shared.module';
 import {NewMessageComponent} from '../../components/new-message/new-message.component';
 import {MessagesListComponent} from '../../components/messages-list/messages-list.component';
 import {MessageItemComponent} from '../../components/message-item/message-item.component';
-import {SelectableListModule} from 'ngx-selectable-list';
+import {NgxSelectableListModule} from 'ngx-selectable-list';
 import {LoginService} from '../../../login/services/login.service';
 
 describe('ChatComponent', () => {
@@ -110,7 +110,7 @@ describe('ChatComponent', () => {
         HttpLinkModule,
         HttpClientTestingModule,
         RouterTestingModule,
-        SelectableListModule,
+        NgxSelectableListModule,
       ],
       providers: [
         ChatsService,

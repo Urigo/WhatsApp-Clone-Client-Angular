@@ -9,7 +9,9 @@ import {GetChats} from '../../../../types';
           <img *ngIf="chat.picture" [src]="chat.picture" width="48" height="48">
           <div>{{ chat.name }} [id: {{ chat.id }}]</div>
         </div>
-        <div class="chat-content">{{ chat.messages[chat.messages.length - 1]?.content | truncate : 20 : '...' }}</div>
+        <div class="chat-content">
+          {{ chat.messageFeed.messages[chat.messageFeed.messages.length - 1]?.content | truncate : 20 : '...' }}
+        </div>
     </div>
   `,
   styleUrls: ['chat-item.component.scss'],

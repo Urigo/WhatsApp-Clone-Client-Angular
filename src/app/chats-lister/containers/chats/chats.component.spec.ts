@@ -13,7 +13,7 @@ import {HttpLink, HttpLinkModule, Options} from 'apollo-angular-link-http';
 import {defaultDataIdFromObject, InMemoryCache} from 'apollo-cache-inmemory';
 import {By} from '@angular/platform-browser';
 import {RouterTestingModule} from '@angular/router/testing';
-import {SelectableListModule} from 'ngx-selectable-list';
+import {NgxSelectableListModule} from 'ngx-selectable-list';
 import {LoginService} from '../../../login/services/login.service';
 
 describe('ChatsComponent', () => {
@@ -332,7 +332,7 @@ describe('ChatsComponent', () => {
         HttpLinkModule,
         HttpClientTestingModule,
         RouterTestingModule,
-        SelectableListModule,
+        NgxSelectableListModule,
       ],
       providers: [
         ChatsService,

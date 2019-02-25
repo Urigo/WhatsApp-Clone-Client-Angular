@@ -1,321 +1,446 @@
 /* tslint:disable */
 
+/** A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
+export type DateTime = any;
+
 export interface Query {
-  users: User[]; 
-  chats: Chat[]; 
-  chat?: Chat | null; 
+  users?: User[] | null;
+  chats?: Chat[] | null;
+  chat?: Chat | null;
 }
 
 export interface User {
-  id: string; 
-  name?: string | null; 
-  picture?: string | null; 
-  phone?: string | null; 
+  id: string;
+  name?: string | null;
+  picture?: string | null;
+  phone?: string | null;
 }
 
 export interface Chat {
-  id: string; /* May be a chat or a group */
-  name?: string | null; /* Computed for chats */
-  picture?: string | null; /* Computed for chats */
-  allTimeMembers: User[]; /* All members, current and past ones. */
-  listingMembers: User[]; /* Whoever gets the chat listed. For groups includes past members who still didn&#x27;t delete the group. */
-  actualGroupMembers: User[]; /* Actual members of the group (they are not the only ones who get the group listed). Null for chats. */
-  admins: User[]; /* Null for chats */
-  owner?: User | null; /* If null the group is read-only. Null for chats. */
-  messages: Message[]; 
-  unreadMessages: number; /* Computed property */
-  isGroup: boolean; /* Computed property */
+  id: string /** May be a chat or a group */;
+  name?: string | null /** Computed for chats */;
+  picture?: string | null /** Computed for chats */;
+  allTimeMembers: User[] /** All members, current and past ones. */;
+  listingMembers: User[] /** Whoever gets the chat listed. For groups includes past members who still didn't delete the group. */;
+  actualGroupMembers: User[] /** Actual members of the group (they are not the only ones who get the group listed). Null for chats. */;
+  admins?: User[] | null /** Null for chats */;
+  owner?: User | null /** If null the group is read-only. Null for chats. */;
+  messages: (Message | null)[];
+  messageFeed?: MessageFeed | null /** Return messages in a a Feed Wrapper with cursor based pagination */;
+  unreadMessages: number /** Computed property */;
+  isGroup: boolean /** Computed property */;
 }
 
 export interface Message {
-  id: string; 
-  sender: User; 
-  chat: Chat; 
-  content: string; 
-  createdAt: string; 
-  type: number; /* FIXME: should return MessageType */
-  recipients: Recipient[]; /* Whoever received the message */
-  holders: User[]; /* Whoever still holds a copy of the message. Cannot be null because the message gets deleted otherwise */
-  ownership: boolean; /* Computed property */
+  id: string;
+  sender: User;
+  chat: Chat;
+  content: string;
+  createdAt: DateTime;
+  type: number /** FIXME: should return MessageType */;
+  recipients: Recipient[] /** Whoever received the message */;
+  holders: User[] /** Whoever still holds a copy of the message. Cannot be null because the message gets deleted otherwise */;
+  ownership: boolean /** Computed property */;
 }
 
 export interface Recipient {
-  user: User; 
-  message: Message; 
-  receivedAt?: string | null; 
-  readAt?: string | null; 
+  user: User;
+  message: Message;
+  chat: Chat;
+  receivedAt?: DateTime | null;
+  readAt?: DateTime | null;
+}
+
+export interface MessageFeed {
+  hasNextPage: boolean;
+  cursor?: string | null;
+  messages: (Message | null)[];
 }
 
 export interface Mutation {
-  addChat?: Chat | null; 
-  addGroup?: Chat | null; 
-  removeChat?: string | null; 
-  addMessage?: Message | null; 
-  removeMessages?: string[] | null; 
-  addMembers?: string[] | null; 
-  removeMembers?: string[] | null; 
-  addAdmins?: string[] | null; 
-  removeAdmins?: string[] | null; 
-  setGroupName?: string | null; 
-  setGroupPicture?: string | null; 
-  markAsReceived?: boolean | null; 
-  markAsRead?: boolean | null; 
+  addChat?: Chat | null;
+  addGroup?: Chat | null;
+  removeChat?: string | null;
+  addMessage?: Message | null;
+  removeMessages?: (string | null)[] | null;
+  addMembers?: (string | null)[] | null;
+  removeMembers?: (string | null)[] | null;
+  addAdmins?: (string | null)[] | null;
+  removeAdmins?: (string | null)[] | null;
+  setGroupName?: string | null;
+  setGroupPicture?: string | null;
+  markAsReceived?: boolean | null;
+  markAsRead?: boolean | null;
 }
 
 export interface Subscription {
-  messageAdded?: Message | null; 
-  chatAdded?: Chat | null; 
+  messageAdded?: Message | null;
+  chatAdded?: Chat | null;
 }
 export interface ChatQueryArgs {
-  chatId: string; 
+  chatId: string;
 }
 export interface MessagesChatArgs {
-  amount?: number | null; 
+  amount?: number | null;
+  before?: string | null;
+}
+export interface MessageFeedChatArgs {
+  amount?: number | null;
+  before?: string | null;
 }
 export interface AddChatMutationArgs {
-  recipientId: string; 
+  recipientId: string;
 }
 export interface AddGroupMutationArgs {
-  recipientIds: string[]; 
-  groupName: string; 
+  recipientIds: string[];
+  groupName: string;
 }
 export interface RemoveChatMutationArgs {
-  chatId: string; 
+  chatId: string;
 }
 export interface AddMessageMutationArgs {
-  chatId: string; 
-  content: string; 
+  chatId: string;
+  content: string;
 }
 export interface RemoveMessagesMutationArgs {
-  chatId: string; 
-  messageIds?: string[] | null; 
-  all?: boolean | null; 
+  chatId: string;
+  messageIds?: (string | null)[] | null;
+  all?: boolean | null;
 }
 export interface AddMembersMutationArgs {
-  groupId: string; 
-  userIds: string[]; 
+  groupId: string;
+  userIds: string[];
 }
 export interface RemoveMembersMutationArgs {
-  groupId: string; 
-  userIds: string[]; 
+  groupId: string;
+  userIds: string[];
 }
 export interface AddAdminsMutationArgs {
-  groupId: string; 
-  userIds: string[]; 
+  groupId: string;
+  userIds: string[];
 }
 export interface RemoveAdminsMutationArgs {
-  groupId: string; 
-  userIds: string[]; 
+  groupId: string;
+  userIds: string[];
 }
 export interface SetGroupNameMutationArgs {
-  groupId: string; 
+  groupId: string;
 }
 export interface SetGroupPictureMutationArgs {
-  groupId: string; 
+  groupId: string;
 }
 export interface MarkAsReceivedMutationArgs {
-  chatId: string; 
+  chatId: string;
 }
 export interface MarkAsReadMutationArgs {
-  chatId: string; 
+  chatId: string;
 }
 export interface MessageAddedSubscriptionArgs {
-  chatId?: string | null; 
+  chatId?: string | null;
 }
 
-export type MessageType = "LOCATION" | "TEXT" | "PICTURE";
-
+export enum MessageType {
+  LOCATION = "LOCATION",
+  TEXT = "TEXT",
+  PICTURE = "PICTURE"
+}
 export namespace AddChat {
   export type Variables = {
     recipientId: string;
-  }
+  };
 
   export type Mutation = {
-    addChat?: AddChat | null; 
-  } 
+    __typename?: "Mutation";
+    addChat?: AddChat | null;
+  };
 
   export type AddChat = {
-    messages: Messages[]; 
-  } & ChatWithoutMessages.Fragment
+    __typename?: "Chat";
+    messageFeed?: MessageFeed | null;
+  } & ChatWithoutMessages.Fragment;
 
-  export type Messages = Message.Fragment
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+    hasNextPage: boolean;
+    cursor?: string | null;
+    messages: (Messages | null)[];
+  };
+
+  export type Messages = Message.Fragment;
 }
 export namespace AddGroup {
   export type Variables = {
     recipientIds: string[];
     groupName: string;
-  }
+  };
 
   export type Mutation = {
-    addGroup?: AddGroup | null; 
-  } 
+    __typename?: "Mutation";
+    addGroup?: AddGroup | null;
+  };
 
   export type AddGroup = {
-    messages: Messages[]; 
-  } & ChatWithoutMessages.Fragment
+    __typename?: "Chat";
+    messageFeed?: MessageFeed | null;
+  } & ChatWithoutMessages.Fragment;
 
-  export type Messages = Message.Fragment
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+    hasNextPage: boolean;
+    cursor?: string | null;
+    messages: (Messages | null)[];
+  };
+
+  export type Messages = Message.Fragment;
 }
 export namespace AddMessage {
   export type Variables = {
     chatId: string;
     content: string;
-  }
+  };
 
   export type Mutation = {
-    addMessage?: AddMessage | null; 
-  } 
+    __typename?: "Mutation";
+    addMessage?: AddMessage | null;
+  };
 
-  export type AddMessage = Message.Fragment
+  export type AddMessage = Message.Fragment;
 }
 export namespace ChatAdded {
   export type Variables = {
-  }
+    amount: number;
+  };
 
   export type Subscription = {
-    chatAdded?: ChatAdded | null; 
-  } 
+    __typename?: "Subscription";
+    chatAdded?: ChatAdded | null;
+  };
 
   export type ChatAdded = {
-    messages: Messages[]; 
-  } & ChatWithoutMessages.Fragment
+    __typename?: "Chat";
+    messageFeed?: MessageFeed | null;
+  } & ChatWithoutMessages.Fragment;
 
-  export type Messages = Message.Fragment
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+    hasNextPage: boolean;
+    cursor?: string | null;
+    messages: (Messages | null)[];
+  };
+
+  export type Messages = Message.Fragment;
 }
 export namespace GetChat {
   export type Variables = {
     chatId: string;
-  }
+    amount: number;
+  };
 
   export type Query = {
-    chat?: Chat | null; 
-  } 
+    __typename?: "Query";
+    chat?: Chat | null;
+  };
 
   export type Chat = {
-    messages: Messages[]; 
-  } & ChatWithoutMessages.Fragment
+    __typename?: "Chat";
+    messageFeed?: MessageFeed | null;
+  } & ChatWithoutMessages.Fragment;
 
-  export type Messages = Message.Fragment
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+    hasNextPage: boolean;
+    cursor?: string | null;
+    messages: (Messages | null)[];
+  };
+
+  export type Messages = Message.Fragment;
 }
 export namespace GetChats {
   export type Variables = {
-    amount?: number | null;
-  }
+    amount: number;
+  };
 
   export type Query = {
-    chats: Chats[]; 
-  } 
+    __typename?: "Query";
+    chats?: Chats[] | null;
+  };
 
   export type Chats = {
-    messages: Messages[]; 
-  } & ChatWithoutMessages.Fragment
+    __typename?: "Chat";
+    messageFeed?: MessageFeed | null;
+  } & ChatWithoutMessages.Fragment;
 
-  export type Messages = Message.Fragment
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+    hasNextPage: boolean;
+    cursor?: string | null;
+    messages: (Messages | null)[];
+  };
+
+  export type Messages = Message.Fragment;
 }
 export namespace GetUsers {
-  export type Variables = {
-  }
+  export type Variables = {};
 
   export type Query = {
-    users: Users[]; 
-  } 
+    __typename?: "Query";
+    users?: Users[] | null;
+  };
 
   export type Users = {
-    id: string; 
-    name?: string | null; 
-    picture?: string | null; 
-  } 
+    __typename?: "User";
+    id: string;
+    name?: string | null;
+    picture?: string | null;
+  };
 }
 export namespace MessageAdded {
   export type Variables = {
     chatId?: string | null;
-  }
+  };
 
   export type Subscription = {
-    messageAdded?: MessageAdded | null; 
-  } 
+    __typename?: "Subscription";
+    messageAdded?: MessageAdded | null;
+  };
 
   export type MessageAdded = {
-    chat: Chat; 
-  } & Message.Fragment
+    __typename?: "Message";
+    chat: Chat;
+  } & Message.Fragment;
 
   export type Chat = {
-    id: string; 
-  } 
+    __typename?: "Chat";
+    id: string;
+  };
+}
+export namespace MoreMessages {
+  export type Variables = {
+    chatId: string;
+    amount: number;
+    before: string;
+  };
+
+  export type Query = {
+    __typename?: "Query";
+    chat?: Chat | null;
+  };
+
+  export type Chat = {
+    __typename?: "Chat";
+    messageFeed?: MessageFeed | null;
+  };
+
+  export type MessageFeed = {
+    __typename?: "MessageFeed";
+    hasNextPage: boolean;
+    cursor?: string | null;
+    messages: (Messages | null)[];
+  };
+
+  export type Messages = Message.Fragment;
 }
 export namespace RemoveAllMessages {
   export type Variables = {
     chatId: string;
     all?: boolean | null;
-  }
+  };
 
   export type Mutation = {
-    removeMessages?: string[] | null; 
-  } 
+    __typename?: "Mutation";
+    removeMessages?: (string | null)[] | null;
+  };
 }
 export namespace RemoveChat {
   export type Variables = {
     chatId: string;
-  }
+  };
 
   export type Mutation = {
-    removeChat?: string | null; 
-  } 
+    __typename?: "Mutation";
+    removeChat?: string | null;
+  };
 }
 export namespace RemoveMessages {
   export type Variables = {
     chatId: string;
-    messageIds?: string[] | null;
-  }
+    messageIds?: (string | null)[] | null;
+  };
 
   export type Mutation = {
-    removeMessages?: string[] | null; 
-  } 
+    __typename?: "Mutation";
+    removeMessages?: (string | null)[] | null;
+  };
 }
 
 export namespace ChatWithoutMessages {
   export type Fragment = {
-    id: string; 
-    name?: string | null; 
-    picture?: string | null; 
-    allTimeMembers: AllTimeMembers[]; 
-    unreadMessages: number; 
-    isGroup: boolean; 
-  } 
+    __typename?: "Chat";
+    id: string;
+    name?: string | null;
+    picture?: string | null;
+    allTimeMembers: AllTimeMembers[];
+    unreadMessages: number;
+    isGroup: boolean;
+  };
 
   export type AllTimeMembers = {
-    id: string; 
-  } 
+    __typename?: "User";
+    id: string;
+  };
 }
 
 export namespace Message {
   export type Fragment = {
-    id: string; 
-    sender: Sender; 
-    content: string; 
-    createdAt: string; 
-    type: number; 
-    recipients: Recipients[]; 
-    ownership: boolean; 
-  } 
+    __typename?: "Message";
+    id: string;
+    chat: Chat;
+    sender: Sender;
+    content: string;
+    createdAt: DateTime;
+    type: number;
+    recipients: Recipients[];
+    ownership: boolean;
+  };
+
+  export type Chat = {
+    __typename?: "Chat";
+    id: string;
+  };
 
   export type Sender = {
-    id: string; 
-    name?: string | null; 
-  } 
+    __typename?: "User";
+    id: string;
+    name?: string | null;
+  };
 
   export type Recipients = {
-    user: User; 
-    message: Message; 
-    receivedAt?: string | null; 
-    readAt?: string | null; 
-  } 
+    __typename?: "Recipient";
+    user: User;
+    message: Message;
+    chat: __Chat;
+    receivedAt?: DateTime | null;
+    readAt?: DateTime | null;
+  };
 
   export type User = {
-    id: string; 
-  } 
+    __typename?: "User";
+    id: string;
+  };
 
   export type Message = {
-    id: string; 
-  } 
+    __typename?: "Message";
+    id: string;
+    chat: _Chat;
+  };
+
+  export type _Chat = {
+    __typename?: "Chat";
+    id: string;
+  };
+
+  export type __Chat = {
+    __typename?: "Chat";
+    id: string;
+  };
 }

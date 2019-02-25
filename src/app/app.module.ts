@@ -1,7 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
-
 import { AppComponent } from './app.component';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {HttpLink, HttpLinkModule, Options} from 'apollo-angular-link-http';
@@ -18,7 +17,6 @@ import {OperationDefinitionNode} from 'graphql';
 import {split} from 'apollo-link';
 import {WebSocketLink} from 'apollo-link-ws';
 import {LoginService} from './login/services/login.service';
-
 const routes: Routes = [];
 
 @NgModule({
@@ -44,7 +42,7 @@ const routes: Routes = [];
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true,
-    }
+    },
   ],
   bootstrap: [AppComponent]
 })
@@ -67,7 +65,7 @@ export class AppModule {
 
     const link = split(
       ({ query }) => {
-        const { kind, operation } = <OperationDefinitionNode>getMainDefinition(query);
+        const { kind, operation } = <OperationDefinitionNode>getMainDefinition(<any>query);
         return kind === 'OperationDefinition' && operation === 'subscription';
       },
       subscriptionLink,

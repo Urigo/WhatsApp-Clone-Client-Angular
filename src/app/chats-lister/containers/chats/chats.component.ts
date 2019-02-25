@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ChatsService} from '../../../services/chats.service';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {GetChats} from '../../../../types';
 import {Router} from '@angular/router';
 
@@ -29,7 +29,7 @@ import {Router} from '@angular/router';
     </mat-menu>
 
     <app-chats-list [items]="chats$ | async"
-                    appSelectableList="both"
+                    libSelectableList="both"
                     (single)="goToChat($event)" (multiple)="deleteChats($event)" (isSelecting)="isSelecting = $event">
       <app-confirm-selection #confirmSelection></app-confirm-selection>
     </app-chats-list>

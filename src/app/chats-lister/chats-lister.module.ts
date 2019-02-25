@@ -11,7 +11,7 @@ import {ChatsComponent} from './containers/chats/chats.component';
 import {ChatsListComponent} from './components/chats-list/chats-list.component';
 import {TruncateModule} from 'ng2-truncate';
 import {SharedModule} from '../shared/shared.module';
-import {SelectableListModule} from 'ngx-selectable-list';
+import {NgxSelectableListModule} from 'ngx-selectable-list';
 import {AuthGuard} from '../login/services/auth.guard';
 
 const routes: Routes = [
@@ -42,7 +42,7 @@ const routes: Routes = [
     TruncateModule,
     // Feature modules
     SharedModule,
-    SelectableListModule,
+    NgxSelectableListModule,
   ],
   providers: [
     ChatsService,

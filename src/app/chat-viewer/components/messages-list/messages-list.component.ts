@@ -8,7 +8,7 @@ import {SelectableListDirective} from 'ngx-selectable-list';
     <mat-list>
       <mat-list-item *ngFor="let message of messages">
         <app-message-item [item]="message" [isGroup]="isGroup"
-                          appSelectableItem></app-message-item>
+                          libSelectableItem></app-message-item>
       </mat-list-item>
     </mat-list>
     <ng-content *ngIf="selectableListDirective.selecting"></ng-content>
