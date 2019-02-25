@@ -1,27 +1,33 @@
 import {concat, map, share, switchMap} from 'rxjs/operators';
-import {Apollo, QueryRef} from 'apollo-angular';
 import {Injectable} from '@angular/core';
-import {getChatsQuery} from '../../graphql/getChats.query';
-import {
-  AddChat, AddGroup, AddMessage, GetChat, GetChats, GetUsers, MessageAdded, MoreMessages, RemoveAllMessages, RemoveChat,
-  RemoveMessages
-} from '../../graphql';
-import {getChatQuery} from '../../graphql/getChat.query';
-import {addMessageMutation} from '../../graphql/addMessage.mutation';
-import {removeChatMutation} from '../../graphql/removeChat.mutation';
-import {DocumentNode} from 'graphql';
-import {removeAllMessagesMutation} from '../../graphql/removeAllMessages.mutation';
-import {removeMessagesMutation} from '../../graphql/removeMessages.mutation';
-import {getUsersQuery} from '../../graphql/getUsers.query';
 import {Observable, AsyncSubject, of} from 'rxjs';
-import {addChatMutation} from '../../graphql/addChat.mutation';
-import {addGroupMutation} from '../../graphql/addGroup.mutation';
-import * as moment from 'moment';
-import {FetchResult} from 'apollo-link';
+import {Apollo, QueryRef} from 'apollo-angular';
+import {
+  GetChatsGQL,
+  GetChatGQL,
+  AddMessageGQL,
+  RemoveChatGQL,
+  RemoveMessagesGQL,
+  RemoveAllMessagesGQL,
+  GetUsersGQL,
+  AddChatGQL,
+  AddGroupGQL,
+  ChatAddedGQL,
+  MessageAddedGQL,
+  MoreMessagesGQL,
+  AddMessage,
+  GetChats,
+  GetChat,
+  RemoveMessages,
+  RemoveAllMessages,
+  GetUsers,
+  AddChat,
+  AddGroup,
+  MessageAdded,
+} from '../../graphql';
+import { DataProxy } from 'apollo-cache';
+import { FetchResult } from 'apollo-link';
 import {LoginService} from '../login/services/login.service';
-import {chatAddedSubscription} from '../../graphql/chatAdded.subscription';
-import {messageAddedSubscription} from '../../graphql/messageAdded.subscription';
-import {moreMessagesQuery} from '../../graphql/moreMessages.query';
 
 @Injectable()
 export class ChatsService {
@@ -33,17 +39,28 @@ export class ChatsService {
   getChatWqSubject: AsyncSubject<QueryRef<GetChat.Query>>;
   addChat$: Observable<FetchResult<AddChat.Mutation | AddGroup.Mutation>>;
 
-  constructor(private apollo: Apollo,
-              private loginService: LoginService) {
-    this.getChatsWq = this.apollo.watchQuery<GetChats.Query, GetChats.Variables>({
-      query: getChatsQuery,
-      variables: {
-        amount: this.chatsMessagesAmount,
-      },
+  constructor(
+    private getChatsGQL: GetChatsGQL,
+    private getChatGQL: GetChatGQL,
+    private addMessageGQL: AddMessageGQL,
+    private removeChatGQL: RemoveChatGQL,
+    private removeMessagesGQL: RemoveMessagesGQL,
+    private removeAllMessagesGQL: RemoveAllMessagesGQL,
+    private getUsersGQL: GetUsersGQL,
+    private addChatGQL: AddChatGQL,
+    private addGroupGQL: AddGroupGQL,
+    private chatAddedGQL: ChatAddedGQL,
+    private messageAddedGQL: MessageAddedGQL,
+    private moreMessagesGQL: MoreMessagesGQL,
+    private apollo: Apollo,
+    private loginService: LoginService
+  ) {
+    this.getChatsWq = this.getChatsGQL.watch({
+      amount: this.chatsMessagesAmount,
     });
 
     this.getChatsWq.subscribeToMore({
-      document: chatAddedSubscription,
+      document: this.chatAddedGQL.document,
       variables: {
         amount: this.chatsMessagesAmount,
       },
@@ -61,7 +78,7 @@ export class ChatsService {
     });
 
     this.getChatsWq.subscribeToMore({
-      document: messageAddedSubscription,
+      document: this.messageAddedGQL.document,
       updateQuery: (prev: GetChats.Query, { subscriptionData }) => {
         if (!subscriptionData.data) {
           return prev;
@@ -73,7 +90,8 @@ export class ChatsService {
         try {
           // Read the data from our cache for this query.
           const {chat}: GetChat.Query = this.apollo.getClient().readQuery({
-            query: getChatQuery, variables: {
+            query: this.getChatGQL.document,
+            variables: {
               chatId: newMessage.chat.id,
               amount: this.chatMessagesAmount,
             }
@@ -83,9 +101,15 @@ export class ChatsService {
           chat.messageFeed.messages.push(newMessage);
           // Write our data back to the cache.
           this.apollo.getClient().writeQuery({
-            query: getChatQuery,
-            variables: {chatId: newMessage.chat.id, amount: this.chatMessagesAmount},
-            data: {chat} });
+            query: this.getChatGQL.document,
+            variables: {
+              chatId: newMessage.chat.id,
+              amount: this.chatMessagesAmount
+            },
+            data: {
+              chat
+            }
+          });
         } catch {
           console.error('The chat we received an update for does not exist in the store');
         }
@@ -129,12 +153,9 @@ export class ChatsService {
     const chat$FromCache = of<GetChat.Chat>(_chat);
 
     const getApolloWatchQuery = (id: string) => {
-      return this.apollo.watchQuery<GetChat.Query, GetChat.Variables>({
-        query: getChatQuery,
-        variables: {
-          chatId: id,
-          amount: this.chatMessagesAmount,
-        }
+      return this.getChatGQL.watch({
+        chatId: id,
+        amount: this.chatMessagesAmount,
       });
     };
 
@@ -162,9 +183,12 @@ export class ChatsService {
       this.getChatWqSubject.complete();
 
       chat$ = chat$FromCache.pipe(
-        concat(query.valueChanges.pipe(
-          map((result) => result.data.chat)
-        )));
+        concat(
+          query.valueChanges.pipe(
+            map((result) => result.data.chat)
+          )
+        )
+      );
     }
 
     return {query$: this.getChatWqSubject.asObservable(), chat$};
@@ -174,13 +198,13 @@ export class ChatsService {
     const {data: {chat: {messageFeed}}} = query.getLastResult();
     if (messageFeed.hasNextPage) {
       query.fetchMore({
-        query: moreMessagesQuery,
+        query: this.moreMessagesGQL.document,
         variables: {
           chatId,
           amount: this.chatMessagesAmount,
           before: messageFeed.cursor,
         },
-        updateQuery: (previousResult: GetChat.Query, { fetchMoreResult }) => {
+        updateQuery: (previousResult, { fetchMoreResult }) => {
           return {
             chat: {
               ...previousResult.chat,
@@ -199,12 +223,10 @@ export class ChatsService {
   }
 
   addMessage(chatId: string, content: string) {
-    return this.apollo.mutate<AddMessage.Mutation, AddMessage.Variables>({
-      mutation: addMessageMutation,
-      variables: {
-        chatId,
-        content,
-      },
+    return this.addMessageGQL.mutate({
+      chatId,
+      content,
+    }, {
       optimisticResponse: {
         __typename: 'Mutation',
         addMessage: {
@@ -231,7 +253,8 @@ export class ChatsService {
         {
           // Read the data from our cache for this query.
           const {chat} = store.readQuery<GetChat.Query, GetChat.Variables>({
-            query: getChatQuery, variables: {
+            query: this.getChatGQL.document,
+            variables: {
               chatId,
               amount: this.chatMessagesAmount,
             }
@@ -239,13 +262,22 @@ export class ChatsService {
           // Add our message from the mutation to the end.
           chat.messageFeed.messages.push(addMessage);
           // Write our data back to the cache.
-          store.writeQuery({ query: getChatQuery, variables: {chatId, amount: this.chatMessagesAmount}, data: {chat} });
+          store.writeQuery({
+            query: this.getChatGQL.document,
+            variables: {
+              chatId,
+              amount: this.chatMessagesAmount
+            },
+            data: {
+              chat
+            }
+          });
         }
         // Update last message cache
         {
           // Read the data from our cache for this query.
           const {chats} = store.readQuery<GetChats.Query, GetChats.Variables>({
-            query: getChatsQuery,
+            query: this.getChatsGQL.document,
             variables: {
               amount: this.chatsMessagesAmount,
             },
@@ -254,7 +286,7 @@ export class ChatsService {
           chats.find(chat => chat.id === chatId).messageFeed.messages.push(addMessage);
           // Write our data back to the cache.
           store.writeQuery<GetChats.Query, GetChats.Variables>({
-            query: getChatsQuery,
+            query: this.getChatsGQL.document,
             variables: {
               amount: this.chatsMessagesAmount,
             },
@@ -263,79 +295,63 @@ export class ChatsService {
             },
           });
         }
-      },
+      }
     });
   }
 
   removeChat(chatId: string) {
-    return this.apollo.mutate<RemoveChat.Mutation, RemoveChat.Variables>({
-      mutation: removeChatMutation,
-      variables: {
+    return this.removeChatGQL.mutate(
+      {
         chatId,
-      },
-      optimisticResponse: {
-        __typename: 'Mutation',
-        removeChat: chatId,
-      },
-      update: (store, { data: { removeChat } }) => {
-        // Read the data from our cache for this query.
-        const {chats} = store.readQuery<GetChats.Query, GetChats.Variables>({
-          query: getChatsQuery,
-          variables: {
-            amount: this.chatsMessagesAmount,
-          },
-        });
-        // Remove the chat (mutable)
-        for (const index of chats.keys()) {
-          if (chats[index].id === removeChat) {
-            chats.splice(index, 1);
+      }, {
+        optimisticResponse: {
+          __typename: 'Mutation',
+          removeChat: chatId,
+        },
+        update: (store, { data: { removeChat } }) => {
+          // Read the data from our cache for this query.
+          const {chats} = store.readQuery<GetChats.Query, GetChats.Variables>({
+            query: this.getChatsGQL.document,
+            variables: {
+              amount: this.chatsMessagesAmount,
+            },
+          });
+          // Remove the chat (mutable)
+          for (const index of chats.keys()) {
+            if (chats[index].id === removeChat) {
+              chats.splice(index, 1);
+            }
           }
-        }
-        // Write our data back to the cache.
-        store.writeQuery<GetChats.Query, GetChats.Variables>({
-          query: getChatsQuery,
-          variables: {
-            amount: this.chatsMessagesAmount,
-          },
-          data: {
-            chats,
-          },
-        });
-      },
-    });
+          // Write our data back to the cache.
+          store.writeQuery<GetChats.Query, GetChats.Variables>({
+            query: this.getChatsGQL.document,
+            variables: {
+              amount: this.chatsMessagesAmount,
+            },
+            data: {
+              chats,
+            },
+          });
+        },
+      }
+    );
   }
 
   removeMessages(chatId: string, messages: GetChat.Messages[], messageIdsOrAll: string[] | boolean) {
-    let variables: RemoveMessages.Variables | RemoveAllMessages.Variables;
     let ids: string[] = [];
-    let mutation: DocumentNode;
 
-    if (typeof messageIdsOrAll === 'boolean') {
-      variables = {chatId, all: messageIdsOrAll} as RemoveAllMessages.Variables;
-      ids = messages.map(message => message.id);
-      mutation = removeAllMessagesMutation;
-    } else {
-      variables = {chatId, messageIds: messageIdsOrAll} as RemoveMessages.Variables;
-      ids = messageIdsOrAll;
-      mutation = removeMessagesMutation;
-    }
-
-    return this.apollo.mutate<
-      RemoveMessages.Mutation | RemoveAllMessages.Mutation,
-      RemoveMessages.Variables | RemoveAllMessages.Variables
-    >({
-      mutation,
-      variables,
-      optimisticResponse: {
+    const options = {
+      optimisticResponse: () => ({
         __typename: 'Mutation',
         removeMessages: ids,
-      },
-      update: (store, { data: { removeMessages } }: {data: RemoveMessages.Mutation | RemoveAllMessages.Mutation}) => {
+      }),
+      update: (store: DataProxy, { data: { removeMessages } }: {data: RemoveMessages.Mutation | RemoveAllMessages.Mutation}) => {
         // Update the messages cache
         {
           // Read the data from our cache for this query.
           const {chat} = store.readQuery<GetChat.Query, GetChat.Variables>({
-            query: getChatQuery, variables: {
+            query: this.getChatGQL.document,
+            variables: {
               chatId,
               amount: this.chatMessagesAmount,
             }
@@ -350,11 +366,7 @@ export class ChatsService {
           });
           // Write our data back to the cache.
           store.writeQuery<GetChat.Query, GetChat.Variables>({
-            query: getChatQuery,
-            variables: {
-              chatId,
-              amount: this.chatMessagesAmount
-            },
+            query: this.getChatGQL.document,
             data: {
               chat
             }
@@ -364,7 +376,7 @@ export class ChatsService {
         {
           // Read the data from our cache for this query.
           const {chats} = store.readQuery<GetChats.Query, GetChats.Variables>({
-            query: getChatsQuery,
+            query: this.getChatsGQL.document,
             variables: {
               amount: this.chatsMessagesAmount,
             },
@@ -375,7 +387,7 @@ export class ChatsService {
             .sort((a, b) => Number(b.createdAt) - Number(a.createdAt)) || [];
           // Write our data back to the cache.
           store.writeQuery<GetChats.Query, GetChats.Variables>({
-            query: getChatsQuery,
+            query: this.getChatsGQL.document,
             variables: {
               amount: this.chatsMessagesAmount,
             },
@@ -384,14 +396,28 @@ export class ChatsService {
             },
           });
         }
-      },
-    });
+      }
+    };
+
+    if (typeof messageIdsOrAll === 'boolean') {
+      ids = messages.map(message => message.id);
+
+      return this.removeAllMessagesGQL.mutate({
+        chatId,
+        all: messageIdsOrAll
+      }, options);
+    } else {
+      ids = messageIdsOrAll;
+
+      return this.removeMessagesGQL.mutate({
+        chatId,
+        messageIds: messageIdsOrAll,
+      }, options);
+    }
   }
 
   getUsers() {
-    const query = this.apollo.watchQuery<GetUsers.Query, GetUsers.Variables>({
-      query: getUsersQuery,
-    });
+    const query = this.getUsersGQL.watch();
     const users$ = query.valueChanges.pipe(
       map((result) => result.data.users)
     );
@@ -409,117 +435,117 @@ export class ChatsService {
   }
 
   addChat(recipientId: string, users: GetUsers.Users[], ouiId: string) {
-    this.addChat$ = this.apollo.mutate<AddChat.Mutation, AddChat.Variables>({
-      mutation: addChatMutation,
-      variables: {
+    this.addChat$ = this.addChatGQL.mutate(
+      {
         recipientId,
-      },
-      optimisticResponse: {
-        __typename: 'Mutation',
-        addChat: {
-          id: ouiId,
-          __typename: 'Chat',
-          name: users.find(user => user.id === recipientId).name,
-          picture: users.find(user => user.id === recipientId).picture,
-          allTimeMembers: [
-            {
-              id: this.loginService.getUser().id,
-              __typename: 'User',
+      }, {
+        optimisticResponse: {
+          __typename: 'Mutation',
+          addChat: {
+            id: ouiId,
+            __typename: 'Chat',
+            name: users.find(user => user.id === recipientId).name,
+            picture: users.find(user => user.id === recipientId).picture,
+            allTimeMembers: [
+              {
+                id: this.loginService.getUser().id,
+                __typename: 'User',
+              },
+              {
+                id: recipientId,
+                __typename: 'User',
+              }
+            ],
+            unreadMessages: 0,
+            messageFeed: {
+              __typename: 'MessageFeed',
+              hasNextPage: false,
+              cursor: null,
+              messages: [],
             },
-            {
-              id: recipientId,
-              __typename: 'User',
-            }
-          ],
-          unreadMessages: 0,
-          messageFeed: {
-            __typename: 'MessageFeed',
-            hasNextPage: false,
-            cursor: null,
-            messages: [],
+            isGroup: false,
           },
-          isGroup: false,
         },
-      },
-      update: (store, { data: { addChat } }) => {
-        // Read the data from our cache for this query.
-        const {chats} = store.readQuery<GetChats.Query, GetChats.Variables>({
-          query: getChatsQuery,
-          variables: {
-            amount: this.chatsMessagesAmount,
-          },
-        });
-        // Add our comment from the mutation to the end.
-        chats.push(addChat);
-        // Write our data back to the cache.
-        store.writeQuery<GetChats.Query, GetChats.Variables>({
-          query: getChatsQuery,
-          variables: {
-            amount: this.chatsMessagesAmount,
-          },
-          data: {
-            chats,
-          },
-        });
-      },
-    }).pipe(share());
+        update: (store, { data: { addChat } }) => {
+          // Read the data from our cache for this query.
+          const {chats} = store.readQuery<GetChats.Query, GetChats.Variables>({
+            query: this.getChatsGQL.document,
+            variables: {
+              amount: this.chatsMessagesAmount,
+            },
+          });
+          // Add our comment from the mutation to the end.
+          chats.push(addChat);
+          // Write our data back to the cache.
+          store.writeQuery<GetChats.Query, GetChats.Variables>({
+            query: this.getChatsGQL.document,
+            variables: {
+              amount: this.chatsMessagesAmount,
+            },
+            data: {
+              chats,
+            },
+          });
+        },
+      }
+    ).pipe(share());
     return this.addChat$;
   }
 
   addGroup(recipientIds: string[], groupName: string, ouiId: string) {
-    this.addChat$ = this.apollo.mutate<AddGroup.Mutation, AddGroup.Variables>({
-      mutation: addGroupMutation,
-      variables: {
+    this.addChat$ = this.addGroupGQL.mutate(
+      {
         recipientIds,
         groupName,
-      },
-      optimisticResponse: {
-        __typename: 'Mutation',
-        addGroup: {
-          id: ouiId,
-          __typename: 'Chat',
-          name: groupName,
-          picture: 'https://randomuser.me/api/portraits/thumb/lego/1.jpg',
-          userIds: [this.loginService.getUser().id, recipientIds],
-          allTimeMembers: [
-            {
-              id: this.loginService.getUser().id,
-              __typename: 'User',
+      }, {
+        optimisticResponse: {
+          __typename: 'Mutation',
+          addGroup: {
+            id: ouiId,
+            __typename: 'Chat',
+            name: groupName,
+            picture: 'https://randomuser.me/api/portraits/thumb/lego/1.jpg',
+            userIds: [this.loginService.getUser().id, recipientIds],
+            allTimeMembers: [
+              {
+                id: this.loginService.getUser().id,
+                __typename: 'User',
+              },
+              ...recipientIds.map(id => ({id, __typename: 'User'})),
+            ],
+            unreadMessages: 0,
+            messageFeed: {
+              __typename: 'MessageFeed',
+              hasNextPage: false,
+              cursor: null,
+              messages: [],
             },
-            ...recipientIds.map(id => ({id, __typename: 'User'})),
-          ],
-          unreadMessages: 0,
-          messageFeed: {
-            __typename: 'MessageFeed',
-            hasNextPage: false,
-            cursor: null,
-            messages: [],
+            isGroup: true,
           },
-          isGroup: true,
         },
-      },
-      update: (store, { data: { addGroup } }) => {
-        // Read the data from our cache for this query.
-        const {chats} = store.readQuery<GetChats.Query, GetChats.Variables>({
-          query: getChatsQuery,
-          variables: {
-            amount: this.chatsMessagesAmount,
-          },
-        });
-        // Add our comment from the mutation to the end.
-        chats.push(addGroup);
-        // Write our data back to the cache.
-        store.writeQuery<GetChats.Query, GetChats.Variables>({
-          query: getChatsQuery,
-          variables: {
-            amount: this.chatsMessagesAmount,
-          },
-          data: {
-            chats,
-          },
-        });
-      },
-    }).pipe(share());
+        update: (store, { data: { addGroup } }) => {
+          // Read the data from our cache for this query.
+          const {chats} = store.readQuery<GetChats.Query, GetChats.Variables>({
+            query: this.getChatsGQL.document,
+            variables: {
+              amount: this.chatsMessagesAmount,
+            },
+          });
+          // Add our comment from the mutation to the end.
+          chats.push(addGroup);
+          // Write our data back to the cache.
+          store.writeQuery<GetChats.Query, GetChats.Variables>({
+            query: this.getChatsGQL.document,
+            variables: {
+              amount: this.chatsMessagesAmount,
+            },
+            data: {
+              chats,
+            },
+          });
+        },
+      }
+    ).pipe(share());
     return this.addChat$;
   }
 }

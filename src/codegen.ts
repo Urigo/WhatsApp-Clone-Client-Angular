@@ -33,8 +33,8 @@ async function main() {
   await generate(
     {
       schema: 'http://localhost:3000/graphql',
-      template: 'graphql-codegen-typescript-template',
-      out: './src/graphql.d.ts',
+      template: 'graphql-codegen-apollo-angular-template',
+      out: './src/graphql.ts',
       args: ['./src/graphql/**/*.ts'],
       header: headers,
       overwrite: true,
