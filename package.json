@@ -11,6 +11,10 @@
     "generator": "ts-node src/codegen.ts"
   },
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://Urigo@github.com/Urigo/WhatsApp-Clone-Client-Angular.git"
+  },
   "dependencies": {
     "@angular/animations": "~7.2.0",
     "@angular/cdk": "^7.3.2",
