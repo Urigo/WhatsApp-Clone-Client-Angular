@@ -57,7 +57,7 @@ import {LoginService} from '../services/login.service';
         </div>
         <mat-form-field>
           <mat-label>Confirm Password</mat-label>
-          <input matInput autocomplete="new-password" formControlName="confirmPassword" type="password" placeholder="Confirm your password" />
+          <input matInput autocomplete="new-password" formControlName="confirmPassword" type="password" placeholder="Confirm password" />
         </mat-form-field>
         <div class="error" *ngIf="signUpForm.get('confirmPassword').hasError('required') && signUpForm.get('confirmPassword').touched">
           Passwords must match
@@ -95,7 +95,7 @@ export class LoginComponent {
     ]],
   });
 
-  private signingIn = true
+  public signingIn = true;
 
   constructor(private http: HttpClient,
               private fb: FormBuilder,
@@ -118,9 +118,11 @@ export class LoginComponent {
 
   signUp() {
     const {username, newPassword: password, name} = this.signUpForm.value;
-    const auth = `Basic ${btoa(`${username}:${password}`)}`;
+    const auth = this.loginService.createBase64Auth(username, password);
     this.http.post('http://localhost:3000/signup', {
       name,
+      username,
+      password,
     }, {
       headers: {
         Authorization: auth,

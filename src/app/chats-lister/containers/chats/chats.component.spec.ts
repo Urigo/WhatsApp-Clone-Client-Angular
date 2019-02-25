@@ -1,6 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { DebugElement, NO_ERRORS_SCHEMA } from '@angular/core';
-import { TruncateModule } from 'ng2-truncate';
 import {
   MatButtonModule,
   MatIconModule,
@@ -333,7 +332,6 @@ describe('ChatsComponent', () => {
         MatIconModule,
         MatButtonModule,
         MatListModule,
-        TruncateModule,
         ApolloTestingModule,
         RouterTestingModule,
         NgxSelectableListModule,

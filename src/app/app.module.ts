@@ -10,6 +10,7 @@ import {ChatViewerModule} from './chat-viewer/chat-viewer.module';
 import {ChatsCreationModule} from './chats-creation/chats-creation.module';
 import {LoginModule} from './login/login.module';
 import {AuthInterceptor} from './login/services/auth.interceptor';
+import { ErrorInterceptor } from './login/services/error.interceptor';
 const routes: Routes = [];
 
 @NgModule({
@@ -32,6 +33,11 @@ const routes: Routes = [];
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ErrorInterceptor,
       multi: true,
     },
   ],

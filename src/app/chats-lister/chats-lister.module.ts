@@ -9,7 +9,6 @@ import {ChatsService} from '../services/chats.service';
 import {ChatItemComponent} from './components/chat-item/chat-item.component';
 import {ChatsComponent} from './containers/chats/chats.component';
 import {ChatsListComponent} from './components/chats-list/chats-list.component';
-import {TruncateModule} from 'ng2-truncate';
 import {SharedModule} from '../shared/shared.module';
 import {NgxSelectableListModule} from 'ngx-selectable-list';
 import {AuthGuard} from '../login/services/auth.guard';
@@ -38,8 +37,6 @@ const routes: Routes = [
     RouterModule.forChild(routes),
     // Forms
     FormsModule,
-    // Truncate Pipe
-    TruncateModule,
     // Feature modules
     SharedModule,
     NgxSelectableListModule,

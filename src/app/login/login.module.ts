@@ -1,6 +1,5 @@
 import {RouterModule, Routes} from '@angular/router';
 import {NgModule} from '@angular/core';
-import {TruncateModule} from 'ng2-truncate';
 import {MatButtonModule, MatIconModule, MatListModule, MatMenuModule, MatFormFieldModule, MatInputModule} from '@angular/material';
 import {SharedModule} from '../shared/shared.module';
 import {BrowserModule} from '@angular/platform-browser';
@@ -11,6 +10,7 @@ import {FlexLayoutModule} from '@angular/flex-layout';
 import {AuthInterceptor} from './services/auth.interceptor';
 import {AuthGuard} from './services/auth.guard';
 import {LoginService} from './services/login.service';
+import { ErrorInterceptor } from './services/error.interceptor';
 
 
 const routes: Routes = [
@@ -39,14 +39,13 @@ const routes: Routes = [
     // Forms
     FormsModule,
     ReactiveFormsModule,
-    // Truncate Pipe
-    TruncateModule,
     // Feature modules
     SharedModule,
   ],
   providers: [
     LoginService,
     AuthInterceptor,
+    ErrorInterceptor,
     AuthGuard,
   ],
 })

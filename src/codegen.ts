@@ -46,6 +46,7 @@ async function main() {
           plugins: [
             'typescript-common',
             'typescript-client',
+            'typescript-server',
             'typescript-apollo-angular',
           ],
         },
