@@ -1,33 +1,42 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
+import { DebugElement, NO_ERRORS_SCHEMA } from '@angular/core';
+import { RouterTestingModule } from '@angular/router/testing';
+import { ActivatedRoute } from '@angular/router';
+import { By } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
+import { of } from 'rxjs';
+import {
+  MatButtonModule,
+  MatGridListModule,
+  MatIconModule,
+  MatListModule,
+  MatMenuModule,
+  MatToolbarModule,
+} from '@angular/material';
+import {
+  ApolloTestingModule,
+  ApolloTestingController,
+  APOLLO_TESTING_CACHE,
+} from 'apollo-angular/testing';
+import { InMemoryCache } from 'apollo-cache-inmemory';
+import { NgxSelectableListModule } from 'ngx-selectable-list';
+
+import { dataIdFromObject } from '../../../graphql.module';
 import { ChatComponent } from './chat.component';
-import {DebugElement, NO_ERRORS_SCHEMA} from '@angular/core';
-import {MatButtonModule, MatGridListModule, MatIconModule, MatListModule, MatMenuModule, MatToolbarModule} from '@angular/material';
-import {ChatsService} from '../../../services/chats.service';
-import {Apollo} from 'apollo-angular';
-import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
-import {HttpLink, HttpLinkModule, Options} from 'apollo-angular-link-http';
-import {defaultDataIdFromObject, InMemoryCache} from 'apollo-cache-inmemory';
-import {RouterTestingModule} from '@angular/router/testing';
-import {ActivatedRoute} from '@angular/router';
-import {of} from 'rxjs';
-import {By} from '@angular/platform-browser';
-import {FormsModule} from '@angular/forms';
-import {SharedModule} from '../../../shared/shared.module';
-import {NewMessageComponent} from '../../components/new-message/new-message.component';
-import {MessagesListComponent} from '../../components/messages-list/messages-list.component';
-import {MessageItemComponent} from '../../components/message-item/message-item.component';
-import {NgxSelectableListModule} from 'ngx-selectable-list';
-import {LoginService} from '../../../login/services/login.service';
+import { ChatsService } from '../../../services/chats.service';
+import { SharedModule } from '../../../shared/shared.module';
+import { NewMessageComponent } from '../../components/new-message/new-message.component';
+import { MessagesListComponent } from '../../components/messages-list/messages-list.component';
+import { MessageItemComponent } from '../../components/message-item/message-item.component';
+import { LoginService } from '../../../login/services/login.service';
 
 describe('ChatComponent', () => {
   let component: ChatComponent;
   let fixture: ComponentFixture<ChatComponent>;
   let el: DebugElement;
 
-  let httpMock: HttpTestingController;
-  let httpLink: HttpLink;
-  let apollo: Apollo;
+  let controller: ApolloTestingController;
 
   const chat: any = {
     id: '1',
@@ -42,7 +51,7 @@ describe('ChatComponent', () => {
       {
         id: '3',
         __typename: 'User',
-      }
+      },
     ],
     unreadMessages: 1,
     isGroup: false,
@@ -57,7 +66,7 @@ describe('ChatComponent', () => {
         sender: {
           id: '3',
           __typename: 'User',
-          name: 'Avery Stewart'
+          name: 'Avery Stewart',
         },
         content: 'Yep!',
         createdAt: '1514035700',
@@ -82,11 +91,11 @@ describe('ChatComponent', () => {
               __typename: 'Chat',
             },
             receivedAt: null,
-            readAt: null
-          }
+            readAt: null,
+          },
         ],
-        ownership: false
-      }
+        ownership: false,
+      },
     ],
   };
 
@@ -107,56 +116,48 @@ describe('ChatComponent', () => {
         MatGridListModule,
         FormsModule,
         SharedModule,
-        HttpLinkModule,
-        HttpClientTestingModule,
+        ApolloTestingModule,
         RouterTestingModule,
         NgxSelectableListModule,
       ],
       providers: [
         ChatsService,
-        Apollo,
+        {
+          provide: APOLLO_TESTING_CACHE,
+          useFactory() {
+            return new InMemoryCache({ dataIdFromObject });
+          },
+        },
         {
           provide: ActivatedRoute,
           useValue: {
             params: of({ id: chat.id }),
             queryParams: of({}),
-          }
+          },
         },
         LoginService,
       ],
-      schemas: [NO_ERRORS_SCHEMA]
-    })
-      .compileComponents();
+      schemas: [NO_ERRORS_SCHEMA],
+    }).compileComponents();
 
-    httpMock = TestBed.get(HttpTestingController);
-    httpLink = TestBed.get(HttpLink);
-    apollo = TestBed.get(Apollo);
-
-    apollo.create({
-      link: httpLink.create(<Options>{ uri: 'http://localhost:3000/graphql' }),
-      cache: new InMemoryCache({
-        dataIdFromObject: (object: any) => {
-          switch (object.__typename) {
-            case 'Message': return `${object.chat.id}:${object.id}`; // use `chatId` prefix and `messageId` as the primary key
-            default: return defaultDataIdFromObject(object); // fall back to default handling
-          }
-        }
-      }),
-    });
+    controller = TestBed.get(ApolloTestingController);
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(ChatComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    httpMock.expectOne(httpReq => httpReq.body.operationName === 'chatAdded', 'call to chatAdded api');
-    httpMock.expectOne(httpReq => httpReq.body.operationName === 'messageAdded', 'call to messageAdded api');
-    httpMock.expectOne(httpReq => httpReq.body.operationName === 'GetChats', 'call to getChats api');
-    const req = httpMock.expectOne(httpReq => httpReq.body.operationName === 'GetChat', 'call to getChat api');
+
+    controller.expectOne('chatAdded', 'call to chatAdded api');
+    controller.expectOne('messageAdded', 'call to messageAdded api');
+    controller.expectOne('GetChats', 'call to getChats api');
+
+    const req = controller.expectOne('GetChat', 'call to getChat api');
+
     req.flush({
       data: {
-        chat
-      }
+        chat,
+      },
     });
   });
 
@@ -168,13 +169,22 @@ describe('ChatComponent', () => {
     fixture.whenStable().then(() => {
       fixture.detectChanges();
       el = fixture.debugElement;
-      expect(el.query(By.css(`app-toolbar > mat-toolbar > div > div`)).nativeElement.textContent).toContain(chat.name);
+      expect(
+        el.query(By.css(`app-toolbar > mat-toolbar > div > div`)).nativeElement
+          .textContent,
+      ).toContain(chat.name);
       for (let i = 0; i < chat.messages.length; i++) {
-        expect(el.query(By.css(`app-messages-list > mat-list > mat-list-item:nth-child(${i + 1}) > div > app-message-item > div`))
-          .nativeElement.textContent).toContain(chat.messages[i].content);
+        expect(
+          el.query(
+            By.css(
+              `app-messages-list > mat-list > mat-list-item:nth-child(${i +
+                1}) > div > app-message-item > div`,
+            ),
+          ).nativeElement.textContent,
+        ).toContain(chat.messages[i].content);
       }
     });
 
-    httpMock.verify();
+    controller.verify();
   });
 });
