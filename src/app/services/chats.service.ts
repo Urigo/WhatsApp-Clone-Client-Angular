@@ -379,33 +379,33 @@ export class ChatsService {
   }
 
   // Checks if the chat is listed for the current user and returns the id
-  getChatId(recipientId: string) {
+  getChatId(userId: string) {
     const _chat = this.chats.find(chat => {
       return !chat.isGroup && !!chat.allTimeMembers.find(user => user.id === this.loginService.getUser().id) &&
-        !!chat.allTimeMembers.find(user => user.id === recipientId);
+        !!chat.allTimeMembers.find(user => user.id === userId);
     });
     return _chat ? _chat.id : false;
   }
 
-  addChat(recipientId: string, users: GetUsers.Users[], ouiId: string) {
+  addChat(userId: string, users: GetUsers.Users[], ouiId: string) {
     this.addChat$ = this.addChatGQL.mutate(
       {
-        recipientId,
+        userId,
       }, {
         optimisticResponse: {
           __typename: 'Mutation',
           addChat: {
             __typename: 'Chat',
             id: ouiId,
-            name: users.find(user => user.id === recipientId).name,
-            picture: users.find(user => user.id === recipientId).picture,
+            name: users.find(user => user.id === userId).name,
+            picture: users.find(user => user.id === userId).picture,
             allTimeMembers: [
               {
                 id: this.loginService.getUser().id,
                 __typename: 'User',
               },
               {
-                id: recipientId,
+                id: userId,
                 __typename: 'User',
               }
             ],
@@ -440,10 +440,10 @@ export class ChatsService {
     return this.addChat$;
   }
 
-  addGroup(recipientIds: string[], groupName: string, ouiId: string) {
+  addGroup(userIds: string[], groupName: string, ouiId: string) {
     this.addChat$ = this.addGroupGQL.mutate(
       {
-        recipientIds,
+        userIds,
         groupName,
       }, {
         optimisticResponse: {
@@ -453,13 +453,13 @@ export class ChatsService {
             id: ouiId,
             name: groupName,
             picture: 'https://randomuser.me/api/portraits/thumb/lego/1.jpg',
-            userIds: [this.loginService.getUser().id, recipientIds],
+            userIds: [this.loginService.getUser().id, userIds],
             allTimeMembers: [
               {
                 id: this.loginService.getUser().id,
                 __typename: 'User',
               },
-              ...recipientIds.map(id => ({id, __typename: 'User'})),
+              ...userIds.map(id => ({id, __typename: 'User'})),
             ],
             unreadMessages: 0,
             messages: [],

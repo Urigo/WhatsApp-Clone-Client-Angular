@@ -36,7 +36,7 @@ async function main() {
   await generate(
     {
       schema: {
-        'http://localhost:3000/graphql': {
+        'http://localhost:4000/graphql': {
           headers,
         },
       },

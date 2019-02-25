@@ -13,18 +13,18 @@ import {ChatsService} from '../../../services/chats.service';
       <div class="title">New group</div>
     </app-toolbar>
 
-    <app-users-list *ngIf="!recipientIds.length" [items]="users"
+    <app-users-list *ngIf="!userIds.length" [items]="users"
                     libSelectableList="multiple_tap" (multiple)="selectUsers($event)">
       <app-confirm-selection #confirmSelection icon="arrow_forward"></app-confirm-selection>
     </app-users-list>
-    <app-new-group-details *ngIf="recipientIds.length" [users]="getSelectedUsers()"
+    <app-new-group-details *ngIf="userIds.length" [users]="getSelectedUsers()"
                            (groupDetails)="addGroup($event)"></app-new-group-details>
   `,
   styleUrls: ['new-group.component.scss'],
 })
 export class NewGroupComponent implements OnInit {
   users: GetUsers.Users[];
-  recipientIds: string[] = [];
+  userIds: string[] = [];
 
   constructor(private router: Router,
               private location: Location,
@@ -35,25 +35,25 @@ export class NewGroupComponent implements OnInit {
   }
 
   goBack() {
-    if (this.recipientIds.length) {
-      this.recipientIds = [];
+    if (this.userIds.length) {
+      this.userIds = [];
     } else {
       this.location.back();
     }
   }
 
-  selectUsers(recipientIds: string[]) {
-    this.recipientIds = recipientIds;
+  selectUsers(userIds: string[]) {
+    this.userIds = userIds;
   }
 
   getSelectedUsers() {
-    return this.users.filter(user => this.recipientIds.includes(user.id));
+    return this.users.filter(user => this.userIds.includes(user.id));
   }
 
   addGroup(groupName: string) {
-    if (groupName && this.recipientIds.length) {
+    if (groupName && this.userIds.length) {
       const ouiId = ChatsService.getRandomId();
-      this.chatsService.addGroup(this.recipientIds, groupName, ouiId).subscribe();
+      this.chatsService.addGroup(this.userIds, groupName, ouiId).subscribe();
       this.router.navigate(['/chat', ouiId], {queryParams: {oui: true}, skipLocationChange: true});
     }
   }

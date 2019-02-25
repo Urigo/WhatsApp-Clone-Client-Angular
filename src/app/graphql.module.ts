@@ -8,7 +8,7 @@ import {split} from 'apollo-link';
 import {WebSocketLink} from 'apollo-link-ws';
 import {LoginService} from './login/services/login.service';
 
-const uri = 'http://localhost:3000/graphql';
+const uri = 'http://localhost:4000/graphql';
 
 export const dataIdFromObject = (object: any) => {
   switch (object.__typename) {

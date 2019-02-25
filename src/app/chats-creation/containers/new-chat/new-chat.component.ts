@@ -41,15 +41,15 @@ export class NewChatComponent implements OnInit {
     this.router.navigate(['/new-group']);
   }
 
-  addChat(recipientId: string) {
-    const chatId = this.chatsService.getChatId(recipientId);
+  addChat(userId: string) {
+    const chatId = this.chatsService.getChatId(userId);
     if (chatId) {
       // Chat is already listed for the current user
       this.router.navigate(['/chat', chatId]);
     } else {
       // Generate id for Optimistic UI
       const ouiId = ChatsService.getRandomId();
-      this.chatsService.addChat(recipientId, this.users, ouiId).subscribe();
+      this.chatsService.addChat(userId, this.users, ouiId).subscribe();
       this.router.navigate(['/chat', ouiId], {queryParams: {oui: true}, skipLocationChange: true});
     }
   }

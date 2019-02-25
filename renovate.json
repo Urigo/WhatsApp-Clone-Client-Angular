@@ -1,7 +1,8 @@
 {
   "extends": [
     "config:base",
-    ":automergeMajor"
+    ":automergeMajor",
+    ":rebaseStalePrs"
   ],
   "baseBranches": [
     "master-step3",
@@ -15,5 +16,6 @@
     "master-step11"
   ],
   "prHourlyLimit": 60,
-  "recreateClosed": true
+  "recreateClosed": true,
+  "rangeStrategy": "lockfile-update"
 }

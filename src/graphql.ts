@@ -6,13 +6,16 @@ export enum MessageType {
   Picture = "PICTURE"
 }
 
+/** A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar. */
+export type DateTime = any;
+
 // ====================================================
 // Documents
 // ====================================================
 
 export namespace AddChat {
   export type Variables = {
-    recipientId: string;
+    userId: string;
   };
 
   export type Mutation = {
@@ -32,7 +35,7 @@ export namespace AddChat {
 
 export namespace AddGroup {
   export type Variables = {
-    recipientIds: string[];
+    userIds: string[];
     groupName: string;
   };
 
@@ -112,7 +115,7 @@ export namespace GetChats {
   export type Query = {
     __typename?: "Query";
 
-    chats: Maybe<Chats[]>;
+    chats: Chats[];
   };
 
   export type Chats = {
@@ -145,9 +148,7 @@ export namespace GetUsers {
 }
 
 export namespace MessageAdded {
-  export type Variables = {
-    chatId?: Maybe<string>;
-  };
+  export type Variables = {};
 
   export type Subscription = {
     __typename?: "Subscription";
@@ -196,7 +197,7 @@ export namespace RemoveChat {
 export namespace RemoveMessages {
   export type Variables = {
     chatId: string;
-    messageIds?: Maybe<(Maybe<string>)[]>;
+    messageIds?: Maybe<string[]>;
   };
 
   export type Mutation = {
@@ -242,7 +243,7 @@ export namespace Message {
 
     content: string;
 
-    createdAt: string;
+    createdAt: DateTime;
 
     type: number;
 
@@ -274,9 +275,9 @@ export namespace Message {
 
     chat: __Chat;
 
-    receivedAt: Maybe<string>;
+    receivedAt: Maybe<DateTime>;
 
-    readAt: Maybe<string>;
+    readAt: Maybe<DateTime>;
   };
 
   export type User = {
@@ -307,13 +308,19 @@ export namespace Message {
 }
 
 // ====================================================
+// Scalars
+// ====================================================
+
+// ====================================================
 // Types
 // ====================================================
 
 export interface Query {
+  me?: Maybe<User>;
+
   users?: Maybe<User[]>;
 
-  chats?: Maybe<Chat[]>;
+  chats: Chat[];
 
   chat?: Maybe<Chat>;
 }
@@ -331,26 +338,32 @@ export interface User {
 export interface Chat {
   /** May be a chat or a group */
   id: string;
+
+  createdAt: DateTime;
   /** Computed for chats */
   name?: Maybe<string>;
   /** Computed for chats */
   picture?: Maybe<string>;
-  /** All members, current and past ones. */
+  /** All members, current and past ones. Includes users who still didn't get the chat listed. */
   allTimeMembers: User[];
-  /** Whoever gets the chat listed. For groups includes past members who still didn't delete the group. */
+  /** Whoever gets the chat listed. For groups includes past members who still didn't delete the group. For chats they are the only ones who can send messages. */
   listingMembers: User[];
-  /** Actual members of the group (they are not the only ones who get the group listed). Null for chats. */
-  actualGroupMembers: User[];
+  /** Actual members of the group. Null for chats. For groups they are the only ones who can send messages. They aren't the only ones who get the group listed. */
+  actualGroupMembers?: Maybe<User[]>;
   /** Null for chats */
   admins?: Maybe<User[]>;
   /** If null the group is read-only. Null for chats. */
   owner?: Maybe<User>;
+  /** Computed property */
+  isGroup: boolean;
 
   messages: (Maybe<Message>)[];
   /** Computed property */
-  unreadMessages: number;
+  lastMessage?: Maybe<Message>;
   /** Computed property */
-  isGroup: boolean;
+  updatedAt: DateTime;
+  /** Computed property */
+  unreadMessages: number;
 }
 
 export interface Message {
@@ -362,15 +375,15 @@ export interface Message {
 
   content: string;
 
-  createdAt: string;
+  createdAt: DateTime;
   /** FIXME: should return MessageType */
   type: number;
-  /** Whoever received the message */
-  recipients: Recipient[];
   /** Whoever still holds a copy of the message. Cannot be null because the message gets deleted otherwise */
   holders: User[];
   /** Computed property */
   ownership: boolean;
+  /** Whoever received the message */
+  recipients: Recipient[];
 }
 
 export interface Recipient {
@@ -380,15 +393,19 @@ export interface Recipient {
 
   chat: Chat;
 
-  receivedAt?: Maybe<string>;
+  receivedAt?: Maybe<DateTime>;
 
-  readAt?: Maybe<string>;
+  readAt?: Maybe<DateTime>;
 }
 
 export interface Mutation {
+  updateUser: User;
+
   addChat?: Maybe<Chat>;
 
   addGroup?: Maybe<Chat>;
+
+  updateGroup?: Maybe<Chat>;
 
   removeChat?: Maybe<string>;
 
@@ -417,6 +434,12 @@ export interface Subscription {
   messageAdded?: Maybe<Message>;
 
   chatAdded?: Maybe<Chat>;
+
+  chatUpdated?: Maybe<Chat>;
+
+  userUpdated?: Maybe<User>;
+
+  userAdded?: Maybe<User>;
 }
 
 // ====================================================
@@ -429,13 +452,27 @@ export interface ChatQueryArgs {
 export interface MessagesChatArgs {
   amount?: Maybe<number>;
 }
+export interface UpdateUserMutationArgs {
+  name?: Maybe<string>;
+
+  picture?: Maybe<string>;
+}
 export interface AddChatMutationArgs {
-  recipientId: string;
+  userId: string;
 }
 export interface AddGroupMutationArgs {
-  recipientIds: string[];
+  userIds: string[];
 
   groupName: string;
+
+  groupPicture?: Maybe<string>;
+}
+export interface UpdateGroupMutationArgs {
+  chatId: string;
+
+  groupName?: Maybe<string>;
+
+  groupPicture?: Maybe<string>;
 }
 export interface RemoveChatMutationArgs {
   chatId: string;
@@ -559,8 +596,8 @@ export class AddChatGQL extends Apollo.Mutation<
   AddChat.Variables
 > {
   document: any = gql`
-    mutation AddChat($recipientId: ID!) {
-      addChat(recipientId: $recipientId) {
+    mutation AddChat($userId: ID!) {
+      addChat(userId: $userId) {
         ...ChatWithoutMessages
         messages {
           ...Message
@@ -580,8 +617,8 @@ export class AddGroupGQL extends Apollo.Mutation<
   AddGroup.Variables
 > {
   document: any = gql`
-    mutation AddGroup($recipientIds: [ID!]!, $groupName: String!) {
-      addGroup(recipientIds: $recipientIds, groupName: $groupName) {
+    mutation AddGroup($userIds: [ID!]!, $groupName: String!) {
+      addGroup(userIds: $userIds, groupName: $groupName) {
         ...ChatWithoutMessages
         messages {
           ...Message
@@ -695,8 +732,8 @@ export class MessageAddedGQL extends Apollo.Subscription<
   MessageAdded.Variables
 > {
   document: any = gql`
-    subscription messageAdded($chatId: ID) {
-      messageAdded(chatId: $chatId) {
+    subscription messageAdded {
+      messageAdded {
         ...Message
         chat {
           id
@@ -741,7 +778,7 @@ export class RemoveMessagesGQL extends Apollo.Mutation<
   RemoveMessages.Variables
 > {
   document: any = gql`
-    mutation RemoveMessages($chatId: ID!, $messageIds: [ID]) {
+    mutation RemoveMessages($chatId: ID!, $messageIds: [ID!]) {
       removeMessages(chatId: $chatId, messageIds: $messageIds)
     }
   `;

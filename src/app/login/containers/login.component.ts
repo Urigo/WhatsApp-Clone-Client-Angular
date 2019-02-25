@@ -105,7 +105,7 @@ export class LoginComponent {
   signIn() {
     const {username, password} = this.signInForm.value;
     const auth = `Basic ${btoa(`${username}:${password}`)}`;
-    this.http.post('http://localhost:3000/signin', null, {
+    this.http.post('http://localhost:4000/signin', null, {
       headers: {
         Authorization: auth,
       }
@@ -119,7 +119,7 @@ export class LoginComponent {
   signUp() {
     const {username, newPassword: password, name} = this.signUpForm.value;
     const auth = this.loginService.createBase64Auth(username, password);
-    this.http.post('http://localhost:3000/signup', {
+    this.http.post('http://localhost:4000/signup', {
       name,
       username,
       password,
