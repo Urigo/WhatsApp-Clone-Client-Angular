@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ChatsService} from '../../../services/chats.service';
 import {Observable} from 'rxjs';
-import {GetChats} from '../../../../types';
+import {GetChats} from '../../../../graphql';
 import {Router} from '@angular/router';
 
 @Component({

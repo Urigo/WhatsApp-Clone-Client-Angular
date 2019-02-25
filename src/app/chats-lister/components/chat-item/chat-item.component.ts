@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {GetChats} from '../../../../types';
+import {GetChats} from '../../../../graphql';
 
 @Component({
   selector: 'app-chat-item',

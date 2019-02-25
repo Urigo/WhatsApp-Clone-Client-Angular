@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {User} from '../../../types';
+import {User} from '../../../graphql';
 
 @Injectable()
 export class LoginService {

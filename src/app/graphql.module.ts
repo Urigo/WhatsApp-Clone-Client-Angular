@@ -1,4 +1,4 @@
-import { NgModule} from '@angular/core';
+import { NgModule } from '@angular/core';
 import { ApolloModule, APOLLO_OPTIONS } from 'apollo-angular';
 import { HttpLinkModule, HttpLink } from 'apollo-angular-link-http';
 import { InMemoryCache, defaultDataIdFromObject } from 'apollo-cache-inmemory';
@@ -9,6 +9,15 @@ import {WebSocketLink} from 'apollo-link-ws';
 import {LoginService} from './login/services/login.service';
 
 const uri = 'http://localhost:3000/graphql';
+
+export const dataIdFromObject = (object: any) => {
+  switch (object.__typename) {
+    case 'Message':
+      return `${object.chat.id}:${object.id}`; // use `chatId` prefix and `messageId` as the primary key
+    default:
+      return defaultDataIdFromObject(object); // fall back to default handling
+  }
+};
 
 export function createApollo(httpLink: HttpLink, loginService: LoginService) {
   const subscriptionLink = new WebSocketLink({
@@ -33,12 +42,7 @@ export function createApollo(httpLink: HttpLink, loginService: LoginService) {
   return {
     link,
     cache: new InMemoryCache({
-      dataIdFromObject: (object: any) => {
-        switch (object.__typename) {
-          case 'Message': return `${object.chat.id}:${object.id}`; // use `chatId` prefix and `messageId` as the primary key
-          default: return defaultDataIdFromObject(object); // fall back to default handling
-        }
-      }
+      dataIdFromObject,
     }),
   };
 }

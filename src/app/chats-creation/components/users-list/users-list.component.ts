@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {GetUsers} from '../../../../types';
+import {GetUsers} from '../../../../graphql';
 import {SelectableListDirective} from 'ngx-selectable-list';
 
 @Component({

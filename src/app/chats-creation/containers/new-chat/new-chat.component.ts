@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Location} from '@angular/common';
 import {Router} from '@angular/router';
-import {AddChat, GetUsers} from '../../../../types';
+import {AddChat, GetUsers} from '../../../../graphql';
 import {ChatsService} from '../../../services/chats.service';
 
 @Component({

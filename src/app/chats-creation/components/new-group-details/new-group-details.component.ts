@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {GetUsers} from '../../../../types';
+import {GetUsers} from '../../../../graphql';
 
 @Component({
   selector: 'app-new-group-details',

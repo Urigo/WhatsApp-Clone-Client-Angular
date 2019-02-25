@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {GetChat} from '../../../../types';
+import {GetChat} from '../../../../graphql';
 import {SelectableListDirective} from 'ngx-selectable-list';
 
 @Component({

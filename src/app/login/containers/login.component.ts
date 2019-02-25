@@ -3,7 +3,7 @@ import {HttpClient} from '@angular/common/http';
 import {FormBuilder, Validators} from '@angular/forms';
 // import {matchOtherValidator} from '@moebius/ng-validators';
 import {Router} from '@angular/router';
-import {User} from '../../../types';
+import {User} from '../../../graphql';
 import {LoginService} from '../services/login.service';
 
 @Component({

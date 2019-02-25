@@ -1,18 +1,23 @@
 import { TestBed, inject } from '@angular/core/testing';
 
+import { Apollo } from 'apollo-angular';
+import {
+  ApolloTestingModule,
+  ApolloTestingController,
+  APOLLO_TESTING_CACHE,
+} from 'apollo-angular/testing';
+import { InMemoryCache } from 'apollo-cache-inmemory';
+
+import { GetChats } from '../../graphql';
+import { dataIdFromObject } from '../graphql.module';
 import { ChatsService } from './chats.service';
-import {Apollo} from 'apollo-angular';
-import {HttpLink, HttpLinkModule, Options} from 'apollo-angular-link-http';
-import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
-import {defaultDataIdFromObject, InMemoryCache} from 'apollo-cache-inmemory';
-import {LoginService} from '../login/services/login.service';
+import { LoginService } from '../login/services/login.service';
 
 describe('ChatsService', () => {
-  let httpMock: HttpTestingController;
-  let httpLink: HttpLink;
+  let controller: ApolloTestingController;
   let apollo: Apollo;
 
-  const chats: any = [
+  const chats: GetChats.Chats[] = [
     {
       id: '1',
       __typename: 'Chat',
@@ -26,7 +31,7 @@ describe('ChatsService', () => {
         {
           id: '3',
           __typename: 'User',
-        }
+        },
       ],
       unreadMessages: 1,
       isGroup: false,
@@ -41,7 +46,7 @@ describe('ChatsService', () => {
           sender: {
             id: '3',
             __typename: 'User',
-            name: 'Avery Stewart'
+            name: 'Avery Stewart',
           },
           content: 'Yep!',
           createdAt: '1514035700',
@@ -67,10 +72,10 @@ describe('ChatsService', () => {
               },
               receivedAt: null,
               readAt: null,
-            }
+            },
           ],
           ownership: false,
-        }
+        },
       ],
     },
     {
@@ -86,7 +91,7 @@ describe('ChatsService', () => {
         {
           id: '4',
           __typename: 'User',
-        }
+        },
       ],
       unreadMessages: 0,
       isGroup: false,
@@ -101,9 +106,9 @@ describe('ChatsService', () => {
           sender: {
             id: '1',
             __typename: 'User',
-            name: 'Ethan Gonzalez'
+            name: 'Ethan Gonzalez',
           },
-          content: 'Hey, it\'s me',
+          content: `Hey, it's me`,
           createdAt: '1514031800',
           type: 0,
           recipients: [
@@ -127,10 +132,10 @@ describe('ChatsService', () => {
               },
               receivedAt: null,
               readAt: null,
-            }
+            },
           ],
-          ownership: true
-        }
+          ownership: true,
+        },
       ],
     },
     {
@@ -146,7 +151,7 @@ describe('ChatsService', () => {
         {
           id: '5',
           __typename: 'User',
-        }
+        },
       ],
       unreadMessages: 0,
       isGroup: false,
@@ -161,7 +166,7 @@ describe('ChatsService', () => {
           sender: {
             id: '1',
             __typename: 'User',
-            name: 'Ethan Gonzalez'
+            name: 'Ethan Gonzalez',
           },
           content: 'You still there?',
           createdAt: '1514010200',
@@ -186,11 +191,11 @@ describe('ChatsService', () => {
                 __typename: 'Chat',
               },
               receivedAt: null,
-              readAt: null
-            }
+              readAt: null,
+            },
           ],
-          ownership: true
-        }
+          ownership: true,
+        },
       ],
     },
     {
@@ -206,11 +211,11 @@ describe('ChatsService', () => {
         {
           id: '6',
           __typename: 'User',
-        }
+        },
       ],
       unreadMessages: 0,
       messages: [],
-      isGroup: false
+      isGroup: false,
     },
     {
       id: '8',
@@ -248,7 +253,7 @@ describe('ChatsService', () => {
           sender: {
             id: '4',
             __typename: 'User',
-            name: 'Katie Peterson'
+            name: 'Katie Peterson',
           },
           content: 'Awesome!',
           createdAt: '1512830000',
@@ -273,7 +278,7 @@ describe('ChatsService', () => {
                 __typename: 'Chat',
               },
               receivedAt: null,
-              readAt: null
+              readAt: null,
             },
             {
               user: {
@@ -294,44 +299,34 @@ describe('ChatsService', () => {
                 __typename: 'Chat',
               },
               receivedAt: null,
-              readAt: null
-            }
+              readAt: null,
+            },
           ],
-          ownership: false
-        }
+          ownership: false,
+        },
       ],
     },
   ];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpLinkModule,
-        // HttpClientModule,
-        HttpClientTestingModule,
-      ],
+      imports: [ApolloTestingModule],
       providers: [
         ChatsService,
-        Apollo,
         LoginService,
-      ]
+        {
+          provide: APOLLO_TESTING_CACHE,
+          useFactory() {
+            return new InMemoryCache({
+              dataIdFromObject,
+            });
+          },
+        },
+      ],
     });
 
-    httpMock = TestBed.get(HttpTestingController);
-    httpLink = TestBed.get(HttpLink);
+    controller = TestBed.get(ApolloTestingController);
     apollo = TestBed.get(Apollo);
-
-    apollo.create({
-      link: httpLink.create(<Options>{ uri: 'http://localhost:3000/graphql' }),
-      cache: new InMemoryCache({
-        dataIdFromObject: (object: any) => {
-          switch (object.__typename) {
-            case 'Message': return `${object.chat.id}:${object.id}`; // use `chatId` prefix and `messageId` as the primary key
-            default: return defaultDataIdFromObject(object); // fall back to default handling
-          }
-        }
-      }),
-    });
   });
 
   it('should be created', inject([ChatsService], (service: ChatsService) => {
@@ -346,15 +341,17 @@ describe('ChatsService', () => {
       }
     });
 
-    httpMock.expectOne(httpReq => httpReq.body.operationName === 'chatAdded', 'call to chatAdded api');
-    httpMock.expectOne(httpReq => httpReq.body.operationName === 'messageAdded', 'call to messageAdded api');
-    const req = httpMock.expectOne(httpReq => httpReq.body.operationName === 'GetChats', 'call to getChats api');
-    expect(req.request.method).toBe('POST');
+    controller.expectOne('chatAdded', 'call to chatAdded api');
+    controller.expectOne('messageAdded', 'call to messageAdded api');
+
+    const req = controller.expectOne('GetChats', 'GetChats operation');
+
     req.flush({
       data: {
-        chats
-      }
+        chats,
+      },
     });
-    httpMock.verify();
+
+    controller.verify();
   }));
 });

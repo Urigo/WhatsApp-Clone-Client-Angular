@@ -1,5 +1,5 @@
 import {Component, Input} from '@angular/core';
-import {GetUsers} from '../../../../types';
+import {GetUsers} from '../../../../graphql';
 
 @Component({
   selector: 'app-user-item',

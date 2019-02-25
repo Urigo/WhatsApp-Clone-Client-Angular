@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {ChatsService} from '../../../services/chats.service';
-import {GetChat} from '../../../../types';
+import {GetChat} from '../../../../graphql';
 import {combineLatest} from 'rxjs';
 import {Location} from '@angular/common';
 import {QueryRef} from 'apollo-angular';
@@ -75,7 +75,7 @@ export class ChatComponent implements OnInit {
   }
 
   addMessage(content: string) {
-    // this.chatsService.addMessage(this.chatId, content).subscribe();
+    this.chatsService.addMessage(this.chatId, content).subscribe();
     this.chatsService.moreMessages(this.query, this.chatId);
   }
 
