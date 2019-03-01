@@ -645,6 +645,14 @@ agentkeepalive@^3.4.1:
   dependencies:
     humanize-ms "^1.2.1"
 
+aggregate-error@2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/aggregate-error/-/aggregate-error-2.1.0.tgz#051a9a733ad2e95ab503d84fb81989e6419b8f09"
+  integrity sha512-rIZJqC4XACGWwmPpi18IhDjIzXTJ93KQwYHXuyMCa0Ak9mtzLIbykuei+0i5EnGDy6ts8JVnSyRnZc2cVIMvVg==
+  dependencies:
+    clean-stack "^2.0.0"
+    indent-string "^3.0.0"
+
 ajv-errors@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/ajv-errors/-/ajv-errors-1.0.1.tgz#f35986aceb91afadec4102fbd85014950cefa64d"
@@ -1652,6 +1660,11 @@ clean-css@4.2.1:
   dependencies:
     source-map "~0.6.0"
 
+clean-stack@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/clean-stack/-/clean-stack-2.0.0.tgz#301bfa9e8dd2d3d984c0e542f7aa67b996f63e0a"
+  integrity sha512-VEoL9Qh7I8s8iHnV53DaeWSt8NJ0g3khMfK6NiCPB7H657juhro+cSw2O88uo3bo0c0X5usamtXk0/Of0wXa5A==
+
 cli-cursor@^2.0.0, cli-cursor@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/cli-cursor/-/cli-cursor-2.1.0.tgz#b35dac376479facc3e94747d41d0d0f5238ffcb5"
@@ -2219,6 +2232,11 @@ deepmerge@3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/deepmerge/-/deepmerge-3.1.0.tgz#a612626ce4803da410d77554bfd80361599c034d"
   integrity sha512-/TnecbwXEdycfbsM2++O3eGiatEFHjjNciHEwJclM+T5Kd94qD1AP+2elP/Mq0L5b9VZJao5znR01Mz6eX8Seg==
+
+deepmerge@3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/deepmerge/-/deepmerge-3.2.0.tgz#58ef463a57c08d376547f8869fdc5bcee957f44e"
+  integrity sha512-6+LuZGU7QCNUnAJyX8cIrlzoEgggTM6B7mm+znKOX4t5ltluT9KLjN6g61ECMS0LTsLW7yDpNoxhix5FZcrIow==
 
 default-gateway@^2.6.0:
   version "2.7.2"
@@ -3309,6 +3327,20 @@ graphql-codegen-core@0.17.0:
     ts-log "2.1.4"
     winston "3.2.1"
 
+graphql-codegen-core@0.18.0:
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/graphql-codegen-core/-/graphql-codegen-core-0.18.0.tgz#4ddeae8b0ee06041d255b5f6e55e6f48ca9ca316"
+  integrity sha512-XzFJoPtsIT8ww6FzFODUlD4h8ycyIKRGIhA86KY738vDcQogMr3Ejh0ntHZq6Y/zLtEiaieXSlXb7OymVN3vbA==
+  dependencies:
+    chalk "2.4.2"
+    change-case "3.1.0"
+    common-tags "1.8.0"
+    graphql-tag "2.10.1"
+    graphql-toolkit "0.2.0"
+    graphql-tools "4.0.4"
+    ts-log "2.1.4"
+    winston "3.2.1"
+
 graphql-codegen-plugin-helpers@0.17.0:
   version "0.17.0"
   resolved "https://registry.yarnpkg.com/graphql-codegen-plugin-helpers/-/graphql-codegen-plugin-helpers-0.17.0.tgz#f65edde8a0810c457a85171d2e8bd0d29c8c7ac3"
@@ -3317,14 +3349,22 @@ graphql-codegen-plugin-helpers@0.17.0:
     graphql-codegen-core "0.17.0"
     import-from "2.1.0"
 
-graphql-codegen-typescript-apollo-angular@^0.17.0:
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/graphql-codegen-typescript-apollo-angular/-/graphql-codegen-typescript-apollo-angular-0.17.0.tgz#c3a9825b66dba99f8a1259bd986c49d88b5f524f"
-  integrity sha512-e5zddWaEUxSJGJ0cByhwctLhRJ7N0c6lu/TqhmJeotXsrfNBLPGYuAaPm/K9SfyODCMjAUQSp7IiHra2biZPvw==
+graphql-codegen-plugin-helpers@0.18.0:
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/graphql-codegen-plugin-helpers/-/graphql-codegen-plugin-helpers-0.18.0.tgz#2502c35e6ae790d761be2126e8743fc1a7310f6f"
+  integrity sha512-Ac9XobEIgBzjsxPBtoAeMG4d9xoFtVCIsUIQr8aY3HFU9h1F5UwlOC6a0yHcUq0n8VtB/6Yu7TNveAuv0oHPSg==
+  dependencies:
+    graphql-codegen-core "0.18.0"
+    import-from "2.1.0"
+
+graphql-codegen-typescript-apollo-angular@^0.18.0:
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/graphql-codegen-typescript-apollo-angular/-/graphql-codegen-typescript-apollo-angular-0.18.0.tgz#0645f1043180bd0b75c2d3bc89608e3f13fcd506"
+  integrity sha512-liGPo9wNXXY4Z3Ev6W45Ae0/y0x2mqGK27Ajv+lVN6Q3flxTBhdXVVeh0MQGG2jzAB8N1DvDd17P8pm/xWFiIQ==
   dependencies:
     dependency-graph "0.8.0"
-    graphql-codegen-plugin-helpers "0.17.0"
-    graphql-codegen-typescript-common "0.17.0"
+    graphql-codegen-plugin-helpers "0.18.0"
+    graphql-codegen-typescript-common "0.18.0"
 
 graphql-codegen-typescript-client@^0.17.0:
   version "0.17.0"
@@ -3344,6 +3384,16 @@ graphql-codegen-typescript-common@0.17.0, graphql-codegen-typescript-common@^0.1
     common-tags "1.8.0"
     graphql-codegen-core "0.17.0"
     graphql-codegen-plugin-helpers "0.17.0"
+
+graphql-codegen-typescript-common@0.18.0:
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/graphql-codegen-typescript-common/-/graphql-codegen-typescript-common-0.18.0.tgz#f0b7121e6d7acdf4568630cefc4ddd413621405e"
+  integrity sha512-eyS3CSilqiK+JPQ7qPtTGFbOBaTuBaPJL1bd3VvzXx03j0nR/6bgNsGKlTyUTDyZ90el++IhFfGGja8cBUjt9g==
+  dependencies:
+    change-case "3.1.0"
+    common-tags "1.8.0"
+    graphql-codegen-core "0.18.0"
+    graphql-codegen-plugin-helpers "0.18.0"
 
 graphql-codegen-typescript-server@^0.17.0:
   version "0.17.0"
@@ -3389,6 +3439,17 @@ graphql-tag-pluck@0.5.0:
     source-map-support "^0.5.9"
     typescript "^3.2.2"
 
+graphql-tag-pluck@0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/graphql-tag-pluck/-/graphql-tag-pluck-0.6.0.tgz#d03ab981cd8d31e564d37f8b9bac94a523dc29dd"
+  integrity sha512-C1SRw5zZtl7CN7mv6Q0abFVSJwG8M+FniFCPqWD+AjQMj9igNPthraMUQ02KSo+j19khR60mksqmFN3BwboFaw==
+  dependencies:
+    "@babel/parser" "^7.2.0"
+    "@babel/traverse" "^7.1.6"
+    "@babel/types" "^7.2.0"
+    source-map-support "^0.5.9"
+    typescript "^3.2.2"
+
 graphql-tag@2.10.1, graphql-tag@^2.10.1:
   version "2.10.1"
   resolved "https://registry.yarnpkg.com/graphql-tag/-/graphql-tag-2.10.1.tgz#10aa41f1cd8fae5373eaf11f1f67260a3cad5e02"
@@ -3407,6 +3468,23 @@ graphql-toolkit@0.0.5:
     is-valid-path "0.1.1"
     lodash "4.17.11"
     request "2.88.0"
+    valid-url "1.0.9"
+
+graphql-toolkit@0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/graphql-toolkit/-/graphql-toolkit-0.2.0.tgz#91364b69911d51bc915269a37963f4ea2d5f335c"
+  integrity sha512-dMwb+V2u6vwJF70tWuqSxgNal9fK1xcB8JtmCJUStVUh+PjfNrlKH1X5e17vJlN+lRPz1hatr8jH+Q6lTW0jLw==
+  dependencies:
+    aggregate-error "2.1.0"
+    deepmerge "3.2.0"
+    glob "7.1.3"
+    graphql-import "0.7.1"
+    graphql-tag-pluck "0.6.0"
+    is-glob "4.0.0"
+    is-valid-path "0.1.1"
+    lodash "4.17.11"
+    request "2.88.0"
+    tslib "^1.9.3"
     valid-url "1.0.9"
 
 graphql-tools@4.0.4:
