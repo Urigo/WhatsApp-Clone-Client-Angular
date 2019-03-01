@@ -57,7 +57,7 @@
     "codelyzer": "~4.5.0",
     "graphql-code-generator": "^0.18.0",
     "graphql-codegen-typescript-apollo-angular": "^0.18.0",
-    "graphql-codegen-typescript-client": "^0.17.0",
+    "graphql-codegen-typescript-client": "^0.18.0",
     "graphql-codegen-typescript-common": "^0.17.0",
     "graphql-codegen-typescript-server": "^0.17.0",
     "jasmine-core": "~2.99.1",
